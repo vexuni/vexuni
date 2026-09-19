@@ -110,12 +110,22 @@ jobs:
             exit 0
           fi
           attach() {
-            curl -sf -X PUT "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" \
+            code=$(curl -s -o /tmp/dom.json -w "%{http_code}" -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" \
               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
-              -d "{\"environment\":\"production\",\"hostname\":\"$1\",\"service\":\"$2\",\"zone_id\":\"$ZONE_ID\"}" \
-              | jq -r '"\(.success // false) \(.result.hostname // .errors[0].message // "unknown")"' \
-              || echo "WARN: attach $1 -> $2 failed"
+              -d "{\"environment\":\"production\",\"hostname\":\"$1\",\"service\":\"$2\",\"zone_id\":\"$ZONE_ID\"}")
+            echo "$1 -> HTTP $code $(head -c 300 /tmp/dom.json)"
           }
           attach vexuni.site vexuni
           attach www.vexuni.site vexuni
           attach apps.vexuni.site vexuni-apps
+
+      - name: Smoke test
+        run: |
+          sleep 15
+          for url in "https://vexuni.site" "https://www.vexuni.site" "https://apps.vexuni.site" "https://vexuni.mzhub.workers.dev"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url/" || echo 000)
+            echo "$url -> $code"
+          done
+          echo "--- /api/bootstrap"
+          curl -s --max-time 20 "https://vexuni.site/api/bootstrap" | head -c 400 || true
