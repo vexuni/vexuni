@@ -121,10 +121,13 @@ jobs:
             if [ "$code" = "409" ]; then
               echo "$1: clearing externally-managed DNS records"
               ZAPI="https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records"
-              curl -s -H "$AUTH" "$ZAPI?name.exact=$1&per_page=100" \
-                | jq -r '.result[] | "\(.type) \(.name) -> \(.content)"' || true
-              for rid in $(curl -s -H "$AUTH" "$ZAPI?name.exact=$1&per_page=100" \
-                | jq -r '.result[] | select(.type != "NS" and .type != "SOA" and .type != "DS" and .type != "DNSKEY") | .id'); do
+              LIST=$(curl -s -H "$AUTH" "$ZAPI?name.exact=$1&per_page=100")
+              if [ "$(echo "$LIST" | jq -r '.result == null')" = "true" ]; then
+                LIST=$(curl -s -H "$AUTH" "$ZAPI?name=$1&per_page=100")
+              fi
+              echo "$LIST" | jq -r '.result[]? | "\(.type) \(.name) -> \(.content)"'
+              echo "$LIST" | jq -r 'if .result == null then .errors[0].message else empty end'
+              for rid in $(echo "$LIST" | jq -r '.result[]? | select(.name == "'"$1"'" and .type != "NS" and .type != "SOA" and .type != "DS" and .type != "DNSKEY") | .id'); do
                 curl -s -X DELETE -H "$AUTH" "$ZAPI/$rid" | jq -r '"deleted: \(.success)"'
               done
               code=$(try_attach "$1" "$2")
