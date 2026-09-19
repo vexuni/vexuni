@@ -18,7 +18,7 @@ blob/tree ID 与原生 Git 一致；OFS/REF/前向 delta、外部 thin-pack 基�
 
 ## 云端与边界
 
-历史部署为 git.1s.hk 和 onestorage.xbitfun.workers.dev，使用真实 D1/R2/SQLite DO/Queues，三项迁移已应用，没有容器绑定；当时根域名仍为 Cubelink。独立非管理员临时用户验证 HTTPS/私有鉴权、空克隆、分块与增量/标签推送、v0/v2 克隆、SHA/二进制/fsck、竞争 CAS 恰好一成功一409、LFS 字节和公开匿名克隆。
+历史部署为 git.example.com 和 vexuni.example.workers.dev，使用真实 D1/R2/SQLite DO/Queues，三项迁移已应用，没有容器绑定；当时根域名仍为 旧站。独立非管理员临时用户验证 HTTPS/私有鉴权、空克隆、分块与增量/标签推送、v0/v2 克隆、SHA/二进制/fsck、竞争 CAS 恰好一成功一409、LFS 字节和公开匿名克隆。
 
 验收撤销凭据、删除临时账号和 D1 项目；当时尚无 GC，少量不可达 R2 对象与 DO refs 留存。初始化密钥仅存 Worker secret 和本地0600文件，管理员尚由操作者认领，这是历史状态。公共 DNS 已解析但本地仍 NXDOMAIN 时，使用公网 IP 和真实主机名且保持 TLS 验证，未改 DNS 或关闭证书验证。
 

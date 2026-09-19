@@ -346,7 +346,7 @@ assert.equal(
       clientInfo: { name: "test", version: "1" },
     })
   ).result.serverInfo.name,
-  "OneStorage",
+  "vexuni",
 );
 assert.ok(
   (await mcp("tools/list", {})).result.tools.some(

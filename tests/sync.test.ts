@@ -42,7 +42,7 @@ const git = (cwd: string, args: string[], input?: Uint8Array) => {
   return p.stdout;
 };
 test("pure JS Git HTTP client fetches and atomically pushes against native Git http-backend", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "onestorage-sync-"));
+  const dir = await mkdtemp(join(tmpdir(), "vexuni-sync-"));
   try {
     git(dir, ["init", "-b", "main", "work"]);
     const work = join(dir, "work");

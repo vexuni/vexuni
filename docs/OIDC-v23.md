@@ -4,11 +4,11 @@
 
 # v0.23 统一登录
 
-OneStorage 在 Workers 中实现 OIDC Authorization Code + PKCE S256，通过 Web Crypto/Jose 验证 ID Token。D1 保存身份映射、版本化配置与一次性登录状态，提供方密钥和短期流程数据用既有 `CREDENTIAL_ENCRYPTION_KEY` 加密。无需容器、独立认证服务器或外部数据库。
+vexuni 在 Workers 中实现 OIDC Authorization Code + PKCE S256，通过 Web Crypto/Jose 验证 ID Token。D1 保存身份映射、版本化配置与一次性登录状态，提供方密钥和短期流程数据用既有 `CREDENTIAL_ENCRYPTION_KEY` 加密。无需容器、独立认证服务器或外部数据库。
 
 ## 管理与使用
 
-1. 管理员打开 `/admin/identity`，在自己的身份服务中注册 Web 应用。当前实例回调地址为 `https://1s.hk/api/auth/oidc/callback`，必须精确登记。
+1. 管理员打开 `/admin/identity`，在自己的身份服务中注册 Web 应用。当前实例回调地址为 `https://example.com/api/auth/oidc/callback`，必须精确登记。
 2. 填写名称、准确的 issuer、client ID、client secret、客户端认证方式及获准端点主机。支持 `client_secret_basic`、`client_secret_post`、`none`。主机列表须覆盖 discovery、authorization、token 与 JWKS 的实际域名；不使用通配符。
 3. 保存时读取 discovery 并验证 issuer、code 流、端点与认证方式。启用后登录页出现按钮。默认不开放创建账户；需要时显式开启该提供方的注册，可限制已验证邮箱的准确域名。
 4. 已有用户先按原方式登录，在 `/settings/account` 输入当前密码和已启用的双因素验证码，再关联身份。匹配依据是提供方 ID 与 `sub`，不会按邮箱、显示名或用户名自动合并账户。
@@ -37,6 +37,6 @@ OIDC 的撤销不会删除独立本地登录产生的凭据、仓库委托签名
 
 应用 `0018_oidc.sql` 后发布主 Worker。新增表与字段；现有用户默认 `has_password=1`，现有凭据提供方字段为空。不改变 Git 对象、R2 布局、DO 类、应用网关或编译 Worker。保留原有加密密钥。升级前导出 D1 并在隔离 SQLite 副本验证迁移和约束；D1 导出不等于 R2/DO 全站备份。
 
-`npm run check` 包含 OIDC 密码学和 D1 事务单元测试。`npm run test:oidc` 使用 Playwright 和独立受密码保护的 Cloudflare 身份测试 Worker，覆盖管理界面、真实跨域回调、账户关联、MFA、撤销 PAT、普通账户注册和本地密码设置。测试程序在结束时解绑身份、删除测试提供方并停用临时账户。生产运行必须显式设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `ONESTORAGE_TOKEN_FILE`。
+`npm run check` 包含 OIDC 密码学和 D1 事务单元测试。`npm run test:oidc` 使用 Playwright 和独立受密码保护的 Cloudflare 身份测试 Worker，覆盖管理界面、真实跨域回调、账户关联、MFA、撤销 PAT、普通账户注册和本地密码设置。测试程序在结束时解绑身份、删除测试提供方并停用临时账户。生产运行必须显式设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `VEXUNI_TOKEN_FILE`。
 
 可重建的测试提供方源码位于 `scripts/support/oidc-provider.ts`。它仅用于验收，部署时必须使用独立 Worker 和随机客户端密钥、测试密码及 ES256 密钥；配置和密钥文件放在忽略目录且权限为 0600。测试后删除该 Worker 及本地密钥。实际商业提供方需要实例管理员配置自己的客户端凭据，受控提供方通过不代表已验证 Google/Microsoft 的真实账户。

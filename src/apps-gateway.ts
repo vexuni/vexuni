@@ -99,7 +99,7 @@ export default {
         "content-security-policy",
         "sandbox allow-scripts allow-forms; frame-ancestors 'none'",
       );
-      out.headers.set("x-onestorage-deployment", row.id);
+      out.headers.set("x-vexuni-deployment", row.id);
       return out;
     } catch {
       return new Response("Application execution failed", { status: 502 });

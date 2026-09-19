@@ -2,11 +2,11 @@
 
 [简体中文](../CLOUD-NATIVE-v05.md) · **English**
 
-OneStorage pursues practical GitLab/Gogs workflows using Workers, JavaScript/WASM, R2, and Durable Objects without containers. This guide records the initial cloud execution/collaboration release; [roadmap](ROADMAP.md) and [limits](LIMITS.md) describe subsequent progress and remaining boundaries.
+vexuni pursues practical GitLab/Gogs workflows using Workers, JavaScript/WASM, R2, and Durable Objects without containers. This guide records the initial cloud execution/collaboration release; [roadmap](ROADMAP.md) and [limits](LIMITS.md) describe subsequent progress and remaining boundaries.
 
 Git HTTP v0/v2, objects/packs/deltas, merges, and CAS refs run in JavaScript with one repository DO; bytes live in R2. D1 holds users/spaces/permissions/issues/MRs/reviews/wiki/runs. Durable events flow through Queues into Workers/Dynamic Workers; Cron recovers undelivered jobs and expired leases. Isolated JS/WASM has no main bindings/credentials and `globalOutbound: null`, with default one-second/max-ten-second step CPU.
 
-Artifacts/application versions are immutable R2 objects; D1 atomically publishes their index/version/success. Invalid leases cannot publish. A separate `onestorage-apps` gateway serves explicitly public active versions on a separate origin, strips credentials/Set-Cookie, and applies CSP sandbox. User applications never execute on the Git login origin.
+Artifacts/application versions are immutable R2 objects; D1 atomically publishes their index/version/success. Invalid leases cannot publish. A separate `vexuni-apps` gateway serves explicitly public active versions on a separate origin, strips credentials/Set-Cookie, and applies CSP sandbox. User applications never execute on the Git login origin.
 
 ## Native CI and application release
 
@@ -21,7 +21,7 @@ export default async ({ sha, ref }) => {
   return { logs: ["Test passed: " + sha], artifacts: { "report.json": JSON.stringify({sha,ref,passed:true}) } };
 };
 // index.js
-export default { fetch() { return new Response("Hello from OneStorage"); } };
+export default { fetch() { return new Response("Hello from vexuni"); } };
 ```
 
 ```json
@@ -50,7 +50,7 @@ Push or run manually, then activate a successful version in Applications. Select
 
 Explicit fixed-commit files support JS ESM, WASM imports/instantiation, and text modules. Binary commit API input uses `{path,data:BASE64}`. Returned artifacts are filename/text mappings, available to later steps; same-name artifacts override source in deploy files. Use static kind/index.html for generated sites. Native npm compilation is a later [build step](CI-BUILDS-v22.md).
 
-Historical JS budgets: 32 files, 1 MiB/file, 4 MiB source/deployment; ten artifacts/2 MiB total; relative safe paths with reserved `__onestorage`; 20 seconds/isolated request, 110 seconds/ten steps per Worker job. Platform limits also apply. Explicit retries avoid duplicate deployments. Trusted external runners remain an optional general-OS path.
+Historical JS budgets: 32 files, 1 MiB/file, 4 MiB source/deployment; ten artifacts/2 MiB total; relative safe paths with reserved `__vexuni`; 20 seconds/isolated request, 110 seconds/ten steps per Worker job. Platform limits also apply. Explicit retries avoid duplicate deployments. Trusted external runners remain an optional general-OS path.
 
 ## Reviews and collaboration
 

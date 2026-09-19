@@ -16,7 +16,7 @@ R2 返回明确的服务错误码 10001、10043、10054 或 10058 时，每次�
 
 ## 诊断与排查
 
-未预期的 Git 后端错误生成独立 incident ID。HTTP 提交接口返回 `incident_id` 和 `X-OneStorage-Incident`；原生 Git 的 report-status 拒绝信息包含同一个日志关联 ID。日志标识 metadata、object-read、object-write、object-verify、object-index 或 ref-publish 阶段，以及可识别的 R2 代码、D1 标记、平台 retryable/overloaded 标记和编译位置。
+未预期的 Git 后端错误生成独立 incident ID。HTTP 提交接口返回 `incident_id` 和 `X-vexuni-Incident`；原生 Git 的 report-status 拒绝信息包含同一个日志关联 ID。日志标识 metadata、object-read、object-write、object-verify、object-index 或 ref-publish 阶段，以及可识别的 R2 代码、D1 标记、平台 retryable/overloaded 标记和编译位置。
 
 诊断不会输出原始异常消息、SQL、请求头、凭据、源码、仓库文件路径或完整堆栈。即使暂态重试随后成功，仍记录仓库 ID、阶段、错误码及重试次数；次数也加入已有 Git 传输指标。阶段名称只说明在哪一层观察到异常；没有对应提供方错误码或其他证据时，不能据此认定具体根因。
 

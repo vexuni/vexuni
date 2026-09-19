@@ -10,7 +10,7 @@ const read = async (f) =>
 const write = async (f, data) =>
   fs.writeFile(path.join(target, f), JSON.stringify(data, null, 2) + "\n");
 const main = await read("wrangler.jsonc");
-main.name = "onestorage";
+main.name = "vexuni";
 delete main.routes;
 delete main.account_id;
 delete main.services;
@@ -20,24 +20,24 @@ delete main.vars;
 main.d1_databases = [
   {
     binding: "DB",
-    database_name: "onestorage",
+    database_name: "vexuni",
     database_id: "00000000-0000-0000-0000-000000000000",
     migrations_dir: "migrations",
   },
 ];
 main.r2_buckets = [
-  { binding: "OBJECTS", bucket_name: "onestorage-objects" },
-  { binding: "NPM_CACHE", bucket_name: "onestorage-npm-cache" },
+  { binding: "OBJECTS", bucket_name: "vexuni-objects" },
+  { binding: "NPM_CACHE", bucket_name: "vexuni-npm-cache" },
 ];
 main.secrets = { required: ["CREDENTIAL_ENCRYPTION_KEY"] };
 await write("wrangler.jsonc", main);
 const compiler = await read("wrangler.build.jsonc");
-compiler.name = "onestorage-build";
+compiler.name = "vexuni-build";
 delete compiler.account_id;
 delete compiler.routes;
 await write("wrangler.build.jsonc", compiler);
 const apps = await read("wrangler.apps.jsonc");
-apps.name = "onestorage-apps";
+apps.name = "vexuni-apps";
 delete apps.account_id;
 delete apps.routes;
 apps.d1_databases = main.d1_databases;

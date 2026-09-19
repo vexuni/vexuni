@@ -8,6 +8,6 @@ On 2026-09-08, type checking/125 tests passed. Tests covered archive transaction
 
 Local archive acceptance passed 63 HTTP/native-Git checks including clone/fetch/fsck, push rejection/restoration, LFS read/upload gates, runner invalidation, owner/read-only restrictions, issue/wiki barriers, and cleanup. Collaboration/cloud CI passed 81 and issue workflows 62. Production archive passed 61 and collaboration/isolated JS/WASM/application rollback 78. All generated projects/apps/spaces were cleaned and accounts disabled/revoked.
 
-The preceding v0.9 release's 13 assets/archive, JavaScript MIME, mirror/fsck, and bc9e160 were reconfirmed. v0.10 release checks likewise matched 13 resources/archive/MIME/version caching and health 0.10.0; Cubelink remained then. verify:release is the reproducible check. The locked Mac still prevented actual browser interaction acceptance at this historical release.
+The preceding v0.9 release's 13 assets/archive, JavaScript MIME, mirror/fsck, and bc9e160 were reconfirmed. v0.10 release checks likewise matched 13 resources/archive/MIME/version caching and health 0.10.0; legacy site remained then. verify:release is the reproducible check. The locked Mac still prevented actual browser interaction acceptance at this historical release.
 
 See [feature guide](ARCHIVE-v10.md) and [current limits](LIMITS.md).

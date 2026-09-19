@@ -1,11 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "onestorage-local",
+  "name": "vexuni-local",
   "main": "src/local.ts",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "limits": { "subrequests": 250000 },
-  "services": [{ "binding": "BUILDER", "service": "onestorage-build" }],
+  "services": [{ "binding": "BUILDER", "service": "vexuni-build" }],
   "worker_loaders": [{ "binding": "LOADER" }],
   "assets": {
     "directory": "./public",
@@ -15,7 +15,7 @@
     "run_worker_first": true,
   },
   "vars": {
-    "APPS_ORIGIN": "https://onestorage-apps.xbitfun.workers.dev",
+    "APPS_ORIGIN": "http://localhost:8789",
     "APP_ORIGIN": "http://localhost:8787",
     "BOOTSTRAP_SECRET": "local-development-only-change-me",
     "WEBHOOK_ALLOWED_HOSTS": "",
@@ -24,7 +24,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "onestorage-local",
+      "database_name": "vexuni-local",
       "database_id": "00000000-0000-0000-0000-000000000001",
       "migrations_dir": "migrations",
     },
@@ -32,7 +32,7 @@
   "r2_buckets": [
     {
       "binding": "OBJECTS",
-      "bucket_name": "onestorage-local",
+      "bucket_name": "vexuni-local",
     },
   ],
   "durable_objects": {
@@ -57,12 +57,12 @@
     "producers": [
       {
         "binding": "EVENTS",
-        "queue": "onestorage-local-events",
+        "queue": "vexuni-local-events",
       },
     ],
     "consumers": [
       {
-        "queue": "onestorage-local-events",
+        "queue": "vexuni-local-events",
         "max_batch_size": 5,
         "max_batch_timeout": 1,
         "max_retries": 5,

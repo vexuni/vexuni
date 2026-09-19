@@ -22,7 +22,7 @@ nbformat 4 只读预览、语言高亮、Markdown、静态 HTML 表格、PNG/JPE
 
 验收脚本 `scripts/e2e-notebook.mjs` 在退出前删除仓库、禁用测试用户并撤销会话，再通过真实 D1 查询检查 repositories、credentials、enabled_users、code_documents、code_index_state、code_contents 均为零。隔离 fixture 的用户行保留禁用状态，未删除审计用户标识。
 
-线上静态文件逐字节对照本地发布产物，版本健康检查、无效凭据的浏览器/Git 鉴权语义，以及 `1s.hk` Cubelink 保留检查均通过。源代码归档使用原有显式文件允许清单，任务私有状态不发布。
+线上静态文件逐字节对照本地发布产物，版本健康检查、无效凭据的浏览器/Git 鉴权语义，以及 `example.com` 旧站 保留检查均通过。源代码归档使用原有显式文件允许清单，任务私有状态不发布。
 
 ## 未包含
 

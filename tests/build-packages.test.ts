@@ -323,7 +323,7 @@ test("cache outages fall back, invalid registry bytes are never cached, and priv
   );
   await assert.rejects(bad.resolve("example", "src/main.ts"), /integrity/);
   assert.equal(writes, 0);
-  const privateURL = "https://git.1s.hk/api/packages/private/pkg.tgz";
+  const privateURL = "https://git.example.com/api/packages/private/pkg.tgz";
   const privateFS = new BuildFileSystem(
     files({ "node_modules/example": { ...entry, resolved: privateURL } }),
     "worker",

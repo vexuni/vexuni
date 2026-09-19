@@ -3,9 +3,9 @@
 Run with Node 22+ after `npm ci`:
 
 ```sh
-export ONESTORAGE_ORIGIN=https://1s.hk
-export ONESTORAGE_REPO=your-namespace/your-repository
-# Supply ONESTORAGE_TOKEN through your shell's secret manager.
+export VEXUNI_ORIGIN=https://example.com
+export VEXUNI_REPO=your-namespace/your-repository
+# Supply VEXUNI_TOKEN through your shell's secret manager.
 node --import tsx examples/run.ts sessions
 ```
 
@@ -23,4 +23,4 @@ The repository must already contain a commit. `workflows.ts` exports seven funct
 
 `parallelAttempts` changes the default branch. Other writing examples keep state in Notes or newly named ephemeral branches. None executes repository content or sends model prompts to a third-party service. Replace the sample content with your agent's output. Retain the branch IDs in returned results to resume or remove an experiment.
 
-For JWT signing, construct `OneStorage` with `signer: {issuer,key,keyId,subject,ttl,refs}`. A new narrowly scoped token is signed for each request. Register the public key in **密钥与连接**; keep its private key in the agent's secret store.
+For JWT signing, construct `vexuni` with `signer: {issuer,key,keyId,subject,ttl,refs}`. A new narrowly scoped token is signed for each request. Register the public key in **密钥与连接**; keep its private key in the agent's secret store.

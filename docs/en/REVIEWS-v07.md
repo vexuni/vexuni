@@ -45,4 +45,4 @@ Cloud JS/WASM steps remain isolated without bindings or external network. Explic
 
 Back up D1, apply `0008_fork_reviews.sql`, and deploy the main Worker. The gateway is unchanged. At this release, snapshot budgets were 8 MiB/object, 32 MiB expanded objects/operation, and 5,000 traversed objects; these do not establish large-repository readiness. See current [limits](LIMITS.md).
 
-CODEOWNERS, merge queues, issue closure, SSO, DAG/cache/secret builds, lifecycle, and packages were subsequent goals. References: [cross-fork collaboration](https://docs.gitlab.com/user/project/merge_requests/allow_collaboration/), [discussions](https://docs.gitlab.com/user/discussions/). OneStorage exposes independent APIs, not drop-in GitLab compatibility.
+CODEOWNERS, merge queues, issue closure, SSO, DAG/cache/secret builds, lifecycle, and packages were subsequent goals. References: [cross-fork collaboration](https://docs.gitlab.com/user/project/merge_requests/allow_collaboration/), [discussions](https://docs.gitlab.com/user/discussions/). vexuni exposes independent APIs, not drop-in GitLab compatibility.

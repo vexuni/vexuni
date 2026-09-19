@@ -19,7 +19,7 @@ export function deploymentConfigs(main, compiler, apps) {
   if (
     main.routes?.length ||
     main.account_id ||
-    ["https://git.1s.hk", "https://1s.hk"].includes(main.vars?.APP_ORIGIN)
+    ["https://git.example.com", "https://example.com"].includes(main.vars?.APP_ORIGIN)
   )
     throw Error(
       "Use the portable deploy branch, not a production configuration",
@@ -106,9 +106,9 @@ export async function deploy() {
   );
   // Config files stay beside root paths so source/assets/migrations remain correctly resolved.
   const files = [
-    ".onestorage-build.generated.json",
-    ".onestorage-apps.generated.json",
-    ".onestorage-main.generated.json",
+    ".vexuni-build.generated.json",
+    ".vexuni-apps.generated.json",
+    ".vexuni-main.generated.json",
   ];
   try {
     for (const [i, cfg] of [build, gateway, primary].entries())
@@ -133,7 +133,7 @@ export async function deploy() {
     await fs.writeFile(files[2], JSON.stringify(primary, null, 2) + "\n");
     await run(["deploy", "--config", files[2]], true);
     console.log(
-      "OneStorage ready: " +
+      "vexuni ready: " +
         primary.vars.APP_ORIGIN +
         " — initialize the administrator with your BOOTSTRAP_SECRET.",
     );

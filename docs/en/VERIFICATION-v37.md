@@ -10,6 +10,6 @@ Type checking/367 tests, production dry run, static-route/cache regression, loca
 
 JSON matched raw source, #L10/#nb-cell-30 worked, mobile had no horizontal overflow, invalid JSON/nbformat3 explained fallback, and later HEAD changes did not alter pinned previews/images. Readers could view; revocation returned 404 for JSON/images and removed preview on refresh; anonymous private reads returned 401. An initial test wrongly expected anonymous 404, then was corrected after cleanup and fully rerun without changing authorization.
 
-Cleanup deleted repositories, disabled users/revoked sessions, and checked zero repositories/credentials/enabled users/code documents/state/content in D1. Disabled audit identities remained. Online bytes/source/health/auth/Cubelink checks passed and private state stayed outside the archive. No Python/Jupyter kernel, executable charts/MathJax/widgets, or rerun of every prior cloud stress suite was claimed. The agreed development scope ended at v0.37, not full GitLab parity.
+Cleanup deleted repositories, disabled users/revoked sessions, and checked zero repositories/credentials/enabled users/code documents/state/content in D1. Disabled audit identities remained. Online bytes/source/health/auth/legacy site checks passed and private state stayed outside the archive. No Python/Jupyter kernel, executable charts/MathJax/widgets, or rerun of every prior cloud stress suite was claimed. The agreed development scope ended at v0.37, not full GitLab parity.
 
 See [feature contract](NOTEBOOK-v37.md) and [current limits](LIMITS.md).

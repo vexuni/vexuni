@@ -1,4 +1,4 @@
-# OneStorage v0.6: account security and content rendering
+# vexuni v0.6: account security and content rendering
 
 [简体中文](../ACCOUNT-v06.md) · **English**
 

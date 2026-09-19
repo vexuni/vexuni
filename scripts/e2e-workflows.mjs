@@ -7,8 +7,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let cookie = "",
   requests = 0,
@@ -119,7 +119,7 @@ const config = {
   ],
 };
 const files = {
-  ".onestorage-ci.json": JSON.stringify(config),
+  ".vexuni-ci.json": JSON.stringify(config),
   "package.json": '{"name":"workflow-fixture"}',
   "build.js": `export default async ({sha}) => { const start=Date.now(); await new Promise(r=>setTimeout(r,4000)); return {logs:[JSON.stringify({kind:'build',start,end:Date.now()})],artifacts:{'index.html':'<h1>workflow '+sha+'</h1>','result.txt':'built'}}; };`,
   "lint.js": `export default async () => { const start=Date.now(); await new Promise(r=>setTimeout(r,4000)); return {logs:[JSON.stringify({kind:'lint',start,end:Date.now()})],artifacts:{'lint.json':'{"passed":true}'}}; };`,
@@ -151,7 +151,7 @@ try {
   );
   await commit(files);
   await api(ap + "/ci/config", "PUT", {
-    source_path: ".onestorage-ci.json",
+    source_path: ".vexuni-ci.json",
     enabled: true,
   });
   const current = await commit({ "README.md": "# Versioned workflow\n" });
@@ -183,7 +183,7 @@ try {
   const successful = await done(measured.id);
   check(
     successful.config_sha === current.sha &&
-      successful.config_path === ".onestorage-ci.json",
+      successful.config_path === ".vexuni-ci.json",
     "Configuration is bound to pushed SHA",
   );
   check(
@@ -246,7 +246,7 @@ try {
   );
 
   // Invalid configuration must remain failed; it cannot be retried as a harmless file check.
-  const broken = await commit({ ".onestorage-ci.json": "{invalid" });
+  const broken = await commit({ ".vexuni-ci.json": "{invalid" });
   let invalid;
   for (let n = 0; n < 120; n++) {
     invalid = (await api(ap + "/ci/runs")).runs.find(
@@ -370,7 +370,7 @@ try {
               type: "run",
               name: "Read cloud artifact",
               command:
-                'test "$(cat "$ONESTORAGE_DEPENDENCIES/build/result.txt")" = built\nprintf done > out.txt',
+                'test "$(cat "$VEXUNI_DEPENDENCIES/build/result.txt")" = built\nprintf done > out.txt',
             },
           ],
           artifacts: ["out.txt"],
@@ -383,17 +383,17 @@ try {
   await waitRun(mixedRun.id, (r) =>
     r.jobs.some((j) => j.job_key === "generic" && j.status === "queued"),
   );
-  dir = await mkdtemp(join(tmpdir(), "onestorage-workflow-"));
+  dir = await mkdtemp(join(tmpdir(), "vexuni-workflow-"));
   const credential = join(dir, "runner-token");
   await writeFile(credential, runner.token, { mode: 0o600 });
   await new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ["scripts/runner.mjs"], {
       env: {
         ...process.env,
-        ONESTORAGE_ORIGIN: origin,
-        ONESTORAGE_RUNNER_TOKEN_FILE: credential,
-        ONESTORAGE_RUNNER_ONCE: "1",
-        ONESTORAGE_JOB_ENV: "",
+        VEXUNI_ORIGIN: origin,
+        VEXUNI_RUNNER_TOKEN_FILE: credential,
+        VEXUNI_RUNNER_ONCE: "1",
+        VEXUNI_JOB_ENV: "",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -429,7 +429,7 @@ try {
 
   // MR configuration is from the target snapshot, even if the source fork changes it.
   await api(ap + "/ci/config", "PUT", {
-    source_path: ".onestorage-ci.json",
+    source_path: ".vexuni-ci.json",
     enabled: false,
   });
   const trusted = {
@@ -438,7 +438,7 @@ try {
     steps: [{ type: "file", path: "package.json", format: "json" }],
   };
   const target = await commit({
-    ".onestorage-ci.json": JSON.stringify(trusted),
+    ".vexuni-ci.json": JSON.stringify(trusted),
   });
   fork = await api(
     "/api/repos",
@@ -454,7 +454,7 @@ try {
   const fp = `/api/repos/${name}/fork`;
   await commit(
     {
-      ".onestorage-ci.json": JSON.stringify({
+      ".vexuni-ci.json": JSON.stringify({
         name: "Fork poison",
         runner: "external",
         steps: [{ type: "run", name: "unexpected", command: "exit 1" }],

@@ -1,17 +1,17 @@
 // Opt-in acceptance on an operator-owned instance. Only generated repositories are mutated.
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
-import { OneStorage } from "../sdk/index.ts";
+import { Vexuni } from "../sdk/index.ts";
 if (process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error(
     "Set ALLOW_REMOTE_ACCEPTANCE=1 to create and delete isolated acceptance repositories",
   );
-const origin = process.env.ONESTORAGE_ORIGIN,
-  token = process.env.ONESTORAGE_TOKEN,
-  namespace = process.env.ONESTORAGE_NAMESPACE;
+const origin = process.env.VEXUNI_ORIGIN,
+  token = process.env.VEXUNI_TOKEN,
+  namespace = process.env.VEXUNI_NAMESPACE;
 if (!origin || !token || !namespace)
   throw Error("Origin, token and namespace are required");
-const client = new OneStorage({ origin, token }),
+const client = new Vexuni({ origin, token }),
   name = "accept_v03_" + crypto.randomUUID().slice(0, 8),
   created = [],
   evidence = [];
@@ -21,7 +21,7 @@ async function check(name, fn) {
   console.log("PASS:", name);
 }
 const author = {
-  name: "OneStorage acceptance",
+  name: "vexuni acceptance",
   email: "acceptance@example.com",
 };
 const health = await (await fetch(origin + "/api/health")).json();
@@ -210,7 +210,7 @@ try {
   await check("encrypted upstream credentials and detach", async () => {
     await repo.configureUpstream({
       provider: "gitlab",
-      owner: "onestorage-acceptance",
+      owner: "vexuni-acceptance",
       name: "unconnected",
     });
     const credential = await repo.createGitCredential(
@@ -244,7 +244,7 @@ try {
     });
     assert.equal(unauth.status, 401);
     assert.ok(
-      (await (await fetch(origin + "/llms.txt")).text()).includes("OneStorage"),
+      (await (await fetch(origin + "/llms.txt")).text()).includes("vexuni"),
     );
     const spec = await (await fetch(origin + "/openapi.json")).json();
     assert.equal(

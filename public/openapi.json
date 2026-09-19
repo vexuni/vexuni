@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OneStorage",
+    "title": "vexuni",
     "version": "0.39.0",
     "description": "Container-free Git hosting on Cloudflare Workers. Independent API; not wire-compatible with third-party SDKs."
   },
@@ -15,7 +15,7 @@
       "get": {
         "operationId": "get_repo_url_by_id",
         "summary": "Get Repo Url By Id",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "id",
@@ -61,7 +61,7 @@
       "get": {
         "operationId": "list_repos",
         "summary": "List Repos",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "q",
@@ -129,7 +129,7 @@
       "post": {
         "operationId": "create_repo",
         "summary": "Create Repo",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [],
         "security": [
           {
@@ -177,7 +177,7 @@
       "delete": {
         "operationId": "delete_repo",
         "summary": "Delete Repo",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -230,7 +230,7 @@
       "get": {
         "operationId": "get_repo",
         "summary": "Get Repo",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -286,7 +286,7 @@
       "patch": {
         "operationId": "update_repo",
         "summary": "Update Repository Settings",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -367,7 +367,7 @@
       "post": {
         "operationId": "archive",
         "summary": "Archive",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -468,7 +468,7 @@
       "delete": {
         "operationId": "unset_base_repo",
         "summary": "Unset Base Repo",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -635,7 +635,7 @@
       "get": {
         "operationId": "get_branch",
         "summary": "Get Branch",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -709,7 +709,7 @@
       "delete": {
         "operationId": "delete_branch",
         "summary": "Delete Branch",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -787,7 +787,7 @@
       "get": {
         "operationId": "list_branches",
         "summary": "List Branches",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -869,7 +869,7 @@
       "post": {
         "operationId": "create_branch",
         "summary": "Create Branch",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1067,7 +1067,7 @@
       "get": {
         "operationId": "get_commit",
         "summary": "Get Commit",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1149,7 +1149,7 @@
       "post": {
         "operationId": "commit_pack",
         "summary": "Create Commit from Files",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1215,7 +1215,7 @@
       "get": {
         "operationId": "list_commits",
         "summary": "List Commits",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1313,7 +1313,7 @@
       "get": {
         "operationId": "get_commit_diff",
         "summary": "Get Commit Diff",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1411,7 +1411,7 @@
       "post": {
         "operationId": "diff_commit",
         "summary": "Create Commit from Diff",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1477,7 +1477,7 @@
       "get": {
         "operationId": "get_file",
         "summary": "Get File",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1557,7 +1557,7 @@
       "head": {
         "operationId": "head_file",
         "summary": "Get File Headers",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1631,7 +1631,7 @@
       "get": {
         "operationId": "list_files",
         "summary": "List Files",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1737,7 +1737,7 @@
       "get": {
         "operationId": "list_files_metadata",
         "summary": "List Files with Metadata",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1843,7 +1843,7 @@
       "post": {
         "operationId": "create_generic_git_credential",
         "summary": "Create Git Credential",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1920,7 +1920,7 @@
       "put": {
         "operationId": "update_generic_git_credential",
         "summary": "Update Git Credential",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -1999,7 +1999,7 @@
       "delete": {
         "operationId": "delete_generic_git_credential",
         "summary": "Delete Git Credential",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2062,7 +2062,7 @@
       "post": {
         "operationId": "grep",
         "summary": "Grep",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2385,7 +2385,7 @@
       "delete": {
         "operationId": "notes_delete",
         "summary": "Delete Note",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2488,7 +2488,7 @@
       "get": {
         "operationId": "notes_read",
         "summary": "Get Note",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2568,7 +2568,7 @@
       "post": {
         "operationId": "notes_write",
         "summary": "Create or Append Note",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2683,7 +2683,7 @@
       "get": {
         "operationId": "list_notes_refs",
         "summary": "List Notes Refs",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2749,7 +2749,7 @@
       "post": {
         "operationId": "pull_upstream",
         "summary": "Pull Upstream",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2815,7 +2815,7 @@
       "post": {
         "operationId": "reset_commits",
         "summary": "Reset Branch to Commit",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2881,7 +2881,7 @@
       "post": {
         "operationId": "restore_commit",
         "summary": "Restore Commit",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -2947,7 +2947,7 @@
       "get": {
         "operationId": "get_tag",
         "summary": "Get Tag",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -3021,7 +3021,7 @@
       "get": {
         "operationId": "list_tags",
         "summary": "List Tags",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -3101,7 +3101,7 @@
       "post": {
         "operationId": "create_tag",
         "summary": "Create Tag",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -3184,7 +3184,7 @@
       "delete": {
         "operationId": "delete_tag",
         "summary": "Delete Tag",
-        "description": "See the OneStorage API contract in the source archive (docs/API.md).",
+        "description": "See the vexuni API contract in the source archive (docs/API.md).",
         "parameters": [
           {
             "name": "namespace",
@@ -8448,7 +8448,7 @@
         "tags": [
           "CI/CD"
         ],
-        "description": "Worker execution steps also support type=build: entry, sources (recursive file/directory selection), outfile, platform (worker/browser), minify, sourcemap, jsx and jsx_import_source. Builds run esbuild WASM in a private Cloudflare service; npm dependencies require matching package-lock v2/v3 with SHA-512 registry tarballs. Private OneStorage packages use private_registries [{project_id,token_variable}], maximum 8 distinct projects. Each token_variable must be selected in job variables and stored as a secret deployment token with package read scope. Main Worker verifies immutable R2 package bytes and current authority; compiler never receives credentials. See docs/CI-PRIVATE-PACKAGES-v27.md. Does not run shell/npm lifecycle scripts. See docs/CI-BUILDS-v22.md for limits and deploy artifact configuration. v0.35 optionally caches public npm tarballs in a dedicated R2 bucket; each hit still verifies SHA-512, private supplied packages bypass it, and success logs report hits/misses/writes/errors/downloaded bytes. See docs/CI-NPM-CACHE-v35.md. v0.36 accepts optional tsconfig selected from source files, relative local extends, baseUrl/paths and supported JSX/TS emit options. Explicit step JSX overrides configuration. See docs/CI-TSCONFIG-v36.md.",
+        "description": "Worker execution steps also support type=build: entry, sources (recursive file/directory selection), outfile, platform (worker/browser), minify, sourcemap, jsx and jsx_import_source. Builds run esbuild WASM in a private Cloudflare service; npm dependencies require matching package-lock v2/v3 with SHA-512 registry tarballs. Private vexuni packages use private_registries [{project_id,token_variable}], maximum 8 distinct projects. Each token_variable must be selected in job variables and stored as a secret deployment token with package read scope. Main Worker verifies immutable R2 package bytes and current authority; compiler never receives credentials. See docs/CI-PRIVATE-PACKAGES-v27.md. Does not run shell/npm lifecycle scripts. See docs/CI-BUILDS-v22.md for limits and deploy artifact configuration. v0.35 optionally caches public npm tarballs in a dedicated R2 bucket; each hit still verifies SHA-512, private supplied packages bypass it, and success logs report hits/misses/writes/errors/downloaded bytes. See docs/CI-NPM-CACHE-v35.md. v0.36 accepts optional tsconfig selected from source files, relative local extends, baseUrl/paths and supported JSX/TS emit options. Explicit step JSX overrides configuration. See docs/CI-TSCONFIG-v36.md.",
         "parameters": [
           {
             "name": "namespace",
@@ -8505,7 +8505,7 @@
         "tags": [
           "CI/CD"
         ],
-        "description": "Worker execution steps also support type=build: entry, sources (recursive file/directory selection), outfile, platform (worker/browser), minify, sourcemap, jsx and jsx_import_source. Builds run esbuild WASM in a private Cloudflare service; npm dependencies require matching package-lock v2/v3 with SHA-512 registry tarballs. Private OneStorage packages use private_registries [{project_id,token_variable}], maximum 8 distinct projects. Each token_variable must be selected in job variables and stored as a secret deployment token with package read scope. Main Worker verifies immutable R2 package bytes and current authority; compiler never receives credentials. See docs/CI-PRIVATE-PACKAGES-v27.md. Does not run shell/npm lifecycle scripts. See docs/CI-BUILDS-v22.md for limits and deploy artifact configuration. v0.35 optionally caches public npm tarballs in a dedicated R2 bucket; each hit still verifies SHA-512, private supplied packages bypass it, and success logs report hits/misses/writes/errors/downloaded bytes. See docs/CI-NPM-CACHE-v35.md. v0.36 accepts optional tsconfig selected from source files, relative local extends, baseUrl/paths and supported JSX/TS emit options. Explicit step JSX overrides configuration. See docs/CI-TSCONFIG-v36.md. Repository files are fixed to the pushed/manual SHA; merge requests select the target SHA configuration. See docs/CI-WORKFLOWS-v14.md for task schemas, dependency artifacts and limits.",
+        "description": "Worker execution steps also support type=build: entry, sources (recursive file/directory selection), outfile, platform (worker/browser), minify, sourcemap, jsx and jsx_import_source. Builds run esbuild WASM in a private Cloudflare service; npm dependencies require matching package-lock v2/v3 with SHA-512 registry tarballs. Private vexuni packages use private_registries [{project_id,token_variable}], maximum 8 distinct projects. Each token_variable must be selected in job variables and stored as a secret deployment token with package read scope. Main Worker verifies immutable R2 package bytes and current authority; compiler never receives credentials. See docs/CI-PRIVATE-PACKAGES-v27.md. Does not run shell/npm lifecycle scripts. See docs/CI-BUILDS-v22.md for limits and deploy artifact configuration. v0.35 optionally caches public npm tarballs in a dedicated R2 bucket; each hit still verifies SHA-512, private supplied packages bypass it, and success logs report hits/misses/writes/errors/downloaded bytes. See docs/CI-NPM-CACHE-v35.md. v0.36 accepts optional tsconfig selected from source files, relative local extends, baseUrl/paths and supported JSX/TS emit options. Explicit step JSX overrides configuration. See docs/CI-TSCONFIG-v36.md. Repository files are fixed to the pushed/manual SHA; merge requests select the target SHA configuration. See docs/CI-WORKFLOWS-v14.md for task schemas, dependency artifacts and limits.",
         "parameters": [
           {
             "name": "namespace",
@@ -14814,7 +14814,7 @@
       "sessionCookie": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "onestorage_session",
+        "name": "vexuni_session",
         "description": "Browser session; same-origin Origin header required for mutations."
       },
       "bearerAuth": {

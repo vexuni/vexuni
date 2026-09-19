@@ -8,8 +8,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-let token = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+let token = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   admin = token ? { Authorization: "Bearer " + token } : {},
   checks = 0,
@@ -433,7 +433,7 @@ try {
       token = temporary.token;
       temporaryTokenId = temporary.id;
     }
-    dir = await mkdtemp(join(tmpdir(), "onestorage-review-"));
+    dir = await mkdtemp(join(tmpdir(), "vexuni-review-"));
     const askpass = join(dir, "askpass");
     await writeFile(
       askpass,

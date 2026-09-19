@@ -2,7 +2,7 @@
 
 [简体中文](../CI-NPM-CACHE-v35.md) · **English**
 
-Native `build` steps reuse public npm tarballs across builds through the compiler's dedicated R2 bucket, `onestorage-npm-cache`. Git objects, project source, private packages, and CI secrets never enter it. It stores disposable derived downloads, not artifacts or the package registry.
+Native `build` steps reuse public npm tarballs across builds through the compiler's dedicated R2 bucket, `vexuni-npm-cache`. Git objects, project source, private packages, and CI secrets never enter it. It stores disposable derived downloads, not artifacts or the package registry.
 
 Keys combine normalized registry URL and lockfile SHA-512 SRI. Only credential-free, query-free, fragment-free `.tgz` HTTPS URLs on `registry.npmjs.org` are accepted. Different integrity values produce different keys; floating versions never replace lockfile entries.
 
@@ -17,8 +17,8 @@ Concurrent misses can download/write identical content; there is no global lock 
 Successful compile logs report cache enabled/disabled, hits, misses, writes, errors, and public-registry downloaded bytes. No credentials or signed object URLs appear. Without a binding, downloads work as before; older compiler responses remain compatible.
 
 ```sh
-npx wrangler r2 bucket create onestorage-npm-cache
-npx wrangler r2 bucket lifecycle add onestorage-npm-cache public-npm-seven-days npm-v1/ --expire-days 7
+npx wrangler r2 bucket create vexuni-npm-cache
+npx wrangler r2 bucket lifecycle add vexuni-npm-cache public-npm-seven-days npm-v1/ --expire-days 7
 npm run deploy:build
 npm run deploy
 ```

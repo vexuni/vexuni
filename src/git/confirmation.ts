@@ -19,7 +19,7 @@ export async function confirmGitResponse(
           incident,
         incident_id: incident,
       },
-      { status: 503, headers: { "X-OneStorage-Incident": incident } },
+      { status: 503, headers: { "X-vexuni-Incident": incident } },
     );
   }
 }

@@ -39,13 +39,13 @@ Commands use `/bin/sh -eu` in one isolated checkout/job, stopping on failure. Th
 Register a repository runner, save its one-time token in a mode-600 file on a trusted POSIX host, obtain this source, run npm ci, and install required build tools:
 
 ```sh
-export ONESTORAGE_ORIGIN=https://1s.hk
-export ONESTORAGE_RUNNER_TOKEN_FILE=/secure/onestorage-runner-token
-export ONESTORAGE_JOB_ENV=CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID
+export VEXUNI_ORIGIN=https://example.com
+export VEXUNI_RUNNER_TOKEN_FILE=/secure/vexuni-runner-token
+export VEXUNI_JOB_ENV=CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID
 node scripts/runner.mjs
 ```
 
-Supply deployment values through host secret management. Only explicit `ONESTORAGE_JOB_ENV` names and basic PATH/fresh HOME/CI/commit/ref pass to child processes; runner token/file do not. Known token/selected values are masked across log chunks, but this cannot stop malicious code encoding/exporting secrets. A dedicated trusted account/host is required: directories/environment filters are not an OS sandbox. Source extraction rejects links/devices and artifacts cannot escape checkout. Long-lived runner operation and real deployment credentials remain operator responsibilities.
+Supply deployment values through host secret management. Only explicit `VEXUNI_JOB_ENV` names and basic PATH/fresh HOME/CI/commit/ref pass to child processes; runner token/file do not. Known token/selected values are masked across log chunks, but this cannot stop malicious code encoding/exporting secrets. A dedicated trusted account/host is required: directories/environment filters are not an OS sandbox. Source extraction rejects links/devices and artifacts cannot escape checkout. Long-lived runner operation and real deployment credentials remain operator responsibilities.
 
 ## Worker checks and reliability
 

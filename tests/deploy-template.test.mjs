@@ -25,7 +25,7 @@ const fixture = () => ({
   },
 });
 test("portable template removes production values and does not create empty required form fields", async () => {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "onestorage-template-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "vexuni-template-"));
   try {
     for (const file of [
       "wrangler.jsonc",
@@ -74,8 +74,8 @@ test("provisioned bindings are shared only with the workers that need them", () 
 });
 test("template refuses production configs, missing provisioning and shared object/cache buckets", () => {
   for (const edit of [
-    (f) => (f.vars.APP_ORIGIN = "https://git.1s.hk"),
-    (f) => (f.routes = [{ pattern: "git.1s.hk" }]),
+    (f) => (f.vars.APP_ORIGIN = "https://git.example.com"),
+    (f) => (f.routes = [{ pattern: "git.example.com" }]),
     (f) => (f.account_id = "real-account"),
     (f) =>
       (f.d1_databases[0].database_id = "00000000-0000-0000-0000-000000000000"),

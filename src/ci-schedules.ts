@@ -171,7 +171,7 @@ export async function consumeSchedule(env: Env, id: string) {
           name: "Invalid scheduled pipeline",
           runner: "worker",
           steps: [
-            { type: "file", path: repo.source_path || ".onestorage-ci.json" },
+            { type: "file", path: repo.source_path || ".vexuni-ci.json" },
           ],
         }),
         config_path: repo.source_path || null,

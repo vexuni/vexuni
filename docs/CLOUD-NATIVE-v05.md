@@ -1,4 +1,4 @@
-# OneStorage Cloudflare 原生协作平台（v0.5）
+# vexuni Cloudflare 原生协作平台（v0.5）
 
 **简体中文** · [English](en/CLOUD-NATIVE-v05.md)
 
@@ -11,7 +11,7 @@
 - 自动触发与执行：Durable Object 持久事件 → Queues → Worker → Dynamic Worker Loader；Cron 恢复未投递任务、回收超时租约。
 - JS/WASM 测试代码：独立 Dynamic Worker，`globalOutbound: null`，无主服务绑定和凭据，CPU 上限 10 秒/步骤，默认 1 秒。
 - 产物/应用版本：R2 不可变对象；D1 事务提交产物索引、版本和成功状态。取消/失效租约不能发布产物。
-- 应用网关：独立 Worker `onestorage-apps`，在独立 workers.dev 域名运行。只读取显式公开且仓库未删除的激活版本。用户应用不在 Git 登录域名运行，不传 Cookie/Authorization，不向响应转发 Set-Cookie，页面使用 CSP sandbox。
+- 应用网关：独立 Worker `vexuni-apps`，在独立 workers.dev 域名运行。只读取显式公开且仓库未删除的激活版本。用户应用不在 Git 登录域名运行，不传 Cookie/Authorization，不向响应转发 Set-Cookie，页面使用 CSP sandbox。
 
 ## 使用云端 CI/CD
 
@@ -36,7 +36,7 @@ export default async ({ sha, ref, files, artifacts }) => {
 // index.js
 export default {
   fetch() {
-    return new Response("Hello from OneStorage");
+    return new Response("Hello from vexuni");
   },
 };
 ```
@@ -70,7 +70,7 @@ export default {
 
 `files` 显式指定固定提交中的源码，支持 JS ESM 和 `.wasm` 二进制模块，普通文件作为 text 模块；不自动下载 npm 依赖、不运行 install scripts。WASM 用 `import wasm from './module.wasm'` 后 `WebAssembly.instantiate(wasm)`。API 提交二进制文件使用 `{path, data: BASE64}`。输出 artifacts 是文件名 → 文本内容；后续步骤可读取 artifacts，部署 files 中同名产物优先于源码。可以在 JS 中生成静态页面，使用 `deploy.kind: "static"`、entry `index.html` 发布。
 
-界限：源码最多 32 个文件、每个 1 MiB、总计 4 MiB；输出产物最多 10 个/总 2 MiB；部署包总 4 MiB。云端步骤只允许相对安全路径，保留内部 `__onestorage` 前缀。每次隔离执行请求 20 秒超时，整个 Worker 流水线最多 110 秒/10 步，实际还受 Cloudflare 账户限制。返回 logs 保存为有界文本；普通 console 输出在 Cloudflare Observability，本版网页以显式返回的 logs 为准。超时运行失败，需显式重试，避免重复部署。已安装的外部 Runner 协议保留，作为通用 OS 构建的可选路径。
+界限：源码最多 32 个文件、每个 1 MiB、总计 4 MiB；输出产物最多 10 个/总 2 MiB；部署包总 4 MiB。云端步骤只允许相对安全路径，保留内部 `__vexuni` 前缀。每次隔离执行请求 20 秒超时，整个 Worker 流水线最多 110 秒/10 步，实际还受 Cloudflare 账户限制。返回 logs 保存为有界文本；普通 console 输出在 Cloudflare Observability，本版网页以显式返回的 logs 为准。超时运行失败，需显式重试，避免重复部署。已安装的外部 Runner 协议保留，作为通用 OS 构建的可选路径。
 
 ## 代码审阅与保护
 
@@ -97,7 +97,7 @@ npm run deploy
 
 主服务配置 `worker_loaders: [{ binding: "LOADER" }]` 和 `APPS_ORIGIN`。网关使用 `wrangler.apps.jsonc`，绑定同一 D1/R2 和 LOADER。开源自部署需替换两份配置中的账户资源与域名；平台不会复制本机 Wrangler OAuth 到任何仓库任务。
 
-正式主站仍为 `git.1s.hk`，`1s.hk` Cubelink 保留。新增 0006 为增量 migration，先备份 D1，再 apply，随后部署。删除仓库时清理 `ci/<repo>/` 包括部署版本。网关每次检查 D1，仓库软删除即停止应用访问。
+正式主站仍为 `git.example.com`，`example.com` 旧站 保留。新增 0006 为增量 migration，先备份 D1，再 apply，随后部署。删除仓库时清理 `ci/<repo>/` 包括部署版本。网关每次检查 D1，仓库软删除即停止应用访问。
 
 ## 与 GitLab/Gogs 的持续差距清单
 
@@ -117,4 +117,4 @@ npm run deploy
 | 持久化可达索引、流式 pack、大仓库增量验证                                   | v0.12/v0.13 实现 DO 索引、对象 LRU、流式出站和有界预取；v0.16 入站扩至 64 MiB/25,000 条目/256 MiB 展开，v0.17 增加有界 R2 完整 pack 缓存，v0.18 增加传输期间的有界页面快照读取。首次导入吞吐、多 Git 流并发和关联算法仍待扩展，见 GIT-SCALE-PLAN.md |
 | 原生 SSH 入站、POSIX/Linux 任意构建                                         | 当前无容器 Workers 架构不提供此执行模型；HTTPS Git 和 JS/WASM 可用                                                                                                                                                                                  |
 
-参考：[Gogs 功能](https://github.com/gogs/gogs#-features)、[GitLab Merge requests](https://docs.gitlab.com/user/project/merge_requests/)、[Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/getting-started/)、[资源限制](https://developers.cloudflare.com/dynamic-workers/usage/limits/)、[Workers TCP](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/)。上述状态是 OneStorage 实现检查，并非上游项目的兼容性认证。
+参考：[Gogs 功能](https://github.com/gogs/gogs#-features)、[GitLab Merge requests](https://docs.gitlab.com/user/project/merge_requests/)、[Dynamic Workers](https://developers.cloudflare.com/dynamic-workers/getting-started/)、[资源限制](https://developers.cloudflare.com/dynamic-workers/usage/limits/)、[Workers TCP](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/)。上述状态是 vexuni 实现检查，并非上游项目的兼容性认证。

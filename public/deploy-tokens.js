@@ -56,7 +56,7 @@ export async function deployTokensPage(h, { r, base, ap, workspace }) {
     )
     .join(
       "",
-    )}</fieldset><label>动态验证码或恢复码（启用 MFA 时填写）<input name="otp" autocomplete="one-time-code" maxlength="64" /></label><button class="btn primary" type="submit">创建令牌</button><p id="deploy-create-status" role="status"></p></form></section><section class="panel"><div class="detail-body"><h2>使用方式</h2><p>Git HTTPS 使用令牌的用户名和密码，建议通过 Git 凭据管理器或 GIT_ASKPASS 提供。npm 使用 Bearer 令牌，在 .npmrc 中引用环境变量。原始令牌只在创建和轮换时显示一次。</p><pre>${esc(workspace ? `git clone ${location.origin}/${workspace}/PROJECT.git` : `git clone ${location.origin}${base}.git`)}</pre><pre>${esc(`${location.origin.replace(/^https?:/, "")}/api${workspace ? "/repos/" + workspace + "/PROJECT" : ap}/packages/npm/:_authToken=\${ONESTORAGE_DEPLOY_TOKEN}`)}</pre></div></section>`;
+    )}</fieldset><label>动态验证码或恢复码（启用 MFA 时填写）<input name="otp" autocomplete="one-time-code" maxlength="64" /></label><button class="btn primary" type="submit">创建令牌</button><p id="deploy-create-status" role="status"></p></form></section><section class="panel"><div class="detail-body"><h2>使用方式</h2><p>Git HTTPS 使用令牌的用户名和密码，建议通过 Git 凭据管理器或 GIT_ASKPASS 提供。npm 使用 Bearer 令牌，在 .npmrc 中引用环境变量。原始令牌只在创建和轮换时显示一次。</p><pre>${esc(workspace ? `git clone ${location.origin}/${workspace}/PROJECT.git` : `git clone ${location.origin}${base}.git`)}</pre><pre>${esc(`${location.origin.replace(/^https?:/, "")}/api${workspace ? "/repos/" + workspace + "/PROJECT" : ap}/packages/npm/:_authToken=\${VEXUNI_DEPLOY_TOKEN}`)}</pre></div></section>`;
   if (workspace)
     layout(
       `<p><a data-link href="/spaces/${encodeURIComponent(workspace)}">← ${esc(space.name)}</a></p>${content}`,

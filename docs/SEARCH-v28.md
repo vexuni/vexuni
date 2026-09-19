@@ -35,4 +35,4 @@ GET /api/search?q=中文检索&type=all&namespace=team&state=all&archived=includ
 
 后续代码索引需单独设计可重建索引存储、异步提交版本投影、覆盖状态及权限重验。Cloudflare 支持 FTS5，但其官方文档说明含虚拟表的 D1 数据库不能直接导出。为保留主库备份能力，本版本不在主库添加 FTS 虚拟表、数据迁移或额外云资源。参考：[D1 SQL 扩展](https://developers.cloudflare.com/d1/sql-api/sql-statements/)、[D1 索引](https://developers.cloudflare.com/d1/best-practices/use-indexes/)、[D1 导入导出限制](https://developers.cloudflare.com/d1/best-practices/import-export-data/)。
 
-验收脚本：`npm run test:search`；远程使用已有测试授权环境变量与 `ONESTORAGE_TOKEN_FILE`，浏览器检查可设置 `PLAYWRIGHT_MODULE`。脚本创建隔离工作空间和项目，退出前删除夹具、禁用临时账户并撤销其凭据。
+验收脚本：`npm run test:search`；远程使用已有测试授权环境变量与 `VEXUNI_TOKEN_FILE`，浏览器检查可设置 `PLAYWRIGHT_MODULE`。脚本创建隔离工作空间和项目，退出前删除夹具、禁用临时账户并撤销其凭据。

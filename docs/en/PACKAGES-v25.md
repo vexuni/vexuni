@@ -9,13 +9,13 @@ Workers implements package protocols, R2 stores immutable files, and D1 stores v
 Use a project `.npmrc` with an environment reference, never a committed token:
 
 ```ini
-@your-scope:registry=https://1s.hk/api/repos/SPACE/PROJECT/packages/npm/
-//1s.hk/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${ONESTORAGE_TOKEN}
+@your-scope:registry=https://example.com/api/repos/SPACE/PROJECT/packages/npm/
+//example.com/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${VEXUNI_TOKEN}
 ```
 
-Use `registry=` instead of the scope prefix to direct all packages there. Set `ONESTORAGE_TOKEN`, then use native `npm publish --access public`, `npm install your-package@1.0.0`, `npm dist-tag add your-package@1.0.0 stable`, `npm dist-tag ls your-package`, `npm dist-tag rm your-package stable`, and `npm unpublish your-package@1.0.0 --force`.
+Use `registry=` instead of the scope prefix to direct all packages there. Set `VEXUNI_TOKEN`, then use native `npm publish --access public`, `npm install your-package@1.0.0`, `npm dist-tag add your-package@1.0.0 stable`, `npm dist-tag ls your-package`, `npm dist-tag rm your-package stable`, and `npm unpublish your-package@1.0.0 --force`.
 
-Scoped/unscoped names are supported. npm's unscoped `access=public` does not expose packages in a private project. Public projects reject restricted-access publication. An npm scope grants no OneStorage space rights.
+Scoped/unscoped names are supported. npm's unscoped `access=public` does not expose packages in a private project. Public projects reject restricted-access publication. An npm scope grants no vexuni space rights.
 
 A publish request contains one version and one gzip/tar attachment. The server calculates SHA-256/SHA-1/SHA-512, checks client integrity, and reads actual metadata from `package/package.json`; it never fetches a supplied tarball URL. Download URLs use the current project path. Binary files, bundled dependencies, and PAX/GNU long names work; traversal, duplicates, links, sparse files, damaged/truncated compression fail.
 
@@ -24,9 +24,9 @@ Names/versions cannot be overwritten or reused after withdrawal. npm reads `_rev
 ## Generic files
 
 ```sh
-export PACKAGE_URL=https://1s.hk/api/repos/SPACE/PROJECT/packages/generic/tool/1.0.0/tool.zip
-curl --fail --request PUT "$PACKAGE_URL" --header "Authorization: Bearer $ONESTORAGE_TOKEN" --header "X-Package-SHA256: $(shasum -a 256 tool.zip | cut -d ' ' -f 1)" --header "Content-Type: application/octet-stream" --data-binary @tool.zip
-curl --fail "$PACKAGE_URL" --header "Authorization: Bearer $ONESTORAGE_TOKEN" --output tool.zip
+export PACKAGE_URL=https://example.com/api/repos/SPACE/PROJECT/packages/generic/tool/1.0.0/tool.zip
+curl --fail --request PUT "$PACKAGE_URL" --header "Authorization: Bearer $VEXUNI_TOKEN" --header "X-Package-SHA256: $(shasum -a 256 tool.zip | cut -d ' ' -f 1)" --header "Content-Type: application/octet-stream" --data-binary @tool.zip
+curl --fail "$PACKAGE_URL" --header "Authorization: Bearer $VEXUNI_TOKEN" --output tool.zip
 ```
 
 Uploads require length and hexadecimal SHA-256 and stream into R2 with checksum verification. Name/version/file are at most 128 characters, starting alphanumeric and then using letters, digits, dot, underscore, plus, or hyphen. A generic version can add distinct files but never replace one. GET/HEAD, single Range, ETag, and checksum headers work.

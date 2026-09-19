@@ -14,10 +14,10 @@ import { tmpdir } from "node:os";
 import { resolve, join, sep, dirname } from "node:path";
 import { spawn } from "node:child_process";
 import { extract } from "tar";
-const origin = process.env.ONESTORAGE_ORIGIN?.replace(/\/$/, ""),
-  tokenFile = process.env.ONESTORAGE_RUNNER_TOKEN_FILE;
+const origin = process.env.VEXUNI_ORIGIN?.replace(/\/$/, ""),
+  tokenFile = process.env.VEXUNI_RUNNER_TOKEN_FILE;
 if (!origin || !tokenFile)
-  throw Error("Set ONESTORAGE_ORIGIN and ONESTORAGE_RUNNER_TOKEN_FILE");
+  throw Error("Set VEXUNI_ORIGIN and VEXUNI_RUNNER_TOKEN_FILE");
 const url = new URL(origin);
 if (
   url.protocol !== "https:" &&
@@ -25,7 +25,7 @@ if (
 )
   throw Error("Runner origin must use HTTPS");
 const token = (await readFile(tokenFile, "utf8")).trim();
-const allowedEnv = (process.env.ONESTORAGE_JOB_ENV || "")
+const allowedEnv = (process.env.VEXUNI_JOB_ENV || "")
   .split(",")
   .filter(Boolean);
 const secretValues = [
@@ -68,7 +68,7 @@ async function execute(run, lease) {
   const jobSecrets = [...secretValues];
   const redact = (s) =>
     jobSecrets.reduce((t, v) => t.split(v).join("[REDACTED]"), s);
-  const dir = await realpath(await mkdtemp(join(tmpdir(), "onestorage-ci-"))),
+  const dir = await realpath(await mkdtemp(join(tmpdir(), "vexuni-ci-"))),
     work = join(dir, "work"),
     home = join(dir, "home");
   await mkdir(work);
@@ -141,11 +141,11 @@ async function execute(run, lease) {
     PATH: process.env.PATH || "/usr/bin:/bin",
     HOME: home,
     CI: "true",
-    ONESTORAGE_COMMIT_SHA: run.sha,
-    ONESTORAGE_REF: run.ref,
+    VEXUNI_COMMIT_SHA: run.sha,
+    VEXUNI_REF: run.ref,
   };
   for (const key of allowedEnv)
-    if (process.env[key] !== undefined && !key.startsWith("ONESTORAGE_"))
+    if (process.env[key] !== undefined && !key.startsWith("VEXUNI_"))
       env[key] = process.env[key];
   try {
     if (run.config.variables?.length) {
@@ -155,7 +155,7 @@ async function execute(run, lease) {
       for (const [key, value] of Object.entries(received.variables)) {
         if (
           !/^[A-Z_][A-Z0-9_]{0,79}$/.test(key) ||
-          /^(ONESTORAGE_|GIT_|LD_|DYLD_|__)/.test(key) ||
+          /^(VEXUNI_|GIT_|LD_|DYLD_|__)/.test(key) ||
           [
             "HOME",
             "PATH",
@@ -210,8 +210,8 @@ async function execute(run, lease) {
           await writeFile(target, data, { flag: "wx", mode: 0o600 });
         }
       }
-      env.ONESTORAGE_DEPENDENCIES = inputRoot;
-      env.ONESTORAGE_JOB = run.job_key;
+      env.VEXUNI_DEPENDENCIES = inputRoot;
+      env.VEXUNI_JOB = run.job_key;
     }
     sendLog("Checking out " + run.sha + "\n");
     const source = await request(base + "/source", undefined, lease);
@@ -353,11 +353,11 @@ while (!stop) {
   try {
     const { run, lease } = await (await request("/claim", {})).json();
     if (run) await execute(run, lease);
-    else if (process.env.ONESTORAGE_RUNNER_ONCE === "1") break;
+    else if (process.env.VEXUNI_RUNNER_ONCE === "1") break;
   } catch (e) {
     console.error(redact(e.message));
-    if (process.env.ONESTORAGE_RUNNER_ONCE === "1") process.exitCode = 1;
+    if (process.env.VEXUNI_RUNNER_ONCE === "1") process.exitCode = 1;
   }
-  if (process.env.ONESTORAGE_RUNNER_ONCE === "1") break;
+  if (process.env.VEXUNI_RUNNER_ONCE === "1") break;
   await new Promise((r) => setTimeout(r, 5000));
 }

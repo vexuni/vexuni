@@ -171,8 +171,8 @@ export function tarHeader(
   put(link, 157, 100);
   put("ustar\0", 257);
   put("00", 263);
-  put("OneStorage", 265);
-  put("OneStorage", 297);
+  put("vexuni", 265);
+  put("vexuni", 297);
   const sum = out.reduce((n, b) => n + b, 0);
   put(sum.toString(8).padStart(6, "0") + "\0 ", 148);
   return out;

@@ -6,7 +6,7 @@ const { chromium } = await import(
 const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 if (!["localhost", "127.0.0.1"].includes(new URL(origin).hostname))
   throw Error("Workflow browser acceptance is local-only");
-const workspaceVariables = process.env.ONESTORAGE_WORKSPACE_VARIABLES === "1";
+const workspaceVariables = process.env.VEXUNI_WORKSPACE_VARIABLES === "1";
 const fixtureHeaders = {
   "cf-connecting-ip": "192.0.2." + (1 + Math.floor(Math.random() * 254)),
 };

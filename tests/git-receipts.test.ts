@@ -373,7 +373,7 @@ test("gateway transport failures preserve commit uncertainty with private incide
   assert.equal(await confirmGitResponse("r", async () => original), original);
   const rejected = new Response("DO rejection", {
     status: 503,
-    headers: { "X-OneStorage-Incident": "existing" },
+    headers: { "X-vexuni-Incident": "existing" },
   });
   assert.equal(await confirmGitResponse("r", async () => rejected), rejected);
   const response = await confirmGitResponse("r", async () => {
@@ -385,7 +385,7 @@ test("gateway transport failures preserve commit uncertainty with private incide
   assert.equal(response.status, 503);
   const body: any = await response.json();
   assert.match(body.error, /inspect remote refs/);
-  assert.equal(response.headers.get("X-OneStorage-Incident"), body.incident_id);
+  assert.equal(response.headers.get("X-vexuni-Incident"), body.incident_id);
   assert.equal(JSON.stringify(body).includes("provider-secret-marker"), false);
   await assert.rejects(
     confirmGitResponse("r", async () => {

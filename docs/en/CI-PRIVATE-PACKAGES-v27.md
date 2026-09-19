@@ -2,7 +2,7 @@
 
 [简体中文](../CI-PRIVATE-PACKAGES-v27.md) · **English**
 
-The v0.27 `build` step can mix public npmjs dependencies with private packages from this OneStorage instance. The main Worker reads the fixed lockfile, authorizes R2 package access, verifies integrity, and sends bounded package bytes to the WASM compiler. The compiler receives no deploy tokens or CI variable values and no private-storage bindings. No container or external runner is required.
+The v0.27 `build` step can mix public npmjs dependencies with private packages from this vexuni instance. The main Worker reads the fixed lockfile, authorizes R2 package access, verifies integrity, and sends bounded package bytes to the WASM compiler. The compiler receives no deploy tokens or CI variable values and no private-storage bindings. No container or external runner is required.
 
 ## Setup
 
@@ -37,7 +37,7 @@ The v0.27 `build` step can mix public npmjs dependencies with private packages f
 }
 ```
 
-Replace the example UUID. At most eight distinct project registries; each credential name must also appear in the task's `variables`. Only secret variables holding OneStorage deploy tokens are accepted. Sessions/PATs and implicit whole-space access are not used. A space token may cover multiple explicitly listed projects. See [deploy-token client setup](DEPLOY-TOKENS-v26.md). Successful builds retain fixed-SHA, environment CAS, and workflow activation gates.
+Replace the example UUID. At most eight distinct project registries; each credential name must also appear in the task's `variables`. Only secret variables holding vexuni deploy tokens are accepted. Sessions/PATs and implicit whole-space access are not used. A space token may cover multiple explicitly listed projects. See [deploy-token client setup](DEPLOY-TOKENS-v26.md). Successful builds retain fixed-SHA, environment CAS, and workflow activation gates.
 
 ## Authorization
 
@@ -55,4 +55,4 @@ All private lock entries are preloaded, even if not imported; public packages re
 
 Private downloads bypass the public npm cache. Tags do not resolve versions; arbitrary npm commands, aliases, extended tar headers, native modules, and unsupported toolchains remain excluded. Registry upload limits can exceed compiler limits; upload success does not imply build compatibility.
 
-Apply `0022_ci_private_packages.sql` after backup/rehearsal, then deploy compiler and main. Public-package requests remain compatible. `npm run test:private-builds` covers actual npm publish/lockfiles, mixed TSX compilation, R2 outputs, activation/rollback, templates, invalid/unauthorized inputs, rotation, recovery, and revocation. Remote acceptance requires `ALLOW_REMOTE_ACCEPTANCE=1` and a private `ONESTORAGE_TOKEN_FILE`. See [verification](VERIFICATION-v27.md).
+Apply `0022_ci_private_packages.sql` after backup/rehearsal, then deploy compiler and main. Public-package requests remain compatible. `npm run test:private-builds` covers actual npm publish/lockfiles, mixed TSX compilation, R2 outputs, activation/rollback, templates, invalid/unauthorized inputs, rotation, recovery, and revocation. Remote acceptance requires `ALLOW_REMOTE_ACCEPTANCE=1` and a private `VEXUNI_TOKEN_FILE`. See [verification](VERIFICATION-v27.md).

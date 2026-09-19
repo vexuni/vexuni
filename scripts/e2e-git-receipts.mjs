@@ -8,8 +8,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-let token = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+let token = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   cookie = "",
   temporaryToken,
@@ -17,7 +17,7 @@ let token = process.env.ONESTORAGE_TOKEN_FILE
   created = false,
   checks = 0;
 const space = "receipts_v29_" + randomBytes(4).toString("hex"),
-  directory = await mkdtemp(join(tmpdir(), "onestorage-receipts-"));
+  directory = await mkdtemp(join(tmpdir(), "vexuni-receipts-"));
 const ap = "/repos/" + space + "/project",
   url = origin + "/" + space + "/project.git";
 const records = [],
@@ -57,7 +57,7 @@ async function git(args, allowFailure = false) {
         "-c",
         "commit.gpgsign=false",
         "-c",
-        "http.extraHeader=X-OneStorage-Probe: v29-acceptance",
+        "http.extraHeader=X-vexuni-Probe: v29-acceptance",
         ...args,
       ],
       { cwd: directory, env: gitEnv },
@@ -150,14 +150,14 @@ try {
   const askpass = join(directory, "askpass.cjs");
   await writeFile(
     askpass,
-    '#!/usr/bin/env node\nprocess.stdout.write(process.argv[2].includes("Username") ? "acceptance\\n" : process.env.ONESTORAGE_ACCEPTANCE_TOKEN + "\\n");\n',
+    '#!/usr/bin/env node\nprocess.stdout.write(process.argv[2].includes("Username") ? "acceptance\\n" : process.env.VEXUNI_ACCEPTANCE_TOKEN + "\\n");\n',
     { mode: 0o700 },
   );
   gitEnv = {
     ...process.env,
     GIT_TERMINAL_PROMPT: "0",
     GIT_ASKPASS: askpass,
-    ONESTORAGE_ACCEPTANCE_TOKEN: token,
+    VEXUNI_ACCEPTANCE_TOKEN: token,
   };
   for (const key of ["GIT_CURL_VERBOSE", "GIT_TRACE_CURL", "GIT_TRACE"])
     delete gitEnv[key];

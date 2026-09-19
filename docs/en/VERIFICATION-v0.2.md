@@ -23,7 +23,7 @@ Real native clients exercise v0/v2, clone/push/pull, incremental thin pushes, ta
 
 Injected R2 and DO write failures cannot advance refs; orphan uploads may remain. Atomic ref batches, stale compare-and-swap, missing graph targets, default-branch deletion, forbidden history rewrites, and unreachable/cross-repository wants are covered. Existing R2 objects with conflicting bytes reject publication.
 
-Both packed test archives and the actual v0.1 local `owner/onestorage` snapshot migrate in JavaScript. macOS AppleDouble metadata is handled. The actual migrated main SHA is `da3fcc97ec2f4a2fab5618c2768fd64cafca06ae` and README content remained unchanged. After stopping/restarting the complete local workerd process, the migrated refs/content still matched, and a native clone plus `git fsck --full --strict` of the new-engine E2E repository passed.
+Both packed test archives and the actual v0.1 local `owner/vexuni` snapshot migrate in JavaScript. macOS AppleDouble metadata is handled. The actual migrated main SHA is `da3fcc97ec2f4a2fab5618c2768fd64cafca06ae` and README content remained unchanged. After stopping/restarting the complete local workerd process, the migrated refs/content still matched, and a native clone plus `git fsck --full --strict` of the new-engine E2E repository passed.
 
 ### Existing collaboration and security
 
@@ -33,7 +33,7 @@ Webhook tests independently verify HMAC, success/duplicate handling, failure cap
 
 ## Cloud results
 
-Deployed **https://git.1s.hk**, also reachable at `https://onestorage.xbitfun.workers.dev`. Resources are real remote D1, R2, SQLite Durable Objects and Queues. All three D1 migrations applied remotely. No Container bindings/images exist. `1s.hk` still returns the Cubelink page.
+Deployed **https://git.example.com**, also reachable at `https://vexuni.example.workers.dev`. Resources are real remote D1, R2, SQLite Durable Objects and Queues. All three D1 migrations applied remotely. No Container bindings/images exist. `example.com` still returns the legacy site page.
 
 A dedicated temporary, non-admin account/PAT and repository exercised the custom domain:
 

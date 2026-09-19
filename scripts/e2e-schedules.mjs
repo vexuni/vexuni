@@ -4,8 +4,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let cookie = "",
   requests = 0,
@@ -97,7 +97,7 @@ try {
       target_branch: "main",
       commit_message: "Scheduled CI fixture",
       files: Object.entries({
-        ".onestorage-ci.json": JSON.stringify(config),
+        ".vexuni-ci.json": JSON.stringify(config),
         "README.md": "Scheduled CI\n",
         "ci.js":
           'export default async ({sha}) => ({artifacts:{"result.txt":sha}});',
@@ -108,7 +108,7 @@ try {
     201,
   );
   await api(ap + "/ci/config", "PUT", {
-    source_path: ".onestorage-ci.json",
+    source_path: ".vexuni-ci.json",
     enabled: false,
   });
   await api(
@@ -210,7 +210,7 @@ try {
   check(run.trigger === "schedule", "scheduled trigger recorded");
   check(run.sha === committed.sha, "fixed code SHA");
   check(run.config_sha === committed.sha, "fixed configuration SHA");
-  check(run.config_path === ".onestorage-ci.json", "versioned source path");
+  check(run.config_path === ".vexuni-ci.json", "versioned source path");
   check(
     run.jobs.length === 2 && run.jobs.every((j) => j.status === "succeeded"),
     "both dependent tasks succeed",

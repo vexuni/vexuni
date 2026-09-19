@@ -96,7 +96,7 @@ test("deploy token management is scoped, secret-once, versioned, and enforces cu
       403,
     );
   const t = await f.create();
-  assert.match(t.token, /^odt_[a-f0-9]{64}$/);
+  assert.match(t.token, /^vdt_[a-f0-9]{64}$/);
   assert.equal(t.hash, undefined);
   const list = (await (await f.request(f.base)).json()) as any;
   assert.equal(list.tokens[0].token, undefined);

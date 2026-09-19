@@ -9,8 +9,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let admin = token ? { Authorization: "Bearer " + token } : {},
   checks = 0;
@@ -61,7 +61,7 @@ const owner = (await api("/me")).user,
   users = [],
   repos = [];
 let created = false;
-const directory = await mkdtemp(join(tmpdir(), "onestorage-archive-"));
+const directory = await mkdtemp(join(tmpdir(), "vexuni-archive-"));
 let temporaryToken;
 async function git(args, expected = 0) {
   const result = await new Promise((resolve, reject) => {
@@ -187,7 +187,7 @@ try {
     "checkout",
     "config",
     "user.email",
-    "test@onestorage.invalid",
+    "test@vexuni.invalid",
   ]);
   await writeFile(
     join(directory, "checkout", "README.md"),

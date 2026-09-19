@@ -1,3 +1,3 @@
-module git.1s.hk/1shk/nb/sdk/go
+module github.com/vexuni/vexuni/sdk/go
 
 go 1.24

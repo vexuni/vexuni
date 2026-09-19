@@ -2,17 +2,17 @@
 
 [简体中文](../SDK.md) · **English**
 
-All three SDKs target the [OneStorage API](API.md), use HTTPS without redirects, support PAT or client-signed JWT, and expose raw streaming downloads. They are source packages in this repository; no npm/PyPI registry publication is claimed.
+All three SDKs target the [vexuni API](API.md), use HTTPS without redirects, support PAT or client-signed JWT, and expose raw streaming downloads. They are source packages in this repository; no npm/PyPI registry publication is claimed.
 
 ## TypeScript
 
 Import `sdk/index.ts` (dependency-free Web Crypto/fetch):
 
 ```ts
-import { OneStorage } from "./sdk/index";
-const client = new OneStorage({
-  origin: "https://1s.hk",
-  token: process.env.ONESTORAGE_TOKEN,
+import { vexuni } from "./sdk/index";
+const client = new vexuni({
+  origin: "https://example.com",
+  token: process.env.VEXUNI_TOKEN,
 });
 const repo = client.repo("alice", "project");
 const commit = await repo
@@ -47,9 +47,9 @@ python3 -m pip install -e ./sdk/python
 
 ```python
 import asyncio, os
-from onestorage import OneStorage
+from vexuni import vexuni
 async def main():
-    client = OneStorage('https://1s.hk', token=os.environ['ONESTORAGE_TOKEN'])
+    client = vexuni('https://example.com', token=os.environ['VEXUNI_TOKEN'])
     repo = client.repo('alice', 'project')
     result = await repo.list_branches()
     with open('project.tar.gz', 'wb') as output:
@@ -62,13 +62,13 @@ API methods use snake_case and async calls. Network I/O runs via `asyncio.to_thr
 
 ## Go
 
-Go ≥1.24; standard library only. Module `git.1s.hk/1shk/nb/sdk/go`. For local development use a Go workspace or `replace` pointing to `./sdk/go`; private repository consumers configure Git credentials before module retrieval.
+Go ≥1.24; standard library only. Module `github.com/vexuni/vexuni/sdk/go`. For local development use a Go workspace or `replace` pointing to `./sdk/go`; private repository consumers configure Git credentials before module retrieval.
 
 ```go
-client, err := onestorage.New("https://1s.hk", token)
+client, err := vexuni.New("https://example.com", token)
 if err != nil { return err }
 repo := client.Repo("alice", "project")
-response, err := repo.GetArchive(ctx, onestorage.Options{"ref": "main"})
+response, err := repo.GetArchive(ctx, vexuni.Options{"ref": "main"})
 if err != nil { return err }
 defer response.Body.Close()
 _, err = io.Copy(output, response.Body)

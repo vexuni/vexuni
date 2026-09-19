@@ -27,4 +27,4 @@ D1 仍使用可导出的普通表。备份恢复须同时保留既有身份/权�
 
 ## 验证
 
-`npm run check` 验证事务恢复、并发请求、混合格式查询和权限。`npm run test:code-content` 使用真实 Workers、原生 Git 与浏览器，检查重命名/复制复用、手动全量重建、默认分支切换和撤权，并清理独立夹具。远端需要 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN`、私有 `ONESTORAGE_TOKEN_FILE` 和可用的 `PLAYWRIGHT_MODULE`。验收和清理期间不要重新部署被测环境。
+`npm run check` 验证事务恢复、并发请求、混合格式查询和权限。`npm run test:code-content` 使用真实 Workers、原生 Git 与浏览器，检查重命名/复制复用、手动全量重建、默认分支切换和撤权，并清理独立夹具。远端需要 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN`、私有 `VEXUNI_TOKEN_FILE` 和可用的 `PLAYWRIGHT_MODULE`。验收和清理期间不要重新部署被测环境。

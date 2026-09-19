@@ -78,7 +78,7 @@ function git(args, cwd, secret = token, allowFailure = false) {
     });
   });
 }
-const tmp = await mkdtemp(join(tmpdir(), "onestorage-e2e-"));
+const tmp = await mkdtemp(join(tmpdir(), "vexuni-e2e-"));
 try {
   const status = await request("/setup");
   if (status.required)
@@ -145,7 +145,7 @@ try {
   await git(["config", "user.email", "test@example.invalid"], work);
   await writeFile(
     join(work, "README.md"),
-    "# OneStorage\n\nReal Git, durable storage.\n",
+    "# vexuni\n\nReal Git, durable storage.\n",
   );
   await git(["add", "."], work);
   await git(["commit", "-m", "Initial commit"], work);
@@ -451,7 +451,7 @@ try {
   await request(ap, "GET", undefined, read.token, 401);
   const html = await fetch(origin + "/" + username + "/" + name);
   assert.equal(html.status, 200);
-  assert.match(await html.text(), /OneStorage/);
+  assert.match(await html.text(), /vexuni/);
   assert.match(
     html.headers.get("content-security-policy"),
     /frame-ancestors 'none'/,

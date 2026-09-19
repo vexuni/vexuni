@@ -143,7 +143,7 @@ async function setup(protocol: "oidc" | "gitlab" = "oidc") {
     );
     assert.equal(r.status, expected, await r.clone().text());
     const set = r.headers.getSetCookie?.() || [];
-    const flow = set.find((s) => s.startsWith("onestorage_oidc="));
+    const flow = set.find((s) => s.startsWith("vexuni_oidc="));
     if (flow) cookie = flow.split(";")[0];
     return r;
   }
@@ -253,7 +253,7 @@ test("OIDC creates ordinary passwordless account, consumes callback and never st
     false,
     201,
   );
-  assert.match(r.headers.get("set-cookie")!, /onestorage_session=/);
+  assert.match(r.headers.get("set-cookie")!, /vexuni_session=/);
   const user = f.db
     .prepare("SELECT * FROM users WHERE username='federated'")
     .get()!;
@@ -275,7 +275,7 @@ test("OIDC state is bound to browser and cannot be replayed or used for login CS
   const f = await setup();
   await f.start();
   const cookie = f.getCookie();
-  f.setCookie("onestorage_oidc=attacker");
+  f.setCookie("vexuni_oidc=attacker");
   assert.equal(
     (await f.callback()).headers.get("location"),
     "/login?oidc_error=failed",
@@ -551,7 +551,7 @@ test("OIDC registration can resume after account insertion without creating anot
     false,
     201,
   );
-  assert.match(r.headers.get("set-cookie")!, /onestorage_session=/);
+  assert.match(r.headers.get("set-cookie")!, /vexuni_session=/);
   assert.equal(
     f.db.prepare("SELECT count(*) n FROM users WHERE username='ignored'").get()!
       .n,
@@ -575,7 +575,7 @@ test("GitLab OAuth shares explicit linking, stable-ID login and provider revocat
   const logged = await f.callback();
   const session = logged.headers
     .getSetCookie()
-    .find((x) => x.startsWith("onestorage_session="));
+    .find((x) => x.startsWith("vexuni_session="));
   assert.ok(session);
   const row = f.db
     .prepare("SELECT * FROM credentials WHERE oidc_provider_id=?")

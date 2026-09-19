@@ -323,7 +323,7 @@ app.onError((err, c) => {
       !/^\/(api|mcp|webhooks)(\/|$)/.test(c.req.path) &&
       /^\/[^/]+\/[^/]+\.git\//.test(c.req.path)
     )
-      c.header("WWW-Authenticate", 'Basic realm="OneStorage", charset="UTF-8"');
+      c.header("WWW-Authenticate", 'Basic realm="vexuni", charset="UTF-8"');
     return c.json({ error: err.message }, err.status);
   }
   if (archiveError(err)) return c.json({ error: "Repository archived" }, 409);
@@ -474,7 +474,7 @@ app.get("*", async (c, next) => {
         element(e) {
           e.setAttribute(
             "content",
-            "OneStorage — Open-source, self-hosted Git collaboration.",
+            "vexuni — Open-source, self-hosted Git collaboration.",
           );
         },
       })
@@ -505,10 +505,10 @@ app.use("*", async (c, next) => {
     }
   } else if (authorization) fail(401, "Unsupported authorization");
   const cookie = !authorization
-    ? getCookie(c, "onestorage_session")
+    ? getCookie(c, "vexuni_session")
     : undefined;
   token ||= cookie;
-  if (token?.startsWith("odt_") && authorization) {
+  if (token?.startsWith("vdt_") && authorization) {
     const deploy = await resolveDeployToken(c.env, token, basicUsername);
     c.set("deploy", deploy);
     c.set("kind", "deploy");
@@ -583,7 +583,7 @@ registerWorkspaceRoutes(app, { engine });
 registerOIDC(app);
 registerMCP(app);
 app.get("/api/health", (c) =>
-  c.json({ name: "OneStorage", version: packageInfo.version, status: "ok" }),
+  c.json({ name: "vexuni", version: packageInfo.version, status: "ok" }),
 );
 app.get("/api/bootstrap", async (c) =>
   c.json({
@@ -702,7 +702,7 @@ app.post("/api/login", async (c) => {
     .run();
   if (!issued.meta.changes)
     fail(409, "Account security changed; sign in again");
-  setCookie(c, "onestorage_session", token, {
+  setCookie(c, "vexuni_session", token, {
     httpOnly: true,
     secure: c.env.APP_ORIGIN.startsWith("https:"),
     sameSite: "Strict",
@@ -722,7 +722,7 @@ app.post("/api/logout", async (c) => {
     await c.env.DB.prepare("DELETE FROM credentials WHERE hash=?")
       .bind(c.get("credential"))
       .run();
-  deleteCookie(c, "onestorage_session", { path: "/" });
+  deleteCookie(c, "vexuni_session", { path: "/" });
   return c.json({ ok: true });
 });
 app.post("/api/password", async (c) => {
@@ -756,7 +756,7 @@ app.post("/api/password", async (c) => {
     ).bind(u.id, u.id, newHash),
   ]);
   if (!changed[0].meta.changes) fail(409, "Password changed; sign in again");
-  deleteCookie(c, "onestorage_session", { path: "/" });
+  deleteCookie(c, "vexuni_session", { path: "/" });
   return c.json({ ok: true });
 });
 app.get("/api/me", (c) => c.json({ user: c.get("user") }));
@@ -1196,7 +1196,7 @@ app.post("/api/repos/:namespace/:repo/commit", async (c) => {
   const result = await engineJSON(c, r, "/commit", {
     ...b,
     author: u.username,
-    email: `${u.username}@users.1s.hk`,
+    email: `${u.username}@users.vexuni.invalid`,
   });
   await audit(c, "repo.commit", r.id, result.sha);
   return c.json(result, 201);

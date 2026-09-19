@@ -1,18 +1,18 @@
-# 部署 OneStorage
+# 部署 vexuni
 
 **简体中文** · [English](en/DEPLOYMENT.md)
 
-## 当前实例
+## 实例构成
 
-规范地址为 **https://1s.hk**；主域名上的 Cubelink 已由 OneStorage 替换。旧 `git.1s.hk` 网页跳转至主域名，Git HTTPS 与 API 地址继续兼容。独立 Worker 地址为 `https://onestorage.xbitfun.workers.dev`，浏览器登录和 LFS 应使用规范地址，以匹配 APP_ORIGIN。
+每个 vexuni 实例由三个 Worker 与一组存储资源组成：主 Worker `vexuni` 处理网页、鉴权、Git HTTPS 与 API；私有编译 Worker `vexuni-build` 用 WASM 执行构建；独立 `vexuni-apps` 网关在单独域名提供已发布的应用。数据面包括 D1 `vexuni`（元数据）、R2 `vexuni-objects` 与 `vexuni-npm-cache`（对象与缓存）、Queue `vexuni-events`（后台事件）和 SQLite Durable Object 类 `Repository`。没有 Containers、Docker 镜像或外部 Git 服务器。
 
-资源：Worker `onestorage`、私有编译 Worker `onestorage-build`、D1 `onestorage`、R2 `onestorage-objects` 与 `onestorage-npm-cache`、Queue `onestorage-events`、SQLite Durable Object 类 `Repository`。应用由独立 `onestorage-apps` 网关提供。没有 Containers、Docker 镜像或外部 Git 服务器。
+规范地址由 `APP_ORIGIN` 指定，浏览器登录和 LFS 都应使用该地址。迁移旧域名时可设置可选变量 `LEGACY_APP_ORIGIN`：仅旧域名的网页 GET/HEAD 请求重定向到规范地址，原生 Git 和 API 请求不重定向。OIDC/OAuth 回调应指向 `<APP_ORIGIN>/api/auth/oidc/callback`。
 
 首次初始化通过网页完成，用户名和密码由操作者选择。初始化 secret 存放在本机被 Git 忽略的 `.data/production-bootstrap-secret.txt`（权限 0600），同时保存在 Worker secret 中。不要将它加入源码或公开发送。成功创建管理员后，D1 会锁定初始化，可删除云端 BOOTSTRAP_SECRET。
 
 ## 主域名与语言
 
-`APP_ORIGIN=https://1s.hk`，`LEGACY_APP_ORIGIN=https://git.1s.hk`。两个域名绑定同一主 Worker；仅旧域名网页 GET/HEAD 重定向，原生 Git 和 API 不重定向。浏览器需在新主域名重新登录；OIDC/OAuth 提供方的回调应改为 `https://1s.hk/api/auth/oidc/callback`。已有仓库 UUID、D1、R2、DO 与加密密钥保持不变。
+切换主域名时，新旧域名可同时绑定到同一主 Worker；浏览器需在新主域名重新登录，OIDC/OAuth 回调域名随之更新。仓库 UUID、D1、R2、DO 与加密密钥保持不变。
 
 平台支持简体中文和英文，语言菜单保存本机偏好；首次访问按浏览器语言协商，可用 `?lang=en` 或 `?lang=zh-CN` 指定。文档入口 `/docs` 跳转到所选语言，文档页可切换对应译文。代码、文件名、Issue 正文和其他用户内容不翻译。
 
@@ -24,10 +24,10 @@
 npm ci
 npx wrangler login
 npx wrangler whoami
-npx wrangler d1 create onestorage
-npx wrangler r2 bucket create onestorage-objects
-npx wrangler r2 bucket create onestorage-npm-cache
-npx wrangler queues create onestorage-events
+npx wrangler d1 create vexuni
+npx wrangler r2 bucket create vexuni-objects
+npx wrangler r2 bucket create vexuni-npm-cache
+npx wrangler queues create vexuni-events
 ```
 
 这些 create 命令仅用于新实例；当前实例的资源已存在，不能重复创建。将返回的数据库 UUID 填入 `wrangler.jsonc` 和 `wrangler.apps.jsonc`，两个配置的 `DB` / `OBJECTS` 必须指向本实例的同一数据库和 Git 对象桶。编译配置 `wrangler.build.jsonc` 的 `NPM_CACHE` 指向独立 npm 缓存桶，缓存清理配置见 [npm 缓存](CI-NPM-CACHE-v35.md)。
@@ -59,7 +59,7 @@ npx wrangler secret put CREDENTIAL_ENCRYPTION_KEY
 
 ## 关于一键部署
 
-[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2FDropKbit%2FOneStorage%2Ftree%2Fdeploy) 使用 [GitHub 的 deploy 分支](https://github.com/DropKbit/OneStorage/tree/deploy)。它包含完整源码和独立部署配置，不使用现有 `git.1s.hk` 的域名、数据库 ID 或凭据。
+[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fvexuni%2Fvexuni%2Ftree%2Fdeploy) 使用 [GitHub 的 deploy 分支](https://github.com/vexuni/vexuni/tree/deploy)。它包含完整源码和独立部署配置，不使用现有 `git.example.com` 的域名、数据库 ID 或凭据。
 
 Cloudflare 的部署表单创建或选择 D1、两个 R2 桶和 Queue，并把实际资源写入配置。服务地址由脚本自动生成，不需要在表单中填写。Worker 名使用 2–50 个小写字母、数字或连字符，且以字母开头、以字母或数字结尾。选择名称时，为衍生的 `<名称>-build` 和 `<名称>-apps` 也预留空闲名称；新实例不要复用已有实例的资源，尤其要检查下拉框是否自动选中了同名资源。
 
@@ -87,7 +87,7 @@ v0.23 升级先应用 `0018_oidc.sql`，再发布主 Worker；应用网关和编
 
 默认 `WEBHOOK_ALLOWED_HOSTS` 为空，不对外投递。操作者可配置逗号分隔的可信 HTTPS 接收端主机名，例如 `build.example.net,hooks.example.net`。接收端必须由你信任和管理，不使用任意租户可控 DNS 或内部地址。
 
-维护者通过 API 创建 `{url}`，得到一次性显示的签名 secret。事件仅包含事件名、仓库 UUID、actor、detail 和时间，不含代码或凭证。操作记录与 outbox 在 D1 同一 batch；Queue 调用失败由五分钟 Cron 补发。投递最多五次，失败状态可通过 deliveries API 查询。接收端校验时间戳/HMAC，并以 `X-OneStorage-Delivery` 去重。
+维护者通过 API 创建 `{url}`，得到一次性显示的签名 secret。事件仅包含事件名、仓库 UUID、actor、detail 和时间，不含代码或凭证。操作记录与 outbox 在 D1 同一 batch；Queue 调用失败由五分钟 Cron 补发。投递最多五次，失败状态可通过 deliveries API 查询。接收端校验时间戳/HMAC，并以 `X-vexuni-Delivery` 去重。
 
 Git ref 与 push 事件现在在 DO 中原子写入，再由 alarm 幂等投影至 D1 outbox。接收端仍需处理重复/延迟，并定期比较 refs；协作元数据与 Git 不是分布式事务。
 
@@ -125,4 +125,4 @@ GitHub App 在网页“密钥与连接”配置 app_id、installation_id、RSA p
 
 ## 可重复的云端验收
 
-`scripts/verify-cloud.mjs` 默认拒绝执行。操作者确认使用自己的测试实例后，设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`ONESTORAGE_ORIGIN`、`ONESTORAGE_NAMESPACE`、`ONESTORAGE_TOKEN`，运行 `node --import tsx scripts/verify-cloud.mjs`。令牌通过安全环境注入，不写入命令行或配置。脚本只创建随机 `accept_v03_` 私有仓库，并在 finally 中删除；读取公开 GitHub，不写外部上游。可设置 `ACCEPTANCE_REPORT` 将无凭证的结果保存至忽略目录。
+`scripts/verify-cloud.mjs` 默认拒绝执行。操作者确认使用自己的测试实例后，设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`VEXUNI_ORIGIN`、`VEXUNI_NAMESPACE`、`VEXUNI_TOKEN`，运行 `node --import tsx scripts/verify-cloud.mjs`。令牌通过安全环境注入，不写入命令行或配置。脚本只创建随机 `accept_v03_` 私有仓库，并在 finally 中删除；读取公开 GitHub，不写外部上游。可设置 `ACCEPTANCE_REPORT` 将无凭证的结果保存至忽略目录。

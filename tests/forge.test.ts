@@ -101,7 +101,7 @@ function git(args: string[], cwd: string, input?: Uint8Array) {
   });
 }
 function fixture() {
-  const dir = mkdtempSync(join(tmpdir(), "onestorage-forge-"));
+  const dir = mkdtempSync(join(tmpdir(), "vexuni-forge-"));
   git(["init", "-b", "main"], dir);
   git(["config", "user.name", "Test"], dir);
   git(["config", "user.email", author.email], dir);
@@ -465,7 +465,7 @@ test("filtered streaming archive and RE2 grep work; cursors bind immutable revis
       archive: { prefix: "snapshot/" },
       include_globs: ["src/**"],
     }),
-    dir = mkdtempSync(join(tmpdir(), "onestorage-archive-"));
+    dir = mkdtempSync(join(tmpdir(), "vexuni-archive-"));
   try {
     const p = join(dir, "snapshot.tar.gz");
     writeFileSync(p, Buffer.from(await archive.arrayBuffer()));

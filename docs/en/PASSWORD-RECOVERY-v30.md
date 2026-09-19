@@ -2,7 +2,7 @@
 
 [简体中文](../PASSWORD-RECOVERY-v30.md) · **English**
 
-OneStorage provides a one-use offline password recovery key through Workers/D1, without email or containers. In account security, enter your current password and enabled second factor to generate it, then save/download it immediately. It is shown once, lasts one year, and only one key exists per account; replacement immediately invalidates the old one.
+vexuni provides a one-use offline password recovery key through Workers/D1, without email or containers. In account security, enter your current password and enabled second factor to generate it, then save/download it immediately. It is shown once, lasts one year, and only one key exists per account; replacement immediately invalidates the old one.
 
 From “Forgot password?” submit username, recovery key, and new password. MFA-enabled accounts still require a fresh authenticator code or unused **MFA recovery code**. Password recovery keys and MFA recovery codes are separate; neither alone bypasses enabled two-factor authentication.
 

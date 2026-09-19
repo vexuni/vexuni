@@ -11,4 +11,4 @@ Recoverable archive arrived in [v0.10](ARCHIVE-v10.md), and transfer, aliases, a
 - Connections, webhooks, CI credentials, and hosted applications follow the transfer contract. Ownership, audit, and access changes commit transactionally, beyond a display-name edit.
 - Acceptance covers real Git, LFS, CI/runners, background sync, cross-space permissions, and concurrent requests in isolated projects. Never modify the canonical source repository as a test fixture.
 
-The earlier requirement to preserve Cubelink was superseded by the explicit v0.38 root-domain replacement request; see [deployment](DEPLOYMENT.md).
+The earlier requirement to preserve legacy site was superseded by the explicit v0.38 root-domain replacement request; see [deployment](DEPLOYMENT.md).

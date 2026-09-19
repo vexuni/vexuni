@@ -30,7 +30,7 @@ test("every document has two generated languages with working page, source and a
           );
       }
       for (const m of html.matchAll(
-        /href="https:\/\/github.com\/DropKbit\/OneStorage\/blob\/main\/([^"#]+)(?:#[^"]*)?"/g,
+        /href="https:\/\/github.com\/vexuni\/vexuni\/blob\/main\/([^"#]+)(?:#[^"]*)?"/g,
       ))
         await fs.access(m[1]);
     }

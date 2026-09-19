@@ -106,7 +106,7 @@ try {
       target_branch: "main",
       commit_message: "Browser workflow fixture",
       files: [
-        { path: ".onestorage-ci.json", content: JSON.stringify(config) },
+        { path: ".vexuni-ci.json", content: JSON.stringify(config) },
         { path: "package.json", content: '{"name":"ci-browser"}' },
         { path: "README.md", content: "# CI browser\n" },
       ],
@@ -152,13 +152,13 @@ try {
   checks += 2;
   await page
     .locator("#pipeline-config input[name=source_path]")
-    .fill(".onestorage-ci.json");
+    .fill(".vexuni-ci.json");
   await page.locator("#pipeline-config input[name=enabled]").uncheck();
   await action(ap + "/ci/config", "#pipeline-config button[type=submit]");
   await page.locator("#pipeline-config select[name=source_mode]").waitFor();
   assert.equal(
     (await api(ap + "/ci/config")).source_path,
-    ".onestorage-ci.json",
+    ".vexuni-ci.json",
   );
   checks++;
   const created = await action(
@@ -181,7 +181,7 @@ try {
   );
   assert.match(
     await page.locator(".content").innerText(),
-    /\.onestorage-ci\.json/,
+    /\.vexuni-ci\.json/,
   );
   checks += 3;
   await page.screenshot({ path: folder + "/workflow.png", fullPage: true });

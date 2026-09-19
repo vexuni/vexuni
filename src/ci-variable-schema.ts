@@ -5,7 +5,7 @@ export const variableKey = z
   .regex(/^[A-Z_][A-Z0-9_]{0,79}$/)
   .refine(
     (k) =>
-      !/^(ONESTORAGE_|GIT_|LD_|DYLD_|__)/.test(k) &&
+      !/^(VEXUNI_|GIT_|LD_|DYLD_|__)/.test(k) &&
       ![
         "HOME",
         "PATH",

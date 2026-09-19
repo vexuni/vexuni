@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import { createHash } from "node:crypto";
-const origin = (process.env.VERIFY_ORIGIN || "https://1s.hk").replace(
+const origin = (process.env.VERIFY_ORIGIN || "https://example.com").replace(
   /\/$/,
   "",
 );
@@ -52,15 +52,15 @@ for (const [path, challenge] of [
   if (challenge)
     assert.match(response.headers.get("www-authenticate"), /^Basic /);
 }
-if (origin === "https://1s.hk") {
-  const response = await fetch("https://git.1s.hk/1shk/nb?lang=en", {
+if (origin === "https://example.com") {
+  const response = await fetch("https://git.example.com/vexuni/vexuni?lang=en", {
     redirect: "manual",
     signal: AbortSignal.timeout(30000),
   });
   assert.equal(response.status, 308);
   assert.equal(
     response.headers.get("location"),
-    "https://1s.hk/1shk/nb?lang=en",
+    "https://github.com/vexuni/vexuni?lang=en",
   );
 }
 
@@ -72,6 +72,6 @@ console.log(
     sourceSHA256: hash(await readFile("public/source.tar.gz")),
     health,
     legacyDomain:
-      origin === "https://1s.hk" ? "redirect verified" : "not applicable",
+      origin === "https://example.com" ? "redirect verified" : "not applicable",
   }),
 );

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPair, exportPKCS8, jwtVerify } from "jose";
 import {
-  OneStorage,
+  Vexuni,
   createToken,
   validateWebhook,
   CommitBuilder,
@@ -75,7 +75,7 @@ test("SDK stream builder supports binary, streamed chunks, deletes and single-us
 test("SDK applies narrow scopes and refuses credential-bearing redirects", async () => {
   const pair = await generateKeyPair("ES256", { extractable: true });
   const calls: any[] = [];
-  const client = new OneStorage({
+  const client = new Vexuni({
     origin: "https://git.example.com",
     signer: { issuer: "owner", key: pair.privateKey },
     fetch: async (url, init) => {
@@ -101,14 +101,14 @@ test("SDK webhook verifier checks timestamp, signature and raw bytes", async () 
     stamp = String(Math.floor(Date.now() / 1000)),
     secret = "testsecret";
   const headers = new Headers({
-    "x-onestorage-timestamp": stamp,
-    "x-onestorage-signature": await signature(secret, stamp, payload),
+    "x-vexuni-timestamp": stamp,
+    "x-vexuni-signature": await signature(secret, stamp, payload),
   });
   assert.equal((await validateWebhook(payload, headers, secret)).valid, true);
   assert.equal(
     (await validateWebhook(payload + " ", headers, secret)).valid,
     false,
   );
-  headers.set("x-onestorage-timestamp", "1");
+  headers.set("x-vexuni-timestamp", "1");
   assert.equal((await validateWebhook(payload, headers, secret)).valid, false);
 });

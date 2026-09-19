@@ -31,7 +31,7 @@
 
 ## 生产与源码
 
-生产 D1 已备份，增量 `0007_account_security.sql` 已应用。主 Worker 发布于 `git.1s.hk`，健康检查返回 `0.6.0`。本轮不需要更新应用发布网关。`1s.hk` 返回 200 且保留 Cubelink 页面。
+生产 D1 已备份，增量 `0007_account_security.sql` 已应用。主 Worker 发布于 `git.example.com`，健康检查返回 `0.6.0`。本轮不需要更新应用发布网关。`example.com` 返回 200 且保留 旧站 页面。
 
 源码压缩包由显式允许列表构建；检查确认不含部署 PAT、生产加密密钥或初始化密钥。临时认证文件保存在忽略的 `.data` 并在交付后移除；数据库备份与部署记录不分发。Git 提交、最终 Worker 版本、源码 SHA-256 与镜像 `git fsck` 结果记录在本地 `.data/release-v06.json`。
 

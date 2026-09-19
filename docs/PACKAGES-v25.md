@@ -2,7 +2,7 @@
 
 **简体中文** · [English](en/PACKAGES-v25.md)
 
-OneStorage 使用 Workers 处理包协议，R2 保存不可变文件，D1 保存版本、标签和上传清理记录。Git 引用仍由 Durable Objects 协调，不引入容器或服务端 npm 进程。
+vexuni 使用 Workers 处理包协议，R2 保存不可变文件，D1 保存版本、标签和上传清理记录。Git 引用仍由 Durable Objects 协调，不引入容器或服务端 npm 进程。
 
 每个项目有独立的通用文件仓库和 npm registry。网页入口为项目的“包仓库”标签：浏览版本、文件与 SHA-256，上传通用文件，管理 npm 标签、撤回版本。包始终继承项目当前可见性及成员权限。
 
@@ -11,17 +11,17 @@ OneStorage 使用 Workers 处理包协议，R2 保存不可变文件，D1 保存
 项目 registry：
 
 ```text
-https://1s.hk/api/repos/SPACE/PROJECT/packages/npm/
+https://example.com/api/repos/SPACE/PROJECT/packages/npm/
 ```
 
 在使用该仓库的项目中创建 `.npmrc`，其中令牌使用环境变量引用：
 
 ```ini
-registry=https://1s.hk/api/repos/SPACE/PROJECT/packages/npm/
-//1s.hk/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${ONESTORAGE_TOKEN}
+registry=https://example.com/api/repos/SPACE/PROJECT/packages/npm/
+//example.com/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${VEXUNI_TOKEN}
 ```
 
-设置 `ONESTORAGE_TOKEN` 后，可以直接使用原生客户端：
+设置 `VEXUNI_TOKEN` 后，可以直接使用原生客户端：
 
 ```sh
 npm publish --access public
@@ -32,13 +32,13 @@ npm dist-tag rm your-package stable
 npm unpublish your-package@1.0.0 --force
 ```
 
-支持普通名称和 `@scope/name`。npm 要求无作用域包使用 `access=public`，但 OneStorage **仍以项目可见性为准**，这个参数不会把私有项目中的包公开。公开项目拒绝带 `access=restricted` 的发布；需要私有包时使用私有项目。包名中的 scope 只是 npm 名称，不授予任何 OneStorage 空间权限。
+支持普通名称和 `@scope/name`。npm 要求无作用域包使用 `access=public`，但 vexuni **仍以项目可见性为准**，这个参数不会把私有项目中的包公开。公开项目拒绝带 `access=restricted` 的发布；需要私有包时使用私有项目。包名中的 scope 只是 npm 名称，不授予任何 vexuni 空间权限。
 
-如果同时依赖 npm 官方仓库，建议只把自己的 scope 指向 OneStorage：
+如果同时依赖 npm 官方仓库，建议只把自己的 scope 指向 vexuni：
 
 ```ini
-@your-scope:registry=https://1s.hk/api/repos/SPACE/PROJECT/packages/npm/
-//1s.hk/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${ONESTORAGE_TOKEN}
+@your-scope:registry=https://example.com/api/repos/SPACE/PROJECT/packages/npm/
+//example.com/api/repos/SPACE/PROJECT/packages/npm/:_authToken=${VEXUNI_TOKEN}
 ```
 
 发布请求携带一个版本和一个 gzip/tar 附件。服务器计算 SHA-256、SHA-1 和 SHA-512，检查客户端的完整性摘要，并从 tar 中的 `package/package.json` 读取真实元数据。不会抓取客户端提供的 tarball URL；下载地址由当前项目地址生成。支持二进制文件、捆绑依赖、PAX/GNU 长文件名；路径越界、重复路径、链接、稀疏文件、损坏或截断的压缩数据会被拒绝。
@@ -48,14 +48,14 @@ npm unpublish your-package@1.0.0 --force
 ## 通用文件
 
 ```sh
-export PACKAGE_URL=https://1s.hk/api/repos/SPACE/PROJECT/packages/generic/tool/1.0.0/tool.zip
+export PACKAGE_URL=https://example.com/api/repos/SPACE/PROJECT/packages/generic/tool/1.0.0/tool.zip
 curl --fail --request PUT "$PACKAGE_URL" \
-  --header "Authorization: Bearer $ONESTORAGE_TOKEN" \
+  --header "Authorization: Bearer $VEXUNI_TOKEN" \
   --header "X-Package-SHA256: $(shasum -a 256 tool.zip | cut -d ' ' -f 1)" \
   --header "Content-Type: application/octet-stream" \
   --data-binary @tool.zip
 curl --fail "$PACKAGE_URL" \
-  --header "Authorization: Bearer $ONESTORAGE_TOKEN" --output tool.zip
+  --header "Authorization: Bearer $VEXUNI_TOKEN" --output tool.zip
 ```
 
 上传需要 `Content-Length` 和十六进制 SHA-256，写入过程直接流向 R2，由 R2 校验摘要。包名、版本和文件名最长 128 字符，以字母或数字开头，其余仅允许字母、数字、点、下划线、加号和连字符。同一通用版本可追加不同文件；同名文件不可替换。支持 GET、HEAD、单区间 Range、ETag 和校验和响应头。
@@ -110,9 +110,9 @@ curl --fail "$PACKAGE_URL" \
 
 ## CI/CD
 
-通用构建 Runner 可以在构建成功后执行 `npm publish`，通过 CI 变量显式选择一个有写权限的 `ONESTORAGE_TOKEN`，并使用上述 `.npmrc` 环境引用。将变量限制到受保护分支和发布环境；固定提交的构建、密钥租约与撤权逻辑沿用已有 CI 实现。普通下载只需只读 PAT。此次没有新增预置 Runner 包发布身份，PAT 的权限仍跟随其用户。
+通用构建 Runner 可以在构建成功后执行 `npm publish`，通过 CI 变量显式选择一个有写权限的 `VEXUNI_TOKEN`，并使用上述 `.npmrc` 环境引用。将变量限制到受保护分支和发布环境；固定提交的构建、密钥租约与撤权逻辑沿用已有 CI 实现。普通下载只需只读 PAT。此次没有新增预置 Runner 包发布身份，PAT 的权限仍跟随其用户。
 
-Cloudflare 隔离 Worker 的 TypeScript/npm 构建目前仍只从 npm 官方 registry 按锁文件获取依赖；OneStorage 私有 registry 的原生云构建依赖接入是后续目标。此次验证的是真实包服务及 npm 客户端，不能据此声称 Maven、PyPI、容器镜像仓库、完整 npmjs 或完整 GitLab API 已实现。
+Cloudflare 隔离 Worker 的 TypeScript/npm 构建目前仍只从 npm 官方 registry 按锁文件获取依赖；vexuni 私有 registry 的原生云构建依赖接入是后续目标。此次验证的是真实包服务及 npm 客户端，不能据此声称 Maven、PyPI、容器镜像仓库、完整 npmjs 或完整 GitLab API 已实现。
 
 参考：[npm publish](https://docs.npmjs.com/cli/commands/npm-publish/)、[GitLab npm registry](https://docs.gitlab.com/user/packages/npm_registry/)、[Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/)、[Workers 内存边界](https://developers.cloudflare.com/workers/platform/limits/)。
 

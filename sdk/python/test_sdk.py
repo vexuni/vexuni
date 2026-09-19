@@ -1,5 +1,5 @@
 import asyncio,io,json,os,unittest,uuid,base64
-from onestorage import OneStorage,create_token
+from vexuni import Vexuni,create_token
 from cryptography.hazmat.primitives.asymmetric import ec,rsa,utils,padding
 from cryptography.hazmat.primitives import serialization,hashes
 class SDKTests(unittest.TestCase):
@@ -16,7 +16,7 @@ class SDKTests(unittest.TestCase):
     @unittest.skipUnless(os.getenv('TEST_ORIGIN'),'local integration origin required')
     def test_integration(self):
         async def run():
-            client=OneStorage(os.environ['TEST_ORIGIN'],signer=dict(issuer=os.environ['TEST_ISSUER'],key=os.environ['TEST_PRIVATE_KEY'],key_id=os.environ['TEST_KEY_ID']))
+            client=Vexuni(os.environ['TEST_ORIGIN'],signer=dict(issuer=os.environ['TEST_ISSUER'],key=os.environ['TEST_PRIVATE_KEY'],key_id=os.environ['TEST_KEY_ID']))
             project=await client.create_repo(name='e2e_sdk_py_'+uuid.uuid4().hex[:8]);repo=client.repo(project['namespace'],project['name'])
             try:
                 self.assertEqual((await client.resolve_repo(project['id']))['id'],project['id'])

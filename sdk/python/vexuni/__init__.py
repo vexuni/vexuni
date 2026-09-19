@@ -1,11 +1,11 @@
-"""OneStorage async SDK. Streaming uploads use bounded chunks over HTTP."""
+"""vexuni async SDK. Streaming uploads use bounded chunks over HTTP."""
 from __future__ import annotations
 import asyncio, base64, hashlib, hmac, http.client, io, json, time, uuid
 from urllib.parse import urlsplit, urlencode, quote
 from dataclasses import dataclass
 from typing import Any, BinaryIO, Iterable
 
-class OneStorageError(Exception):
+class VexuniError(Exception):
     def __init__(self, status: int, message: str):
         self.status = status
         super().__init__(message)
@@ -14,7 +14,7 @@ def _b64(value: bytes) -> str:
     return base64.urlsafe_b64encode(value).rstrip(b'=').decode()
 
 def create_token(*, issuer: str, key: str | bytes, scopes: list[str], repo: str | None = None,
-                 subject='onestorage-python', algorithm='ES256', ttl=3600, key_id=None, refs=None) -> str:
+                 subject='vexuni-python', algorithm='ES256', ttl=3600, key_id=None, refs=None) -> str:
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import ec, padding, utils
     if algorithm not in ('ES256', 'ES384', 'ES512', 'RS256') or not 1 <= ttl <= 365*86400:
@@ -39,11 +39,11 @@ def create_token(*, issuer: str, key: str | bytes, scopes: list[str], repo: str 
 
 def validate_webhook(payload: bytes | str, headers: dict, secret: str, tolerance=300):
     headers = {k.lower(): v for k, v in headers.items()}
-    timestamp = headers.get('x-onestorage-timestamp', '')
+    timestamp = headers.get('x-vexuni-timestamp', '')
     if not timestamp.isdigit() or abs(time.time()-int(timestamp)) > tolerance: return None
     body = payload.encode() if isinstance(payload, str) else payload
     expected = 'sha256='+hmac.new(secret.encode(), timestamp.encode()+b'.'+body, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, headers.get('x-onestorage-signature', '')): return None
+    if not hmac.compare_digest(expected, headers.get('x-vexuni-signature', '')): return None
     return json.loads(body)
 
 @dataclass
@@ -53,7 +53,7 @@ class Response:
     body: bytes
     def json(self): return json.loads(self.body)
 
-class OneStorage:
+class Vexuni:
     def __init__(self, origin: str, token: str | None = None, *, signer: dict | None = None, timeout=60):
         self.origin = origin.rstrip('/')
         parsed = urlsplit(self.origin)
@@ -74,7 +74,7 @@ class OneStorage:
                 raw = response.read(1024*1024)
                 try: message = json.loads(raw).get('error', response.reason)
                 except (ValueError, AttributeError): message = response.reason
-                raise OneStorageError(response.status, message)
+                raise VexuniError(response.status, message)
             if sink is not None:
                 while chunk := response.read(1024*1024): sink.write(chunk)
                 data = b''
@@ -112,13 +112,13 @@ class OneStorage:
                 if item['id'] == id:
                     repository = item['namespace']+'/'+item['name']
                     break
-            if not repository: raise OneStorageError(404, 'Repository not found')
+            if not repository: raise VexuniError(404, 'Repository not found')
         return await self.request('/repo-url/'+quote(id,safe=''), repo=repository or id, scopes=['git:read'])
 
     def repo(self, namespace: str, name: str): return Repository(self, namespace, name)
 
 class Repository:
-    def __init__(self, client: OneStorage, namespace: str, name: str):
+    def __init__(self, client: Vexuni, namespace: str, name: str):
         self.client, self.id = client, namespace+'/'+name
         self.path = '/repos/'+quote(namespace,safe='')+'/'+quote(name,safe='')
 

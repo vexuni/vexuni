@@ -75,12 +75,12 @@ test("signed delivery is persisted and duplicate message does not redeliver", as
     calls++;
     assert.equal(url, "https://hooks.example.com/events");
     assert.equal(init.redirect, "manual");
-    assert.equal(init.headers["X-OneStorage-Delivery"], "d");
+    assert.equal(init.headers["X-vexuni-Delivery"], "d");
     assert.equal(
-      init.headers["X-OneStorage-Signature"],
+      init.headers["X-vexuni-Signature"],
       await signature(
         "signing-secret",
-        init.headers["X-OneStorage-Timestamp"],
+        init.headers["X-vexuni-Timestamp"],
         init.body,
       ),
     );

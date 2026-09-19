@@ -132,7 +132,7 @@ export async function exchangeOAuth(
       headers: {
         "content-type": "application/x-www-form-urlencoded",
         accept: "application/json",
-        "user-agent": "OneStorage",
+        "user-agent": "vexuni",
       },
       body: form,
       redirect: "manual",
@@ -150,7 +150,7 @@ export async function exchangeOAuth(
   const headers = {
     accept: "application/json",
     authorization: "Bearer " + token.access_token,
-    "user-agent": "OneStorage",
+    "user-agent": "vexuni",
     ...(cfg.protocol === "github"
       ? { "X-GitHub-Api-Version": "2022-11-28" }
       : {}),

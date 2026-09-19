@@ -159,7 +159,7 @@ const first = (
         {
           path: "test.cjs",
           content:
-            "const fs=require('node:fs'); console.log('npm test passed'); console.log(process.env.CI_TEST_SECRET); fs.writeFileSync('artifact.txt','built:'+process.env.ONESTORAGE_COMMIT_SHA);",
+            "const fs=require('node:fs'); console.log('npm test passed'); console.log(process.env.CI_TEST_SECRET); fs.writeFileSync('artifact.txt','built:'+process.env.VEXUNI_COMMIT_SHA);",
         },
       ],
     },
@@ -257,7 +257,7 @@ const runner = (
     await req(root + "/runners", "POST", { name: "e2e runner" }, ac, 201)
   ).data,
   run = (await req(root + "/runs", "POST", {}, ac, 201)).data;
-const dir = await mkdtemp(join(tmpdir(), "onestorage-runner-test-")),
+const dir = await mkdtemp(join(tmpdir(), "vexuni-runner-test-")),
   file = join(dir, "token");
 await writeFile(file, runner.token, { mode: 0o600 });
 try {
@@ -265,10 +265,10 @@ try {
     const proc = spawn(process.execPath, ["scripts/runner.mjs"], {
       env: {
         ...process.env,
-        ONESTORAGE_ORIGIN: origin,
-        ONESTORAGE_RUNNER_TOKEN_FILE: file,
-        ONESTORAGE_RUNNER_ONCE: "1",
-        ONESTORAGE_JOB_ENV: "CI_TEST_SECRET",
+        VEXUNI_ORIGIN: origin,
+        VEXUNI_RUNNER_TOKEN_FILE: file,
+        VEXUNI_RUNNER_ONCE: "1",
+        VEXUNI_JOB_ENV: "CI_TEST_SECRET",
         CI_TEST_SECRET: "test-secret-redact-" + suffix,
       },
       stdio: ["ignore", "pipe", "pipe"],

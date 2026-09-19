@@ -7,7 +7,7 @@ interface Env {
   PRIVATE_JWK: string;
   PUBLIC_JWK: string;
 }
-const client = "onestorage-acceptance-v23";
+const client = "vexuni-acceptance-v23";
 const equal = async (a: string, b: string) => {
   const hash = async (s: string) =>
     new Uint8Array(
@@ -58,7 +58,7 @@ export class IdentityFixture {
         return new Response("Bad redirect", { status: 400 });
       }
       if (
-        !["http://localhost:8787", "https://git.1s.hk"].includes(
+        !["http://localhost:8787", "https://git.example.com"].includes(
           callback.origin,
         ) ||
         callback.pathname !== "/api/auth/oidc/callback" ||
@@ -73,7 +73,7 @@ export class IdentityFixture {
         return new Response("Invalid authorization", { status: 400 });
       if (request.method === "GET")
         return new Response(
-          `<!doctype html><html><head><title>OneStorage test identity provider</title></head><body><h1>Test identity provider</h1><form method="post" action="${esc(url.pathname + url.search)}"><label>Subject<input name="subject" value="acceptance-user" required></label><label>Test password<input name="password" type="password" required></label><button>Authorize</button></form></body></html>`,
+          `<!doctype html><html><head><title>vexuni test identity provider</title></head><body><h1>Test identity provider</h1><form method="post" action="${esc(url.pathname + url.search)}"><label>Subject<input name="subject" value="acceptance-user" required></label><label>Test password<input name="password" type="password" required></label><button>Authorize</button></form></body></html>`,
           {
             headers: {
               "content-type": "text/html;charset=utf-8",

@@ -12,11 +12,11 @@
 - 候选 Worker `6eb9ab3e-6f32-489b-a464-a1253122c313`（提交 `42bc590`）完成生产端到端验收：94 次 API/浏览器响应断言。第一个候选 `a25fbbc672636fea235252eee1197745841934bd`，第二个候选 `8760e6da613a3612f458d32e9c4fd58ee584cc24`；根 CI 成功且发布 SHA 完全相同。第三个候选 CI 失败，目标分支保持第二个 SHA，移动端取消成功。
 - 生产独立原生 Git 克隆得到相同 main SHA，严格 fsck 通过；桌面和移动端页面无脚本错误、无移动端横向溢出。没有使用容器或外部 Runner 完成本轮候选检查。
 - 只读线上文件核对第一次超时，第二次通过全部文件字节核对后发现健康接口仍写死旧版本。已将接口改为读取 `package.json`，本地健康接口返回 `0.31.0`，331 项测试再次通过；最终发布包含这一修正。该超时没有被归因为历史 Git 500/503 的原因。
-- 修正版本号后，线上 19 个文件（含源码包）字节核对、健康接口和 Cubelink 检查全部通过。源码同步首次被本机 Git 鉴权拒绝，确认远端引用未变且令牌仍有效；隔离凭据缓存的推送预检通过。验收脚本现对原生 clone 禁用本次命令的 credential helper，避免读写用户 Keychain 中的临时测试凭据。
+- 修正版本号后，线上 19 个文件（含源码包）字节核对、健康接口和 旧站 检查全部通过。源码同步首次被本机 Git 鉴权拒绝，确认远端引用未变且令牌仍有效；隔离凭据缓存的推送预检通过。验收脚本现对原生 clone 禁用本次命令的 credential helper，避免读写用户 Keychain 中的临时测试凭据。
 
 ## 验收入口与边界
 
-`npm run check`、`npm run test:merge-queue`、`npm run build:production`、`npm run verify:release`。生产端到端需显式设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `ONESTORAGE_TOKEN_FILE`；浏览器依赖通过 `PLAYWRIGHT_MODULE` 指定。脚本只创建隔离的私有仓库/测试账户，结束后删除仓库、禁用账户并撤销凭据，以 D1 实际计数确认清理；保留禁用账户及审计历史。
+`npm run check`、`npm run test:merge-queue`、`npm run build:production`、`npm run verify:release`。生产端到端需显式设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `VEXUNI_TOKEN_FILE`；浏览器依赖通过 `PLAYWRIGHT_MODULE` 指定。脚本只创建隔离的私有仓库/测试账户，结束后删除仓库、禁用账户并撤销凭据，以 D1 实际计数确认清理；保留禁用账户及审计历史。
 
 本轮生产验收使用单 Worker 文件检查流水线；工作流/外部 Runner 沿用已有执行器，此轮没有分别部署外部 Runner 或运行所有组合。DO/R2/D1 之间不声称分布式事务；已验证的恢复边界、跨 Fork 快照限制及 24 小时意向有效期见 [功能说明](MERGE-QUEUE-v31.md)。
 

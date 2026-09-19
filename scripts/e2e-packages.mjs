@@ -8,8 +8,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-let token = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+let token = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   cookie = "",
   minted,
@@ -20,7 +20,7 @@ let token = process.env.ONESTORAGE_TOKEN_FILE
   browser;
 const space = "pkg_v25_" + crypto.randomUUID().slice(0, 8),
   ap = `/api/repos/${space}/project`,
-  root = await mkdtemp(join(tmpdir(), "onestorage-packages-")),
+  root = await mkdtemp(join(tmpdir(), "vexuni-packages-")),
   registry = origin + ap + "/packages/npm/";
 const check = (condition, message) => {
   assert.ok(condition, message);
@@ -92,7 +92,7 @@ async function npm(args, cwd, expected = 0) {
         cwd,
         env: {
           ...process.env,
-          ONESTORAGE_PACKAGE_TOKEN: token,
+          VEXUNI_PACKAGE_TOKEN: token,
           npm_config_loglevel: "error",
           npm_config_update_notifier: "false",
         },
@@ -147,7 +147,7 @@ try {
   );
   await writeFile(
     join(root, ".npmrc"),
-    `${registry.replace(/^https?:/, "")}:_authToken=\${ONESTORAGE_PACKAGE_TOKEN}\n`,
+    `${registry.replace(/^https?:/, "")}:_authToken=\${VEXUNI_PACKAGE_TOKEN}\n`,
     { mode: 0o600 },
   );
   const tarballs = [];
@@ -158,7 +158,7 @@ try {
       name,
       version: "1.0.0",
       main: "index.cjs",
-      description: "OneStorage npm acceptance",
+      description: "vexuni npm acceptance",
       files: ["index.cjs", "binary.bin"],
     };
     await writeFile(
@@ -363,7 +363,7 @@ try {
   await request(path, "GET", undefined, 401, {}, true);
   checks++;
   await request(path, "GET", undefined, 401, {
-    Authorization: "Bearer os_invalid",
+    Authorization: "Bearer vx_invalid",
   });
   checks++;
   const results = await Promise.all(
@@ -404,7 +404,7 @@ try {
     const context = await browser.newContext();
     await context.addCookies([
       {
-        name: "onestorage_session",
+        name: "vexuni_session",
         value: cookie.split("=").slice(1).join("="),
         url: origin,
       },
@@ -443,7 +443,7 @@ try {
   await publicResponse.body.cancel();
   checks++;
   await request(path, "GET", undefined, 401, {
-    Authorization: "Bearer os_invalid",
+    Authorization: "Bearer vx_invalid",
   });
   checks++;
   await api(ap + "/packages/versions/" + published.version_id, "DELETE");

@@ -28,16 +28,16 @@ Archive permits reads/token management but blocks package writes. Resource delet
 Use the configured token username and plaintext token as Git password through a credential manager or `GIT_ASKPASS`, never URL/history:
 
 ```sh
-git clone https://1s.hk/team/project.git
+git clone https://example.com/team/project.git
 ```
 
 ```ini
-@team:registry=https://1s.hk/api/repos/team/project/packages/npm/
-//1s.hk/api/repos/team/project/packages/npm/:_authToken=${ONESTORAGE_DEPLOY_TOKEN}
+@team:registry=https://example.com/api/repos/team/project/packages/npm/
+//example.com/api/repos/team/project/packages/npm/:_authToken=${VEXUNI_DEPLOY_TOKEN}
 ```
 
 ```sh
-npm publish --registry=https://1s.hk/api/repos/team/project/packages/npm/ --access=public
+npm publish --registry=https://example.com/api/repos/team/project/packages/npm/ --access=public
 npm install @team/example --ignore-scripts
 ```
 

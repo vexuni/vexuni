@@ -1,4 +1,4 @@
-# OneStorage v0.4：协作空间与 CI/CD
+# vexuni v0.4：协作空间与 CI/CD
 
 **简体中文** · [English](en/PLATFORM-v04.md)
 
@@ -47,18 +47,18 @@
 ### 启动通用 Runner
 
 1. 在 CI/CD 页面注册仓库 Runner，将只显示一次的令牌保存到专用主机上的文件，权限设为 `600`。
-2. 在该主机取得 OneStorage 源码并 `npm ci`，安装目标构建需要的 Node/npm、编译器等工具。Runner 支持 POSIX 主机。
+2. 在该主机取得 vexuni 源码并 `npm ci`，安装目标构建需要的 Node/npm、编译器等工具。Runner 支持 POSIX 主机。
 3. 配置目标 Cloudflare 账户的部署凭证，启动：
 
 ```sh
-export ONESTORAGE_ORIGIN=https://git.1s.hk
-export ONESTORAGE_RUNNER_TOKEN_FILE=/secure/onestorage-runner-token
-export ONESTORAGE_JOB_ENV=CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID
+export VEXUNI_ORIGIN=https://git.example.com
+export VEXUNI_RUNNER_TOKEN_FILE=/secure/vexuni-runner-token
+export VEXUNI_JOB_ENV=CLOUDFLARE_API_TOKEN,CLOUDFLARE_ACCOUNT_ID
 # CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID 由主机的密钥管理提供
 node scripts/runner.mjs
 ```
 
-`ONESTORAGE_JOB_ENV` 明确列出允许传给构建进程的环境变量；默认只传 PATH、全新 HOME、CI、ONESTORAGE_COMMIT_SHA 和 ONESTORAGE_REF。令牌文件路径与 Runner 令牌不作为构建环境变量传递。部署凭证留在执行主机，按允许列表传给构建。日志会遮盖已知令牌和显式传入环境变量中至少四字符的值，包括跨输出块的原始密钥；这是意外泄漏防护，不能阻止恶意代码编码或外传密钥。
+`VEXUNI_JOB_ENV` 明确列出允许传给构建进程的环境变量；默认只传 PATH、全新 HOME、CI、VEXUNI_COMMIT_SHA 和 VEXUNI_REF。令牌文件路径与 Runner 令牌不作为构建环境变量传递。部署凭证留在执行主机，按允许列表传给构建。日志会遮盖已知令牌和显式传入环境变量中至少四字符的值，包括跨输出块的原始密钥；这是意外泄漏防护，不能阻止恶意代码编码或外传密钥。
 
 **Runner 会执行仓库代码，必须运行在信任该仓库的专用账户/主机上。** 独立目录、环境变量筛选和日志遮盖不构成 OS 沙箱。服务端及 Worker 检查不使用容器，外部 Runner 也没有容器依赖。不要把不可信的多租户仓库接到共享部署主机。当前源码提取拒绝符号链接/设备文件，产物不可越出 checkout；含符号链接的项目需调整流水线输入或自行实现 Runner 协议。
 

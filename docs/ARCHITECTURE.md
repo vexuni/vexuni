@@ -2,6 +2,8 @@
 
 **简体中文** · [English](en/ARCHITECTURE.md)
 
+vexuni 是一个运行在 Cloudflare 上的小型代码托管平台：Git 协议、网页与 API 全部用 JavaScript 实现，对象保存在 R2，引用由 Durable Object 原子发布，元数据落在 D1。本文描述存储与发布顺序、并发模型和安全边界。
+
 Git 存储与 HTTP 路径后续加入了 [v0.12 索引和流式处理](GIT-SCALE-v12.md)；云端执行与协作能力见 [v0.5 及后续文档](CLOUD-NATIVE-v05.md)。当前平台由主服务、私有 WASM 编译服务、独立应用网关三个 Worker 组成。
 
 本项目参考 Code Storage 的公开文档独立实现。Git 处理全部使用 Cloudflare Workers 中的 JavaScript，不依赖容器、原生 Git 进程、SSH 守护进程，也不在 Git 接收路径执行仓库代码。原生 Git 仅作为测试客户端和兼容性对照。Web Crypto 负责哈希和签名检查，pako 处理 zlib，RE2JS 限制正则计算，jsdiff/node-diff3 处理文本差异与合并，OpenPGP 处理文本封装的签名。
@@ -43,7 +45,7 @@ Fork 预留新 UUID，复制期间持有目标 DO 队列，避免删除/GC 与�
 
 通用 HTTPS Git 和 GitHub App 模式使用纯 JavaScript 协议客户端。Pull 下载并验证受预算限制的完整可达对象图，持久化后发布 heads/tags，保留本地 Notes 和临时引用。公开 GitHub 模式只支持手动单向刷新。所有出站 URL 必须属于内置提供方或操作者允许的主机，不跟随重定向。
 
-双向写入先验证策略并刷入 R2，再保存持久 `sync-reconcile` 标记并安排 alarm。向上游推送使用其通告的旧 SHA；多引用操作要求上游支持 atomic，仅上游接受后才本地发布。任何不确定结果都保留恢复标记，在队列/DO alarm 实际拉取并核对上游引用前阻止普通操作。自动恢复有上限，也可手动重试 Pull。这不是跨提供方原子事务，但不会虚构推送成功。临时命名空间操作不离开 OneStorage。
+双向写入先验证策略并刷入 R2，再保存持久 `sync-reconcile` 标记并安排 alarm。向上游推送使用其通告的旧 SHA；多引用操作要求上游支持 atomic，仅上游接受后才本地发布。任何不确定结果都保留恢复标记，在队列/DO alarm 实际拉取并核对上游引用前阻止普通操作。自动恢复有上限，也可手动重试 Pull。这不是跨提供方原子事务，但不会虚构推送成功。临时命名空间操作不离开 vexuni。
 
 凭据和 GitHub App 私钥使用 AES-256-GCM、随机 IV、仓库/账户特定关联数据加密后存入 D1；加密密钥是 Worker secret。GitHub 安装 JWT 只申请指定仓库的令牌。入站签名 Webhook 先去重再入队。GitHub App LFS 校验 batch/action 主机与 SHA-256/长度后缓存，不向任意 action 主机发送安装凭据。通用/公开上游的 LFS 明确拒绝。
 

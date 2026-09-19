@@ -2,11 +2,11 @@
 
 **简体中文** · [English](en/CI-WORKFLOWS-v14.md)
 
-本轮把流水线配置纳入 Git 版本，并增加有独立运行记录、租约、日志和产物的依赖任务。现有单流水线 JSON 与外部 Runner 协议继续可用；这是 OneStorage 的配置格式，不是 GitLab YAML 兼容层。定时流水线、共享构建缓存、平台变量/密钥和云端 npm/TypeScript 工具链仍待开发。
+本轮把流水线配置纳入 Git 版本，并增加有独立运行记录、租约、日志和产物的依赖任务。现有单流水线 JSON 与外部 Runner 协议继续可用；这是 vexuni 的配置格式，不是 GitLab YAML 兼容层。定时流水线、共享构建缓存、平台变量/密钥和云端 npm/TypeScript 工具链仍待开发。
 
 ## 配置来源
 
-维护者在 CI/CD 中选择「仓库中的 JSON 文件」，默认路径 `.onestorage-ci.json`。API 保存 `{ "source_path": ".onestorage-ci.json", "enabled": true }`；页面保存配置则继续使用 `{ "config": { ... }, "enabled": true }`。配置文件最多 128 KiB UTF-8 JSON，路径必须在仓库内部。
+维护者在 CI/CD 中选择「仓库中的 JSON 文件」，默认路径 `.vexuni-ci.json`。API 保存 `{ "source_path": ".vexuni-ci.json", "enabled": true }`；页面保存配置则继续使用 `{ "config": { ... }, "enabled": true }`。配置文件最多 128 KiB UTF-8 JSON，路径必须在仓库内部。
 
 - Push 从事件记录的固定 SHA 读取配置；手动运行先解析分支，随后读取该 SHA 的文件。
 - MR 使用目标提交的配置来检查固定的源提交，来源 Fork 不能替换目标选择的执行规则。记录同时显示代码 SHA、配置路径和配置 SHA。
@@ -87,7 +87,7 @@ export default async ({ dependencies }) => ({
 
 Worker 输入产物总量最多 4 MiB，external 输入最多 16 MiB，编码后还有限额。普通 JS/WASM 源码、步骤输出与部署包仍受原有预算控制。只有已经成功发布到产物索引的文件可传递；不扫描其他任务的 R2 前缀，不读取未声明任务或另一工作流的产物。
 
-随源码提供的 Runner 在独立临时目录下载这些文件，设置 `ONESTORAGE_DEPENDENCIES`，命令可读取 `$ONESTORAGE_DEPENDENCIES/build/result.txt`；`ONESTORAGE_JOB` 为任务 ID。输入路径检查、源码解包与输出上传的限制继续生效，任务完成后清理临时目录。
+随源码提供的 Runner 在独立临时目录下载这些文件，设置 `VEXUNI_DEPENDENCIES`，命令可读取 `$VEXUNI_DEPENDENCIES/build/result.txt`；`VEXUNI_JOB` 为任务 ID。输入路径检查、源码解包与输出上传的限制继续生效，任务完成后清理临时目录。
 
 ## 状态、取消与发布
 
@@ -109,7 +109,7 @@ MR 的最新 CI 结果只选择顶层运行；一个成功子任务不能掩盖�
 
 首次生产执行在提交 API 返回一次 503 后失败并完成清理；后续完整工作流和独立原生 Git 验收通过，但这不足以确定或排除该写入异常的根因。此前版本也观察过写入失败，此问题仍需定位，不能把一次成功重试当作修复。
 
-迁移 `0014_ci_workflows.sql` 已应用于本地和生产 D1。迁移前导出生产备份并在独立 SQLite 中恢复，完整性和外键检查通过。部署不改变应用运行 Worker，也不修改 `1s.hk` 的 Cubelink 服务。
+迁移 `0014_ci_workflows.sql` 已应用于本地和生产 D1。迁移前导出生产备份并在独立 SQLite 中恢复，完整性和外键检查通过。部署不改变应用运行 Worker，也不修改 `example.com` 的 旧站 服务。
 
 部署需要先应用 `0014_ci_workflows.sql`。正式部署前按项目指南备份 D1；本轮不改变应用网关的 Worker 代码。
 

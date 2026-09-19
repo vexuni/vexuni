@@ -8,7 +8,7 @@
 
 先保存页面配置或仓库 JSON 配置，再添加名称、分支、五字段 Cron 和 IANA 时区。例如 `0 9 * * 1-5` 配合 `Asia/Singapore` 表示新加坡工作日 09:00。使用 Unix 星期约定：0/7 为周日，1 为周一。支持 cron-parser 的确定性五字段表达式；不支持秒字段、`H` 随机字段、`?` 占位或 `@daily` 等别名。时区及夏令时由 cron-parser/Luxon 解析；界面按计划时区显示下次计划时间。
 
-OneStorage 的计划表达式不是 Cloudflare 控制台 Cron 表达式。Cloudflare 只配置一个既有的 UTC `*/5 * * * *` 调度器，OneStorage 在应用中计算各计划的时区与到期时间。[Cloudflare Cron 文档](https://developers.cloudflare.com/workers/configuration/cron-triggers/)说明平台调度使用 UTC；[cron-parser 文档](https://github.com/harrisiirak/cron-parser)说明 IANA 时区的解析方式。
+vexuni 的计划表达式不是 Cloudflare 控制台 Cron 表达式。Cloudflare 只配置一个既有的 UTC `*/5 * * * *` 调度器，vexuni 在应用中计算各计划的时区与到期时间。[Cloudflare Cron 文档](https://developers.cloudflare.com/workers/configuration/cron-triggers/)说明平台调度使用 UTC；[cron-parser 文档](https://github.com/harrisiirak/cron-parser)说明 IANA 时区的解析方式。
 
 调度每五分钟检查一次，队列、网络及平台容量还可能延迟；不保证精确到分钟。一个周期内错过的多次时间合并为一个事件，停机后不补跑每个历史时间点。每仓库最多 20 个计划；每次扫描最多 50 个到期计划、重投最多 100 个持久事件。已有待派发事件的计划等待其处理后再生成后续事件。分钟级表达式可保存，但实际检查频率仍为五分钟。
 
@@ -38,7 +38,7 @@ D1 在同一事务中建立唯一时间槽事件并推进下次时间。Queues �
 
 ## 验收与部署
 
-迁移为 `0015_ci_schedules.sql`。必须先备份并验证 D1 恢复，再迁移、发布主 Worker；本版不修改 R2 对象格式、DO migration 或应用网关 Worker，也不改变 Cubelink。
+迁移为 `0015_ci_schedules.sql`。必须先备份并验证 D1 恢复，再迁移、发布主 Worker；本版不修改 R2 对象格式、DO migration 或应用网关 Worker，也不改变 旧站。
 
 类型检查和 216 项单元测试通过，覆盖命名星期（包括 THU）、随机 H 拒绝、时区/夏令时/闰日、重复调度与消费、队列失败、满容量冻结快照重试、无效配置与分支、撤权/归档/转移竞态、迟到产物拒绝、子任务取消、版本冲突和接管。`test:schedules` 本地通过 14 项语义检查、91 次 HTTP 断言，实际经 Miniflare scheduled event、D1、Queues、隔离 JS DAG 和跨任务产物完成；`test:schedule-ui` 通过 14 项桌面/390px 手机与只读用户检查，包括浏览器纽约时区与计划新加坡时区的显示一致性。核心回归通过 43 次 API 断言及原生 Git/LFS 检查；完整工作流回归通过 23 项语义检查、97 次 HTTP 断言，包含随源码提供的真实外部 Runner、版本化配置与 MR 规则。浏览器全站回归 42 项、工作流 UI 回归 18 项、原生 Git push → 版本化 DAG → clone/fsck 回归 21 项通过。生产 `test:schedules` 通过 14 项语义检查、87 次 HTTP 断言，固定代码/配置 SHA 为 `c19f539d08398a041f6cc8352631d2421c852771`。Cloudflare tail 确认实际 `*/5 * * * *` scheduled event 成功，随后 D1/Queues 启动两级隔离 JS 工作流并传递产物；没有使用生产手动触发替代 Cron。发布复查曾发现随机 H 拒绝规则误拒绝 THU，修正后新增命名星期用例，并重跑本地及生产定时专项；这里记录的是修正后的结果。生产独立原生 Git → DAG → clone/fsck 回归通过 21 项检查。
 

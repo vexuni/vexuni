@@ -87,7 +87,7 @@ export function registerForgeRoutes(app: Hono<App>, h: Helpers) {
     if (user && !data.author)
       data.author = {
         name: user.username,
-        email: user.username + "@users.1s.hk",
+        email: user.username + "@users.vexuni.invalid",
       };
     const response = await h.engine(c, repo, path, {
       method: "POST",

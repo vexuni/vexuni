@@ -12,8 +12,8 @@ const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
 const prefix = ".data/v31-" + (remote ? "production" : "local") + "-queue";
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await fs.readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await fs.readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let admin = token ? { Authorization: "Bearer " + token } : {},
   checks = 0;

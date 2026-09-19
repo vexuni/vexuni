@@ -36,7 +36,7 @@ async function repositoryClass() {
       },
     ],
   });
-  const folder = await mkdtemp(join(tmpdir(), "onestorage-alarm-test-"));
+  const folder = await mkdtemp(join(tmpdir(), "vexuni-alarm-test-"));
   const entry = join(folder, "repository.mjs");
   await writeFile(entry, bundled.outputFiles[0].contents);
   let Repository;
@@ -420,7 +420,7 @@ test("real snapshot prelude checks project versions and uses isolated published 
   const response = await repository.fetch(
     new Request("https://repo/browse", { headers }),
   );
-  assert.equal(response.headers.get("x-onestorage-read-mode"), "snapshot");
+  assert.equal(response.headers.get("x-vexuni-read-mode"), "snapshot");
   const data = await response.json();
   assert.equal(data.data.ref, commit.oid);
   assert.equal(data.readme.ref, commit.oid);

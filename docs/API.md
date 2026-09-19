@@ -2,9 +2,9 @@
 
 **简体中文** · [English](en/API.md)
 
-基础地址：`https://1s.hk/api`，本地为 `http://localhost:8787/api`。使用 `Authorization: Bearer <token>` 传递短期 PAT；不要把令牌放进 URL、查询参数或命令历史。浏览器会话写请求还必须携带与配置一致的 `Origin`。
+基础地址：`https://example.com/api`，本地为 `http://localhost:8787/api`。使用 `Authorization: Bearer <token>` 传递短期 PAT；不要把令牌放进 URL、查询参数或命令历史。浏览器会话写请求还必须携带与配置一致的 `Origin`。
 
-本文介绍基础 Git API；完整机器可读契约为 [`/openapi.json`](https://1s.hk/openapi.json)。后续协作与平台接口见各功能指南。响应一般为 JSON；错误含 `error`，校验错误可含 `details`。400 表示参数错误，401 未认证，403 权限不足，404 不存在或隐藏，409 冲突，413 超限，429 限流，5xx 为运行时或存储错误。写请求失败不一定代表未提交，重试前先读取远端引用。
+本文介绍基础 Git API；完整机器可读契约为 [`/openapi.json`](https://example.com/openapi.json)。后续协作与平台接口见各功能指南。响应一般为 JSON；错误含 `error`，校验错误可含 `details`。400 表示参数错误，401 未认证，403 权限不足，404 不存在或隐藏，409 冲突，413 超限，429 限流，5xx 为运行时或存储错误。写请求失败不一定代表未提交，重试前先读取远端引用。
 
 ## 账户与项目
 
@@ -56,13 +56,13 @@ PAT 创建接受 `{name,scope:"read"或"write",days:1..365}`，明文只返回�
 ## Git 与 LFS
 
 ```sh
-git clone https://1s.hk/alice/project.git
+git clone https://example.com/alice/project.git
 # 用户名为 alice；密码使用 PAT，而非账户密码
 ```
 
 支持 HTTPS smart HTTP、v0/v2、info/refs、upload-pack、receive-pack、OFS_DELTA、REF_DELTA 和 thin pack；输出为完整 zlib 对象。公开仓库允许匿名克隆，私有仓库需有效凭据。PAT 默认禁止改写历史；JWT 可由引用策略限制。默认分支不能删除，批量引用更新全成或全败。不支持 SSH、dumb HTTP、压缩请求体、SHA-256 Git、shallow/partial clone。资源预算见[限制](LIMITS.md)。
 
-LFS 基址为 `https://1s.hk/alice/project.git/info/lfs`。`POST /objects/batch` 接受 operation 与 `{oid,size}` 列表；PUT `/objects/:sha256` 上传并校验 SHA-256（16 MiB），GET 授权流式下载。Action 使用可信实例地址和请求的认证头；缺失对象单项 404。相同 OID 仍按仓库隔离。不支持 LFS 锁和可选 verify action。
+LFS 基址为 `https://example.com/alice/project.git/info/lfs`。`POST /objects/batch` 接受 operation 与 `{oid,size}` 列表；PUT `/objects/:sha256` 上传并校验 SHA-256（16 MiB），GET 授权流式下载。Action 使用可信实例地址和请求的认证头；缺失对象单项 404。相同 OID 仍按仓库隔离。不支持 LFS 锁和可选 verify action。
 
 ## 委托身份与引用隔离
 
@@ -84,6 +84,6 @@ PUT `/upstream` 设置描述或 null，DELETE `/base` 解绑；POST `/pull-upstr
 
 维护者管理项目 `/webhooks`（最多 10 项）、DELETE `/webhooks/:id`、GET `/deliveries`（最近 100 条）。URL 必须为 `WEBHOOK_ALLOWED_HOSTS` 明确允许的 HTTPS 主机。创建只显示一次 secret，可指定 events。已发布 push 事件与 refs 原子保存，拒绝/无变化探针不发成功事件；同步事件含 started/succeeded/failed，协作事件使用 D1 outbox。至少一次投递，接收方按 ID 去重。
 
-载荷 `{id,event,repository_id,actor,detail,timestamp}`；头为 X-OneStorage-Delivery、X-OneStorage-Timestamp（秒）、X-OneStorage-Signature（sha256=hex）。对 `timestamp + "." + rawBody` 计算 HMAC-SHA256，常量时间比较，检查新鲜时间并去重。10 秒内返回 2xx，不跟随跳转。
+载荷 `{id,event,repository_id,actor,detail,timestamp}`；头为 X-vexuni-Delivery、X-vexuni-Timestamp（秒）、X-vexuni-Signature（sha256=hex）。对 `timestamp + "." + rawBody` 计算 HMAC-SHA256，常量时间比较，检查新鲜时间并去重。10 秒内返回 2xx，不跟随跳转。
 
 POST `/mcp` 实现无状态 Streamable HTTP JSON-RPC，支持协议 2025-03-26、2025-06-18、2025-11-25，initialize、ping、tools/list/call、resources/list/read。GET 返回 405，无 SSE 会话。客户端通过 Authorization 传 PAT/JWT，每个工具复用 REST 权限。`/llms.txt` 提供机器入口。SDK 使用方法见[三语言 SDK](SDK.md)。

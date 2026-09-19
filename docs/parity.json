@@ -736,7 +736,7 @@
       ],
       "verification": "Local workerd/native-Git coverage plus operator-owned Cloudflare acceptance; see VERIFICATION.md for tested cases and limits.",
       "cloud_verified": true,
-      "note": "OneStorage additionally copies available reachable LFS objects; Code Storage documents Git history only."
+      "note": "vexuni additionally copies available reachable LFS objects; Code Storage documents Git history only."
     },
     {
       "id": "sync",

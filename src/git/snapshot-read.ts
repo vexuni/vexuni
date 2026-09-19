@@ -233,6 +233,6 @@ export async function snapshotResponse(response: Response) {
     yield data;
   }
   const headers = new Headers(response.headers);
-  headers.set("X-OneStorage-Read-Mode", "snapshot");
+  headers.set("X-vexuni-Read-Mode", "snapshot");
   return streamResponse(body(), headers, 20000, response.status);
 }

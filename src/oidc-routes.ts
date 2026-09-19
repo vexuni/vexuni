@@ -23,7 +23,7 @@ import {
 
 const adminGuard =
   "EXISTS(SELECT 1 FROM users u JOIN credentials c ON c.user_id=u.id WHERE u.id=? AND u.admin=1 AND u.disabled=0 AND c.hash=? AND c.scope='write' AND c.kind IN ('session','pat') AND c.expires_at>?)";
-const cookieName = "onestorage_oidc",
+const cookieName = "vexuni_oidc",
   prefix = "/api/auth/oidc";
 interface Flow {
   state_hash: string;
@@ -142,7 +142,7 @@ async function issue(
   ]);
   if (!result[1].meta.changes)
     fail(409, "Account or login changed; start again");
-  setCookie(c, "onestorage_session", token, {
+  setCookie(c, "vexuni_session", token, {
     httpOnly: true,
     secure: c.env.APP_ORIGIN.startsWith("https:"),
     sameSite: "Strict",

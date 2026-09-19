@@ -2,6 +2,8 @@
 
 [简体中文](../ARCHITECTURE.md) · **English**
 
+vexuni is a small code hosting platform running on Cloudflare: the Git protocol, the website, and every API are implemented in JavaScript, objects live in R2, refs are published atomically by a Durable Object, and metadata lives in D1. This document describes the storage and publication ordering, the concurrency model, and the security boundaries.
+
 The Git storage/HTTP path is extended by [v0.12 indexing and streaming](GIT-SCALE-v12.md); cloud execution and collaboration are documented in [v0.5+](CLOUD-NATIVE-v05.md).
 
 Independent implementation inspired by public Code Storage documentation. All Git processing is JavaScript in Cloudflare Workers; no container, native Git process or SSH daemon. The Git path never executes repository code. Native Git is only the test client/oracle. Web Crypto performs hashing/signature checks, pako handles zlib, RE2JS bounds regex matching, jsdiff/node-diff3 implement text comparison/merge, OpenPGP handles armored signatures.
@@ -45,7 +47,7 @@ Ref events are recorded atomically in the DO and idempotently projected to D1 de
 
 Generic HTTPS Git and GitHub App mode use a pure JavaScript protocol client. Pull downloads/validates the complete bounded reachable graph, persists objects, then publishes heads/tags; local Notes and ephemeral refs remain. Public GitHub mode requires manual one-way refresh. All outbound URLs are validated against known provider/operator hosts; no redirects are followed.
 
-For bidirectional writes, policy validation and R2 flush precede a durable `sync-reconcile` marker and alarm. The server pushes upstream with advertised old SHAs, requiring atomic support for multiple refs, then publishes locally only after upstream acceptance. Any uncertain outcome retains the marker and blocks ordinary operations until a queued/DO-alarm pull reconciles actual upstream refs. Auto-recovery is bounded; manual pull retries remain available. This ordering is not a cross-provider atomic transaction, but avoids acknowledging a fabricated successful push. Ephemeral operations do not leave OneStorage.
+For bidirectional writes, policy validation and R2 flush precede a durable `sync-reconcile` marker and alarm. The server pushes upstream with advertised old SHAs, requiring atomic support for multiple refs, then publishes locally only after upstream acceptance. Any uncertain outcome retains the marker and blocks ordinary operations until a queued/DO-alarm pull reconciles actual upstream refs. Auto-recovery is bounded; manual pull retries remain available. This ordering is not a cross-provider atomic transaction, but avoids acknowledging a fabricated successful push. Ephemeral operations do not leave vexuni.
 
 Credentials and GitHub App private keys are encrypted in D1 with AES-256-GCM, random IV and repository/account-specific associated data; the encryption key is a Worker secret. GitHub installation JWTs request repository-narrow tokens. Signed incoming webhooks are deduplicated before enqueueing. GitHub App LFS checks batch/action hosts and SHA-256/size before caching; it never sends installation credentials to arbitrary action hosts. Generic/public upstream LFS is rejected explicitly.
 

@@ -34,4 +34,4 @@
 
 `GET /api/repos/:namespace/:repo/code-index` 读取状态；`POST .../code-index/rebuild` 返回 202。已排队但未开始的新重建请求可合并；构建中的新请求会留到后续。待办先持久化，因此唤醒请求异常可由 cron 恢复。
 
-开发验证：`npm run check`；本地 Workers 启动且迁移后，设置 `PLAYWRIGHT_MODULE` 运行 `npm run test:code-index`。远端需要显式 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 与私有 `ONESTORAGE_TOKEN_FILE`；脚本创建并清理独立夹具，使用禁用 credential helper 的原生 Git 和浏览器，禁止在验收及清理期间重新部署该环境。
+开发验证：`npm run check`；本地 Workers 启动且迁移后，设置 `PLAYWRIGHT_MODULE` 运行 `npm run test:code-index`。远端需要显式 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 与私有 `VEXUNI_TOKEN_FILE`；脚本创建并清理独立夹具，使用禁用 credential helper 的原生 Git 和浏览器，禁止在验收及清理期间重新部署该环境。

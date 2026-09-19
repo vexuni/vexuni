@@ -128,7 +128,7 @@ test("cloud modules preserve WASM bytes and reject reserved/traversal paths and 
     }),
   );
   assert.throws(() =>
-    modulesFor({ "__onestorage_ci.js": { content: "host override" } }),
+    modulesFor({ "__vexuni_ci.js": { content: "host override" } }),
   );
   assert.throws(() =>
     pipelineSchema.parse({

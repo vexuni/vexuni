@@ -31,7 +31,7 @@ export async function searchPage(h) {
           `<option value="${value}" ${(params.get(name) || fallback) === value ? "selected" : ""}>${text}</option>`,
       )
       .join("")}</select></label>`;
-  document.title = i18nText("跨项目搜索 · OneStorage");
+  document.title = i18nText("跨项目搜索 · vexuni");
   layout(
     i18nHTML`<div class="titlebar"><h1>跨项目搜索</h1></div><form id="global-search" class="panel search-form" role="search"><label class="field" for="global-query">关键词<input id="global-query" name="q" value="${esc(q)}" placeholder="搜索标题、正文或选择代码范围" maxlength="128" required></label><div class="search-filters">${select("type", i18nText("内容类型"), labels, "all")}${select("state", i18nText("协作状态"), states, "all")}${select("archived", i18nText("归档项目"), { include: i18nText("包含归档"), exclude: i18nText("仅未归档"), only: i18nText("仅已归档") }, "include")}<label class="field" for="search-namespace">空间标识<input id="search-namespace" name="namespace" value="${esc(params.get("namespace") || "")}" maxlength="64" placeholder="留空搜索所有可访问空间"></label></div><div class="search-filters" id="code-search-filters"><label class="field">文件路径包含<input name="path" value="${esc(params.get("path") || "")}" maxlength="1000"></label><label class="field">扩展名<input name="extension" value="${esc(params.get("extension") || "")}" maxlength="32" placeholder="例如 ts、py"></label></div><button type="submit" class="btn primary">搜索</button><p class="hint">代码搜索至少输入三个字符，检索各项目默认分支的已发布索引快照。更新异步完成；结果中的版本和覆盖提示说明索引状态。协作搜索不包括评论及 Wiki 历史。</p></form><section id="search-results" class="panel" aria-live="polite" aria-busy="${!!q.trim()}"><div class="empty">${q.trim() ? i18nText("正在搜索…") : i18nText("输入关键词开始搜索")}</div></section>`,
     i18nText("搜索"),

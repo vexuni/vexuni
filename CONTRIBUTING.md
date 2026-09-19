@@ -2,7 +2,7 @@
 
 **简体中文** · [English](CONTRIBUTING.en.md)
 
-OneStorage 按 AGPL-3.0-only 接收贡献。
+vexuni 按 AGPL-3.0-only 接收贡献。
 
 1. 阅读 [架构设计](docs/ARCHITECTURE.md)，尤其是先写 R2、后发布引用的顺序以及授权检查。
 2. 安装 Node.js 22.13+ 和 npm。原生 Git、tar 仅供测试使用，不是服务运行时依赖。
@@ -24,7 +24,7 @@ OneStorage 按 AGPL-3.0-only 接收贡献。
 
 - 跨 Fork 审阅：先 `KEEP_REVIEW_FIXTURE=1 npm run test:reviews`，再 `npm run test:review-ui`，使用同样的 Playwright 配置。覆盖来源选择、分支加载、创建请求、Diff 两侧、讨论/回复分页、审阅与 CI 门禁以及真实合并。主测试仓库留作检查，关闭分页请求、删除额外 Fork、退出隔离会话。再次运行前建立新数据，因为已完成的合并不可逆。截图在 `.data/v13-review-ui`，凭据只存在被忽略的 `.data`。
 - CI 工作流：运行 `npm run test:workflows`，覆盖真实 Dynamic Worker、版本化配置、取消/发布门禁和仓库提供的外部 Runner。`npm run test:workflow-git` 验证原生 push、自动工作流、clone 和严格 fsck；`npm run test:workflow-ui` 验证配置模式、任务导航、快照重试、移动布局和 Reader 权限。等全部临时数据清理后再改运行时代码或资源。
-- Git 持久化：另运行 `npm run test:git-reliability`，覆盖多次 API 提交、并发 expected-SHA 写入、旧 SHA 拒绝、增量 push/fetch 和 clone/fsck。提供方故障用例在 `tests/git-reliability.test.ts`；不得向生产存储注入故障。远程脚本需 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `ONESTORAGE_TOKEN_FILE`。生产诊断仅保存脱敏字段。
+- Git 持久化：另运行 `npm run test:git-reliability`，覆盖多次 API 提交、并发 expected-SHA 写入、旧 SHA 拒绝、增量 push/fetch 和 clone/fsck。提供方故障用例在 `tests/git-reliability.test.ts`；不得向生产存储注入故障。远程脚本需 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `VEXUNI_TOKEN_FILE`。生产诊断仅保存脱敏字段。
 - 定时 CI：运行 `npm run test:schedules` 与 `npm run test:schedule-ui`。前者等待真实 Cron/Queue 触发，在 Cloudflare 上最长约九分钟。后者使用可选 Playwright。清理完成前不重建或部署；远程验收需显式启用与私有令牌文件。
 - CI 变量：运行 `npm run test:variables`（真实 Worker、外部 Runner、租约、轮换、日志脱敏）和 `npm run test:variable-ui`（只写值、编辑、权限、移动端）。同样遵守清理与远程启用规则。测试值不能使用真实部署凭据。
 - 共享 CI 缓存：运行 `npm run test:caches` 和 `npm run test:cache-ui`，验证真实 Worker/外部 Runner 复用、失败工作流隔离、代际失效、租约拒绝、有界解包、配额和最终 R2 回收。等待清理后再改代码或部署。

@@ -14,9 +14,9 @@ test("language negotiation honors explicit choice, cookie and weighted browser p
   assert.equal(supportedLocale("<script>"), null);
   assert.equal(
     requestLocale(
-      new Request("https://1s.hk/?lang=en", {
+      new Request("https://example.com/?lang=en", {
         headers: {
-          cookie: "onestorage_locale=zh-CN",
+          cookie: "vexuni_locale=zh-CN",
           "accept-language": "zh-CN",
         },
       }),
@@ -25,9 +25,9 @@ test("language negotiation honors explicit choice, cookie and weighted browser p
   );
   assert.equal(
     requestLocale(
-      new Request("https://1s.hk/", {
+      new Request("https://example.com/", {
         headers: {
-          cookie: "onestorage_locale=zh-CN",
+          cookie: "vexuni_locale=zh-CN",
           "accept-language": "en-US",
         },
       }),
@@ -38,27 +38,27 @@ test("language negotiation honors explicit choice, cookie and weighted browser p
 test("domain migration redirects browser pages without redirecting native Git and API requests", () => {
   const url = (path: string, method = "GET") =>
     canonicalPageURL(
-      new Request("https://git.1s.hk" + path, { method }),
-      "https://1s.hk",
-      "https://git.1s.hk",
+      new Request("https://git.example.com" + path, { method }),
+      "https://example.com",
+      "https://git.example.com",
     );
   assert.equal(
-    url("/1shk/nb?path=README.md&lang=en"),
-    "https://1s.hk/1shk/nb?path=README.md&lang=en",
+    url("/vexuni/nb?path=README.md&lang=en"),
+    "https://example.com/vexuni/nb?path=README.md&lang=en",
   );
   assert.equal(
     url("/docs/en/index.html", "HEAD"),
-    "https://1s.hk/docs/en/index.html",
+    "https://example.com/docs/en/index.html",
   );
-  assert.equal(url("/1shk/nb.git/info/refs?service=git-upload-pack"), null);
-  assert.equal(url("/1shk/nb.git/git-receive-pack", "POST"), null);
+  assert.equal(url("/vexuni/nb.git/info/refs?service=git-upload-pack"), null);
+  assert.equal(url("/vexuni/nb.git/git-receive-pack", "POST"), null);
   assert.equal(url("/api/repos"), null);
   assert.equal(url("/mcp"), null);
   assert.equal(
     canonicalPageURL(
       new Request("https://unrelated.test/"),
-      "https://1s.hk",
-      "https://git.1s.hk",
+      "https://example.com",
+      "https://git.example.com",
     ),
     null,
   );
@@ -67,9 +67,9 @@ test("malformed URLs do not crash canonicalization and encoded APIs stay compati
   for (const path of ["/%ZZ", "/%61pi/repos"])
     assert.equal(
       canonicalPageURL(
-        new Request("https://git.1s.hk" + path),
-        "https://1s.hk",
-        "https://git.1s.hk",
+        new Request("https://git.example.com" + path),
+        "https://example.com",
+        "https://git.example.com",
       ),
       null,
     );

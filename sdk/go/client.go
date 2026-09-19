@@ -1,4 +1,4 @@
-package onestorage
+package vexuni
 
 import (
 	"bytes"
@@ -21,7 +21,7 @@ type Error struct {
 	Message string
 }
 
-func (e *Error) Error() string { return fmt.Sprintf("OneStorage HTTP %d: %s", e.Status, e.Message) }
+func (e *Error) Error() string { return fmt.Sprintf("vexuni HTTP %d: %s", e.Status, e.Message) }
 
 type Client struct {
 	Origin, Token string
@@ -32,7 +32,7 @@ type Client struct {
 func New(origin, token string) (*Client, error) {
 	u, err := url.Parse(origin)
 	if err != nil || u == nil || (u.Scheme != "https" && u.Scheme != "http") || u.User != nil || u.Host == "" || (u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.Fragment != "" {
-		return nil, errors.New("invalid OneStorage origin")
+		return nil, errors.New("invalid vexuni origin")
 	}
 	return &Client{Origin: strings.TrimRight(origin, "/"), Token: token}, nil
 }

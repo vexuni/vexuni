@@ -5,7 +5,7 @@ node_modules/
 !.env.example
 dist/
 .data/
-.onestorage-*.generated.json
+.vexuni-*.generated.json
 *.log
 .DS_Store
 coverage/

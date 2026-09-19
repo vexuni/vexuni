@@ -73,7 +73,7 @@ export async function digest(value: string | Uint8Array) {
   );
 }
 export function randomToken() {
-  return "os_" + hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
+  return "vx_" + hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
 }
 export async function passwordHash(
   password: string,

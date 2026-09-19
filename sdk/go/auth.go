@@ -1,4 +1,4 @@
-package onestorage
+package vexuni
 
 import (
 	"crypto"
@@ -66,7 +66,7 @@ func (s *Signer) Token(repo string, scopes []string) (string, error) {
 	}
 	subject := s.Subject
 	if subject == "" {
-		subject = "onestorage-go"
+		subject = "vexuni-go"
 	}
 	now := time.Now()
 	claims := map[string]any{"iss": s.Issuer, "sub": subject, "iat": now.Unix(), "exp": now.Add(ttl).Unix(), "scopes": scopes}
@@ -128,7 +128,7 @@ func ValidateWebhook(payload []byte, headers http.Header, secret string, toleran
 	if tolerance == 0 {
 		tolerance = 5 * time.Minute
 	}
-	stamp := headers.Get("X-OneStorage-Timestamp")
+	stamp := headers.Get("X-vexuni-Timestamp")
 	timestamp, err := strconv.ParseInt(stamp, 10, 64)
 	if err != nil {
 		return nil, errors.New("invalid webhook timestamp")
@@ -137,7 +137,7 @@ func ValidateWebhook(payload []byte, headers http.Header, secret string, toleran
 	if delta > tolerance || delta < -tolerance {
 		return nil, errors.New("expired webhook")
 	}
-	supplied := headers.Get("X-OneStorage-Signature")
+	supplied := headers.Get("X-vexuni-Signature")
 	if !strings.HasPrefix(supplied, "sha256=") {
 		return nil, errors.New("missing webhook signature")
 	}

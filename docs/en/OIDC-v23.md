@@ -6,7 +6,7 @@ Workers implements Authorization Code with PKCE S256 and validates ID tokens usi
 
 ## Configuration and use
 
-1. An administrator opens `/admin/identity` and registers a web client with the identity provider. Register the exact callback `https://1s.hk/api/auth/oidc/callback` for this instance.
+1. An administrator opens `/admin/identity` and registers a web client with the identity provider. Register the exact callback `https://example.com/api/auth/oidc/callback` for this instance.
 2. Enter name, exact issuer, client ID/secret, client authentication method, and approved endpoint hosts. Methods: `client_secret_basic`, `client_secret_post`, `none`. Explicit hosts must cover discovery, authorization, token, and JWKS; no wildcards.
 3. Saving fetches discovery and validates issuer, code flow, endpoints, and authentication. Enabling adds a login button. Account creation is off by default; explicitly enable it and optional exact verified-email domain restrictions.
 4. Existing users sign in normally and link in `/settings/account` using current password and enabled MFA. Identity matches provider ID plus `sub`, never automatic email/name merging.

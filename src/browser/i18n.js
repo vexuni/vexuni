@@ -9,7 +9,7 @@ import {
   cookieLocale,
   LOCALE_COOKIE,
 } from "../i18n/locale.ts";
-const storageKey = "onestorage.locale";
+const storageKey = "vexuni.locale";
 let saved;
 try {
   saved = localStorage.getItem(storageKey);

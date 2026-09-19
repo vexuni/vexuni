@@ -55,7 +55,7 @@ export async function createToken(
     },
     claims = {
       iss: options.issuer,
-      sub: options.subject || "onestorage-sdk",
+      sub: options.subject || "vexuni-sdk",
       iat: now,
       exp: now + ttl,
       scopes: options.scopes,
@@ -79,8 +79,8 @@ export async function validateWebhook(
   secret: string,
   tolerance = 300,
 ) {
-  const timestamp = headers.get("x-onestorage-timestamp") || "",
-    signature = headers.get("x-onestorage-signature") || "";
+  const timestamp = headers.get("x-vexuni-timestamp") || "",
+    signature = headers.get("x-vexuni-signature") || "";
   if (
     !/^\d+$/.test(timestamp) ||
     Math.abs(Date.now() / 1000 - Number(timestamp)) > tolerance ||

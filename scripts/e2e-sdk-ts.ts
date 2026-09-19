@@ -8,8 +8,8 @@ import {
   liveDiff,
 } from "../examples/workflows";
 import assert from "node:assert/strict";
-import { OneStorage } from "../sdk/index";
-const client = new OneStorage({
+import { Vexuni } from "../sdk/index";
+const client = new Vexuni({
   origin: process.env.TEST_ORIGIN!,
   signer: {
     issuer: process.env.TEST_ISSUER!,

@@ -8,7 +8,7 @@
 | ------------------------------------- | ------------------------------------------------------------ |
 | `npm run check`                       | TypeScript 通过，92/92 单元测试通过                          |
 | `npm run test:reviews`，本地          | 最后一轮 62 项 HTTP 检查与真实 Git clone/fsck 通过           |
-| 同脚本，真实 `git.1s.hk`              | 最后一轮 62 项 HTTP 检查与真实 Git clone/fsck 通过           |
+| 同脚本，真实 `git.example.com`              | 最后一轮 62 项 HTTP 检查与真实 Git clone/fsck 通过           |
 | `scripts/e2e-collaboration.mjs`，本地 | 81 项已有协作、分支保护、发布/回滚和隔离 JS/WASM CI 检查通过 |
 | `npm run test:e2e`                    | 43 项基础 API 与原生 Git 协议、并发、LFS、对象持久化回归通过 |
 | `npm run build:production`            | Wrangler 生产构建通过                                        |
@@ -43,6 +43,6 @@ v0.7 发布时桌面浏览器工具确认 Mac 已锁定，因此当时没有完�
 
 ## 部署与源码
 
-生产 D1 在应用 `0008_fork_reviews.sql` 前已备份。主 Worker 已升级为 `0.7.0`，`git.1s.hk/api/health` 正常；`1s.hk` 保持 Cubelink 和 200 响应。本轮未修改应用发布网关。
+生产 D1 在应用 `0008_fork_reviews.sql` 前已备份。主 Worker 已升级为 `0.7.0`，`git.example.com/api/health` 正常；`example.com` 保持 旧站 和 200 响应。本轮未修改应用发布网关。
 
 源码压缩包使用允许列表，检查不含生产 PAT、初始化密钥或凭据加密密钥；临时文件位于忽略的 `.data`。最终提交、Worker 版本、源码 SHA-256、线上资源比对及独立 Git 镜像检查保存在 `.data/release-v07.json`。完整能力与剩余项目见 [审阅说明](REVIEWS-v07.md) 和 [持续矩阵](CLOUD-NATIVE-v05.md)。

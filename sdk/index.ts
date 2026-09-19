@@ -1,4 +1,4 @@
-/** OneStorage TypeScript SDK. No runtime dependencies. */
+/** vexuni TypeScript SDK. No runtime dependencies. */
 import { createToken, Signer, Scope } from "./auth";
 import {
   CommitBuilder,
@@ -34,16 +34,16 @@ export interface Project {
   default_branch: string;
   clone_url?: string;
 }
-export class OneStorageError extends Error {
+export class VexuniError extends Error {
   constructor(
     public status: number,
     message: string,
   ) {
     super(message);
-    this.name = "OneStorageError";
+    this.name = "VexuniError";
   }
 }
-export class OneStorage {
+export class Vexuni {
   private origin: string;
   constructor(
     private options: {
@@ -89,7 +89,7 @@ export class OneStorage {
       try {
         error = ((await response.json()) as any).error;
       } catch {}
-      throw new OneStorageError(response.status, error || response.statusText);
+      throw new VexuniError(response.status, error || response.statusText);
     }
     return response;
   }
@@ -115,7 +115,7 @@ export class OneStorage {
           repository = item.namespace + "/" + item.name;
           break;
         }
-      if (!repository) throw new OneStorageError(404, "Repository not found");
+      if (!repository) throw new VexuniError(404, "Repository not found");
     }
     return this.request<{
       id: string;
@@ -213,7 +213,7 @@ export class OneStorage {
 }
 export class RepositoryClient {
   constructor(
-    private client: OneStorage,
+    private client: Vexuni,
     private path: string,
     readonly id: string,
   ) {}

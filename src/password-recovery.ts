@@ -235,7 +235,7 @@ export function registerPasswordRecovery(app: Hono<App>) {
       ).bind(row.id, operation, ...guard),
     ]);
     if (!result[0].meta.changes) return invalid();
-    deleteCookie(c, "onestorage_session", { path: "/" });
+    deleteCookie(c, "vexuni_session", { path: "/" });
     return c.json({ ok: true, sign_in_required: true });
   });
 }

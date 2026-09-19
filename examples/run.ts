@@ -1,4 +1,4 @@
-import { OneStorage } from "../sdk/index";
+import { Vexuni } from "../sdk/index";
 import {
   memory,
   sessions,
@@ -21,17 +21,17 @@ if (!name || !(name in workflows || name === "liveDiff"))
   throw Error(
     "Choose: memory, sessions, checkpoints, liveDiff, productFiles, parallelAttempts, review",
   );
-const origin = process.env.ONESTORAGE_ORIGIN,
-  token = process.env.ONESTORAGE_TOKEN,
-  target = process.env.ONESTORAGE_REPO;
+const origin = process.env.VEXUNI_ORIGIN,
+  token = process.env.VEXUNI_TOKEN,
+  target = process.env.VEXUNI_REPO;
 if (!origin || !token || !target)
   throw Error(
-    "Set ONESTORAGE_ORIGIN, ONESTORAGE_TOKEN and ONESTORAGE_REPO=namespace/name",
+    "Set VEXUNI_ORIGIN, VEXUNI_TOKEN and VEXUNI_REPO=namespace/name",
   );
 const [namespace, ...segments] = target.split("/"),
   repoName = segments.join("/");
 if (!namespace || !repoName) throw Error("Expected namespace/name");
-const repo = new OneStorage({ origin, token }).repo(namespace, repoName);
+const repo = new Vexuni({ origin, token }).repo(namespace, repoName);
 if (name === "liveDiff") {
   const current = await repo.get();
   for await (const diff of liveDiff(repo, { branch: current.default_branch }))

@@ -3,15 +3,15 @@ import { readFile, writeFile, mkdtemp, rm } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-const verifyTS = process.env.ONESTORAGE_TSCONFIG === "1";
-const verifyCache = process.env.ONESTORAGE_NPM_CACHE === "1";
+const verifyTS = process.env.VEXUNI_TSCONFIG === "1";
+const verifyCache = process.env.VEXUNI_NPM_CACHE === "1";
 const cacheReports = [];
 const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let cookie = "",
   requests = 0,
@@ -142,7 +142,7 @@ async function activate(id, expected, expectedText) {
   const originApps =
     process.env.TEST_APPS_ORIGIN ||
     (remote
-      ? "https://onestorage-apps.xbitfun.workers.dev"
+      ? "https://vexuni-apps.example.workers.dev"
       : "http://localhost:8789");
   const r = await fetch(originApps + "/apps/" + repo.id + "/preview/", {
     signal: AbortSignal.timeout(30000),
@@ -344,7 +344,7 @@ try {
   const originApps =
     process.env.TEST_APPS_ORIGIN ||
     (remote
-      ? "https://onestorage-apps.xbitfun.workers.dev"
+      ? "https://vexuni-apps.example.workers.dev"
       : "http://localhost:8789");
   for (const path of ["", "dist/client.js", "dist/client.css"]) {
     const r = await fetch(originApps + "/apps/" + repo.id + "/web/" + path, {

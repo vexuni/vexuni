@@ -179,10 +179,10 @@ export function registerAccount(app: Hono<App>) {
       expires_at: expires,
       uri:
         "otpauth://totp/" +
-        encodeURIComponent("OneStorage:" + u.username) +
+        encodeURIComponent("vexuni:" + u.username) +
         "?secret=" +
         secret +
-        "&issuer=OneStorage&algorithm=SHA1&digits=6&period=30",
+        "&issuer=vexuni&algorithm=SHA1&digits=6&period=30",
     });
   });
   app.post("/api/account/mfa/enable", async (c) => {
@@ -300,7 +300,7 @@ export function registerAccount(app: Hono<App>) {
       .bind(c.req.param("id"), u.id)
       .first<{ hash: string }>();
     if (row?.hash === c.get("credential"))
-      deleteCookie(c, "onestorage_session", { path: "/" });
+      deleteCookie(c, "vexuni_session", { path: "/" });
     await record(c, "account.session.revoke");
     return c.json({ ok: true });
   });

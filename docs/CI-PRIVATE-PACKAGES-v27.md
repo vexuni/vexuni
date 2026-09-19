@@ -2,7 +2,7 @@
 
 **简体中文** · [English](en/CI-PRIVATE-PACKAGES-v27.md)
 
-v0.27 的 `build` 步骤可以混合使用公开 npmjs 依赖和当前 OneStorage 实例内的私有 npm 包。主 Worker 按固定提交的锁文件从 R2 读取包，校验完整性后将包内容传给独立 WASM 编译 Worker；编译服务没有账户存储绑定，也不会接收部署令牌或 CI 变量值。构建不需要容器或外部 Runner。
+v0.27 的 `build` 步骤可以混合使用公开 npmjs 依赖和当前 vexuni 实例内的私有 npm 包。主 Worker 按固定提交的锁文件从 R2 读取包，校验完整性后将包内容传给独立 WASM 编译 Worker；编译服务没有账户存储绑定，也不会接收部署令牌或 CI 变量值。构建不需要容器或外部 Runner。
 
 ## 使用
 
@@ -37,7 +37,7 @@ v0.27 的 `build` 步骤可以混合使用公开 npmjs 依赖和当前 OneStorag
 }
 ```
 
-UUID 为示例，须替换。`private_registries` 最多 8 项，不能重复项目，且每个凭据变量必须同时列入该任务的 `variables`。只允许标记为密钥的变量以及 OneStorage 部署令牌，不会自动使用用户的 PAT、当前会话或整个空间权限。一个空间部署令牌可配置到多个明确列出的项目。
+UUID 为示例，须替换。`private_registries` 最多 8 项，不能重复项目，且每个凭据变量必须同时列入该任务的 `variables`。只允许标记为密钥的变量以及 vexuni 部署令牌，不会自动使用用户的 PAT、当前会话或整个空间权限。一个空间部署令牌可配置到多个明确列出的项目。
 
 npm 客户端配置见 [部署令牌](DEPLOY-TOKENS-v26.md)。成功后在「应用发布」激活或回滚，沿用既有固定 SHA、环境比较交换和工作流门禁。
 
@@ -57,6 +57,6 @@ npm 客户端配置见 [部署令牌](DEPLOY-TOKENS-v26.md)。成功后在「应
 
 此版本没有依赖包下载缓存，不从 npm tag 推断版本，不执行任意 `npm run build`。私有 npm 包名与锁文件安装位置须匹配；npm alias、扩展 tar 头、原生模块和其余现有编译器不支持的工具链仍需后续扩展。包仓库本身可以存储比编译预算更大的包；上传成功不代表该包可在受限云编译器内使用。
 
-迁移新增 `0022_ci_private_packages.sql`。自托管先备份并应用 D1 迁移，再发布编译 Worker 和主 Worker；编译协议向后兼容原有公开包请求。验收脚本为 `node scripts/e2e-private-builds.mjs`，覆盖真实 npm 发布/锁文件、混合 TSX 编译、R2 输出、激活/回滚、浏览器模板、无效锁与未授权输入、轮换失效/更新密钥恢复及撤销拒绝。远程验收必须显式设置 `ALLOW_REMOTE_ACCEPTANCE=1` 和私密 `ONESTORAGE_TOKEN_FILE`。
+迁移新增 `0022_ci_private_packages.sql`。自托管先备份并应用 D1 迁移，再发布编译 Worker 和主 Worker；编译协议向后兼容原有公开包请求。验收脚本为 `node scripts/e2e-private-builds.mjs`，覆盖真实 npm 发布/锁文件、混合 TSX 编译、R2 输出、激活/回滚、浏览器模板、无效锁与未授权输入、轮换失效/更新密钥恢复及撤销拒绝。远程验收必须显式设置 `ALLOW_REMOTE_ACCEPTANCE=1` 和私密 `VEXUNI_TOKEN_FILE`。
 
-锁文件字段依据 [npm package-lock.json 文档](https://docs.npmjs.com/cli/v11/configuring-npm/package-lock-json/)；此功能沿用 OneStorage 独立的 CI 配置，不宣称 GitLab YAML 或全部 npm 构建生态兼容。
+锁文件字段依据 [npm package-lock.json 文档](https://docs.npmjs.com/cli/v11/configuring-npm/package-lock-json/)；此功能沿用 vexuni 独立的 CI 配置，不宣称 GitLab YAML 或全部 npm 构建生态兼容。

@@ -100,7 +100,7 @@ test("variable names, secret length, job selection and environment contracts rej
     "PATH",
     "NODE_OPTIONS",
     "GIT_ASKPASS",
-    "ONESTORAGE_TOKEN",
+    "VEXUNI_TOKEN",
     "LD_PRELOAD",
     "a",
     "A-B",

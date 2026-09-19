@@ -1,6 +1,6 @@
 /** Seven reusable agent workflows. All writes are real Git objects and guarded ref updates. */
 import type { RepositoryClient } from "../sdk/index";
-const author = { name: "OneStorage Agent", email: "agent@onestorage.invalid" };
+const author = { name: "vexuni Agent", email: "agent@vexuni.invalid" };
 const task = () => crypto.randomUUID().slice(0, 12);
 async function head(repo: RepositoryClient) {
   const project = await repo.get(),

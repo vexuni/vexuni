@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 if (process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Set ALLOW_REMOTE_ACCEPTANCE=1");
-const origin = process.env.ONESTORAGE_ORIGIN || "https://git.1s.hk",
-  token = (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim();
+const origin = process.env.VEXUNI_ORIGIN || "https://git.example.com",
+  token = (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim();
 let checks = 0;
 async function req(
   path,
@@ -88,7 +88,7 @@ try {
         {
           path: "test.cjs",
           content:
-            "require('node:fs').writeFileSync('result.txt',process.env.ONESTORAGE_COMMIT_SHA);console.log('Cloud runner test passed')",
+            "require('node:fs').writeFileSync('result.txt',process.env.VEXUNI_COMMIT_SHA);console.log('Cloud runner test passed')",
         },
       ],
     },
@@ -132,7 +132,7 @@ try {
       201,
     ),
     run = await req(root + "/runs", "POST", {}, 201);
-  const dir = await mkdtemp(join(tmpdir(), "onestorage-cloud-runner-")),
+  const dir = await mkdtemp(join(tmpdir(), "vexuni-cloud-runner-")),
     file = join(dir, "token");
   await writeFile(file, runner.token, { mode: 0o600 });
   try {
@@ -140,10 +140,10 @@ try {
       const child = spawn(process.execPath, ["scripts/runner.mjs"], {
         env: {
           ...process.env,
-          ONESTORAGE_ORIGIN: origin,
-          ONESTORAGE_RUNNER_TOKEN_FILE: file,
-          ONESTORAGE_RUNNER_ONCE: "1",
-          ONESTORAGE_JOB_ENV: "",
+          VEXUNI_ORIGIN: origin,
+          VEXUNI_RUNNER_TOKEN_FILE: file,
+          VEXUNI_RUNNER_ONCE: "1",
+          VEXUNI_JOB_ENV: "",
         },
         stdio: ["ignore", "pipe", "pipe"],
       });

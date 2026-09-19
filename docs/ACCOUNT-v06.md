@@ -1,4 +1,4 @@
-# OneStorage v0.6：账户安全与内容展示
+# vexuni v0.6：账户安全与内容展示
 
 **简体中文** · [English](en/ACCOUNT-v06.md)
 

@@ -78,4 +78,4 @@ npm run test:codeowners
 
 生产验收使用显式 `TEST_ORIGIN`、`ALLOW_REMOTE_ACCEPTANCE=1` 和本地令牌文件；只创建隔离的临时项目。Mac 锁定时可以验证 HTTP、数据库和纯渲染逻辑，但不能据此宣称实际拖放/表单交互已验证。
 
-行为研究参考：[GitLab Issue boards](https://docs.gitlab.com/user/project/issue_board/)、[Issue 管理](https://docs.gitlab.com/user/project/issues/managing_issues/)。上述描述是 OneStorage 的实现契约及边界，不是完整 GitLab API 兼容声明。
+行为研究参考：[GitLab Issue boards](https://docs.gitlab.com/user/project/issue_board/)、[Issue 管理](https://docs.gitlab.com/user/project/issues/managing_issues/)。上述描述是 vexuni 的实现契约及边界，不是完整 GitLab API 兼容声明。

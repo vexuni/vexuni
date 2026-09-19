@@ -189,7 +189,7 @@ test("public package routes keep explicit invalid credentials rejected and inher
     .prepare("UPDATE repositories SET visibility='public' WHERE id='r'")
     .run();
   assert.equal((await f.request("", "")).status, 200);
-  assert.equal((await f.request("", "os_invalid")).status, 401);
+  assert.equal((await f.request("", "vx_invalid")).status, 401);
   f.db.exec(
     "INSERT INTO workspaces(id,slug,name) VALUES('w','team','Team'); INSERT INTO workspace_members VALUES('w','g','reader'); UPDATE repositories SET workspace_id='w',visibility='private' WHERE id='r';",
   );

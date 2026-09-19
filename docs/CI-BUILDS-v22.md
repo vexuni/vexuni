@@ -4,13 +4,13 @@
 
 v0.35 更新：公共 npm 压缩包可以通过专用 R2 缓存跨构建复用，见 [缓存说明](CI-NPM-CACHE-v35.md)。下文无 R2 绑定、每次重新下载的描述记录 v0.22 初始实现。
 
-`build` 步骤在独立的 `onestorage-build` Worker 中运行 esbuild 0.28.2 WASM。无需容器、Node 服务器或外部 Runner。控制面读取固定提交中的源码，通过私有 Service Binding 编译，再将产物、应用版本存入 R2，并沿用 D1 租约、工作流门禁、权限撤销和环境 CAS 激活/回滚。
+`build` 步骤在独立的 `vexuni-build` Worker 中运行 esbuild 0.28.2 WASM。无需容器、Node 服务器或外部 Runner。控制面读取固定提交中的源码，通过私有 Service Binding 编译，再将产物、应用版本存入 R2，并沿用 D1 租约、工作流门禁、权限撤销和环境 CAS 激活/回滚。
 
 此功能编译和打包 JS/TS/JSX/TSX、JSON、CSS；**不是任意 `npm run build` 的执行器**。不运行 npm 生命周期脚本、Vite/Next 配置、shell、原生插件或 TypeScript 类型检查。需要这些工具的项目仍可使用外部 Runner。构建 Worker 不接收 CI 密钥，没有 D1/R2/账户绑定，不执行输入源码；部署后的应用仍使用现有无出站网络、无账户绑定的 Dynamic Worker。
 
 ## 配置与界面
 
-CI/CD 页面提供「TypeScript / npm 云端构建」模板，可保存页面配置或提交 `.onestorage-ci.json`。`build` 也可放在 DAG 的 Worker 子任务中。产物可由后续 JavaScript 步骤通过 `input.artifacts` 检查，由依赖任务读取，或用于应用发布。
+CI/CD 页面提供「TypeScript / npm 云端构建」模板，可保存页面配置或提交 `.vexuni-ci.json`。`build` 也可放在 DAG 的 Worker 子任务中。产物可由后续 JavaScript 步骤通过 `input.artifacts` 检查，由依赖任务读取，或用于应用发布。
 
 ```json
 {
@@ -51,11 +51,11 @@ CI/CD 页面提供「TypeScript / npm 云端构建」模板，可保存页面配
 
 ## 自托管
 
-先 `npm run deploy:build`，再 `npm run deploy`。新增 Worker `onestorage-build` 禁用 workers.dev 与 preview URL，只由主 Worker 的 `BUILDER` Service Binding 调用。没有数据库迁移，不修改 `onestorage-apps` 或 `1s.hk`。
+先 `npm run deploy:build`，再 `npm run deploy`。新增 Worker `vexuni-build` 禁用 workers.dev 与 preview URL，只由主 Worker 的 `BUILDER` Service Binding 调用。没有数据库迁移，不修改 `vexuni-apps` 或 `example.com`。
 
 `npm run dev` 同时启动主 Worker 和编译 Worker；已有独立主进程可额外运行 `npm run dev:build`（8788）。应用网关验收需要另一个配置到同一**本地** D1/R2 的实例，默认 `TEST_APPS_ORIGIN=http://localhost:8789`。生产验收使用现有独立应用域名。
 
-运行 `npm run check`、`npm run test:builds`、界面与现有核心/工作流回归。构建专项会创建临时私有空间，验证真实 TSX/npm 编译、R2 下载、Worker 激活和回滚、失败不发布、静态 JS/CSS，并清理项目及空间。远程必须设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和权限为 600 的 `ONESTORAGE_TOKEN_FILE`。等待完整清理后才能编辑或部署。
+运行 `npm run check`、`npm run test:builds`、界面与现有核心/工作流回归。构建专项会创建临时私有空间，验证真实 TSX/npm 编译、R2 下载、Worker 激活和回滚、失败不发布、静态 JS/CSS，并清理项目及空间。远程必须设置 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和权限为 600 的 `VEXUNI_TOKEN_FILE`。等待完整清理后才能编辑或部署。
 
 实现参考：[esbuild browser/WASM API](https://esbuild.github.io/api/#browser)、[npm lockfile](https://docs.npmjs.com/cli/v11/configuring-npm/package-lock-json/)、[Cloudflare Service Binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/)。Cloudflare 官方 worker-bundler 展示了 Workers 内编译可行性，本项目为强制锁文件、完整性验证及多产物处理实现了独立受限解析器。
 

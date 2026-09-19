@@ -73,7 +73,7 @@ async function fixture() {
     path: string,
     method = "GET",
     body?: unknown,
-    cookie = "onestorage_session=fixture-session",
+    cookie = "vexuni_session=fixture-session",
   ) {
     const r = await app.fetch(
       new Request("http://localhost/api" + path, {

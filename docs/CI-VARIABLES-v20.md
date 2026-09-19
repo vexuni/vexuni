@@ -65,4 +65,4 @@ export default async ({ variables }) => {
 
 226 项单元测试和 TypeScript 检查通过；本地变量验收 41 项、变量界面 16 项、通用界面 43 项、基础 API 43 项及原生 Git/LFS、工作流界面 18 项、工作流 23 项（包含实际外部 Runner）、Git→版本化 DAG→克隆/fsck 21 项通过。生产迁移前的独立 D1 恢复及迁移试跑通过完整性和外键检查，并保持原有数据数量。
 
-生产候选版在 `git.1s.hk` 通过 41 项变量验收（真实 Dynamic Worker、发货版外部 Runner、MR/重试拒绝、暂停环境拒绝回退、轮换取消和历史脱敏），以及原生 Git 推送→版本化 DAG→克隆/fsck 的 30 项检查。线上资源与源码指纹和健康检查通过，Cubelink 保持可用。
+生产候选版在 `git.example.com` 通过 41 项变量验收（真实 Dynamic Worker、发货版外部 Runner、MR/重试拒绝、暂停环境拒绝回退、轮换取消和历史脱敏），以及原生 Git 推送→版本化 DAG→克隆/fsck 的 30 项检查。线上资源与源码指纹和健康检查通过，旧站 保持可用。

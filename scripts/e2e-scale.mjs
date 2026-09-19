@@ -13,16 +13,16 @@ import { join } from "node:path";
 import { randomBytes } from "node:crypto";
 const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
-const readConcurrency = process.env.ONESTORAGE_READ_CONCURRENCY === "1",
+const readConcurrency = process.env.VEXUNI_READ_CONCURRENCY === "1",
   cacheAcceptance =
-    readConcurrency || process.env.ONESTORAGE_PACK_CACHE === "1",
+    readConcurrency || process.env.VEXUNI_PACK_CACHE === "1",
   singleImport =
-    cacheAcceptance || process.env.ONESTORAGE_SINGLE_IMPORT === "1",
+    cacheAcceptance || process.env.VEXUNI_SINGLE_IMPORT === "1",
   payloadBytes = (cacheAcceptance ? 10 : singleImport ? 35 : 42) * 1024 * 1024;
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const existing = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const existing = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let auth = existing ? { Authorization: "Bearer " + existing } : {},
   checks = 0;
@@ -63,7 +63,7 @@ if (!existing)
   };
 const owner = (await api("/me")).data.user,
   name = "scale_" + randomBytes(4).toString("hex"),
-  directory = await mkdtemp(join(tmpdir(), "onestorage-scale-"));
+  directory = await mkdtemp(join(tmpdir(), "vexuni-scale-"));
 let repo,
   credential,
   spaceCreated = false;
@@ -313,7 +313,7 @@ try {
           expected,
           "README shares the captured reference",
         );
-      if (response.headers.get("x-onestorage-read-mode") === "snapshot") {
+      if (response.headers.get("x-vexuni-read-mode") === "snapshot") {
         found = true;
         break;
       }

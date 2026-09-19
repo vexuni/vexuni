@@ -57,6 +57,6 @@ npm run test:reviews
 npm run test:collaboration
 ```
 
-Production scripts require explicit TEST_ORIGIN, ALLOW_REMOTE_ACCEPTANCE=1, and a local-only ONESTORAGE_TOKEN_FILE. They create isolated workspaces/repositories and clean repositories, spaces, and user credentials afterward. Current primary URL: https://1s.hk.
+Production scripts require explicit TEST_ORIGIN, ALLOW_REMOTE_ACCEPTANCE=1, and a local-only VEXUNI_TOKEN_FILE. They create isolated workspaces/repositories and clean repositories, spaces, and user credentials afterward. Current primary URL: https://example.com.
 
-References: [GitLab CODEOWNERS](https://docs.gitlab.com/user/project/codeowners/reference/), [automatic issue closure](https://docs.gitlab.com/user/project/issues/managing_issues/). These are OneStorage contracts and differences, not full GitLab API/syntax compatibility.
+References: [GitLab CODEOWNERS](https://docs.gitlab.com/user/project/codeowners/reference/), [automatic issue closure](https://docs.gitlab.com/user/project/issues/managing_issues/). These are vexuni contracts and differences, not full GitLab API/syntax compatibility.

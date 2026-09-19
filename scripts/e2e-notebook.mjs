@@ -12,8 +12,8 @@ if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
 const prefix = ".data/v37-" + (remote ? "production" : "local") + "-notebook",
   suffix = randomBytes(4).toString("hex");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await fs.readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await fs.readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let admin = token ? { Authorization: "Bearer " + token } : {},
   owner = {},

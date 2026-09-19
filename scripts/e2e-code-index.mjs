@@ -9,7 +9,7 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const shared = process.env.ONESTORAGE_SHARED_CODE === "1";
+const shared = process.env.VEXUNI_SHARED_CODE === "1";
 const prefix =
     ".data/" +
     (shared ? "v34-" : "v32-") +
@@ -17,8 +17,8 @@ const prefix =
     "-index",
   suffix = randomBytes(4).toString("hex"),
   keyword = "needle_v32_" + suffix;
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await fs.readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await fs.readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let admin = token ? { Authorization: "Bearer " + token } : {},
   owner = {},

@@ -2,7 +2,7 @@
 
 [简体中文](SECURITY.md) · **English**
 
-OneStorage is an alpha. It has not undergone independent penetration testing or production-scale reliability review. Report security issues privately to the deployment operator; this repository does not yet advertise a dedicated security mailbox.
+vexuni is an alpha. It has not undergone independent penetration testing or production-scale reliability review. Report security issues privately to the deployment operator; this repository does not yet advertise a dedicated security mailbox.
 
 - Git, LFS and content routes check project visibility, membership and credential scope. Internal repository IDs are derived server-side.
 - The Git service runs only JavaScript in Workers. The Git receive path executes no repository-controlled code, native command, hook, filesystem path or symlink. CI code runs in separately authorized isolated execution.

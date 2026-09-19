@@ -80,7 +80,7 @@ export async function resolveDeployToken(
   secret: string,
   basicUsername?: string,
 ) {
-  if (!/^odt_[a-f0-9]{64}$/.test(secret)) fail(401, "Invalid deploy token");
+  if (!/^vdt_[a-f0-9]{64}$/.test(secret)) fail(401, "Invalid deploy token");
   const hash = await digest(secret),
     row = await unguardDatabase(env.DB)
       .prepare(
@@ -96,7 +96,7 @@ export async function resolveDeployToken(
   } as DeployToken;
 }
 export const newDeploySecret = () =>
-  "odt_" + hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
+  "vdt_" + hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
 /** A token is never a user session and is accepted only on explicitly supported protocols. */
 export function deployRequestAllowed(path: string) {
   return (

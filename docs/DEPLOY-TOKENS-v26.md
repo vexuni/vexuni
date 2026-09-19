@@ -32,18 +32,18 @@ v0.26 增加专门给 Git 拉取、包发布和部署工具使用的凭据。认
 Git 使用令牌配置的用户名，密码为令牌原文。建议使用 Git 凭据管理器或 `GIT_ASKPASS`；不要将秘密写入 URL 或命令历史。
 
 ```sh
-git clone https://1s.hk/team/project.git
+git clone https://example.com/team/project.git
 ```
 
-npm 项目 `.npmrc` 引用环境变量；`ONESTORAGE_DEPLOY_TOKEN` 由 CI 密钥或本地秘密管理器注入。占位符替换为实际空间和项目名。
+npm 项目 `.npmrc` 引用环境变量；`VEXUNI_DEPLOY_TOKEN` 由 CI 密钥或本地秘密管理器注入。占位符替换为实际空间和项目名。
 
 ```ini
-@team:registry=https://1s.hk/api/repos/team/project/packages/npm/
-//1s.hk/api/repos/team/project/packages/npm/:_authToken=${ONESTORAGE_DEPLOY_TOKEN}
+@team:registry=https://example.com/api/repos/team/project/packages/npm/
+//example.com/api/repos/team/project/packages/npm/:_authToken=${VEXUNI_DEPLOY_TOKEN}
 ```
 
 ```sh
-npm publish --registry=https://1s.hk/api/repos/team/project/packages/npm/ --access=public
+npm publish --registry=https://example.com/api/repos/team/project/packages/npm/ --access=public
 npm install @team/example --ignore-scripts
 ```
 
@@ -62,7 +62,7 @@ npm install @team/example --ignore-scripts
 
 名称不超过 80 字符；可选用户名匹配 `[a-zA-Z0-9][a-zA-Z0-9._+-]{0,79}`，未指定自动生成。时间字段为 Unix 毫秒。陈旧版本、有效数量超限或操作过程中管理权限改变返回 409。认证失败为 401，已认证但范围不足为 403。OpenAPI 与本地/生产验收脚本 `npm run test:deploy-tokens` 随源码提供。
 
-设计参照 [GitLab deploy tokens](https://docs.gitlab.com/user/project/deploy_tokens/) 的独立项目/组主体与代码只读语义；OneStorage 额外拆分包撤回权限并强制有限有效期，不宣称 GitLab API 完全兼容。
+设计参照 [GitLab deploy tokens](https://docs.gitlab.com/user/project/deploy_tokens/) 的独立项目/组主体与代码只读语义；vexuni 额外拆分包撤回权限并强制有限有效期，不宣称 GitLab API 完全兼容。
 
 ## v0.27 私有包云构建
 

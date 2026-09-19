@@ -377,8 +377,8 @@ export async function advanceQueue(
         squash: !!e.squash,
         commit_message: "Merge !" + mr.id + ": " + mr.title,
         author: {
-          name: "OneStorage merge queue",
-          email: "merge@onestorage.invalid",
+          name: "vexuni merge queue",
+          email: "merge@vexuni.invalid",
           timestamp: Math.floor(e.created_at / 1000),
         },
       });

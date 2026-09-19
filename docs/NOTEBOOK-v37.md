@@ -34,6 +34,6 @@ Notebook 沿用仓库权限：私有仓库的 JSON 和相对图片均经过当�
 PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs npm run test:notebook
 ```
 
-浏览器验收创建隔离私有仓库和临时 owner/reader，检查真实提交预览、高亮、表格和图表、无外部请求/脚本执行、分页、源码/锚点、移动端、错误格式、固定 SHA 和成员撤权。结束后删除仓库、禁用临时用户并撤销会话，查询 D1 确认数据清理。生产验收必须显式提供 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `ONESTORAGE_TOKEN_FILE`。
+浏览器验收创建隔离私有仓库和临时 owner/reader，检查真实提交预览、高亮、表格和图表、无外部请求/脚本执行、分页、源码/锚点、移动端、错误格式、固定 SHA 和成员撤权。结束后删除仓库、禁用临时用户并撤销会话，查询 D1 确认数据清理。生产验收必须显式提供 `ALLOW_REMOTE_ACCEPTANCE=1`、`TEST_ORIGIN` 和私有 `VEXUNI_TOKEN_FILE`。
 
 规范参考：[Jupyter nbformat](https://nbformat.readthedocs.io/en/latest/format_description.html)、[DOMPurify](https://github.com/cure53/DOMPurify)。

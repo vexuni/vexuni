@@ -137,7 +137,7 @@ export class Repository extends DurableObject<Env> {
             incident,
           incident_id: incident,
         },
-        { status: 503, headers: { "X-OneStorage-Incident": incident } },
+        { status: 503, headers: { "X-vexuni-Incident": incident } },
       );
     }
   }
@@ -205,7 +205,7 @@ export class Repository extends DurableObject<Env> {
                 "x-repo-id": live.id,
                 "x-lifecycle-revision": String(live.lifecycle_revision),
                 "x-default-branch": live.default_branch,
-                "x-actor": "OneStorage merge queue",
+                "x-actor": "vexuni merge queue",
               },
             }),
           );
@@ -853,8 +853,8 @@ export class Repository extends DurableObject<Env> {
         squash: !!body.squash,
         commit_message: "Merge !" + mr.id + ": " + mr.title,
         author: {
-          name: request.headers.get("x-actor") || "OneStorage",
-          email: "merge@onestorage.invalid",
+          name: request.headers.get("x-actor") || "vexuni",
+          email: "merge@vexuni.invalid",
         },
       });
       if (result.result === "no_op") {

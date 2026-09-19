@@ -268,7 +268,7 @@ test("versioned config reads an exact SHA, validates nested HTTP destinations, a
       },
     }),
   } as any;
-  const saved = { config: "null", source_path: ".onestorage-ci.json" };
+  const saved = { config: "null", source_path: ".vexuni-ci.json" };
   const loaded = await resolvePipeline(f.env, f.repo, saved, "a".repeat(40));
   assert.equal(loaded.config_sha, "a".repeat(40));
   assert.equal(loaded.config_path, saved.source_path);
@@ -298,7 +298,7 @@ test("push outbox never reenters the repository DO and duplicate/failed queue de
   const f = setup();
   f.db
     .prepare(
-      "INSERT INTO ci_pipelines(repo_id,config,source_path) VALUES('r','null','.onestorage-ci.json')",
+      "INSERT INTO ci_pipelines(repo_id,config,source_path) VALUES('r','null','.vexuni-ci.json')",
     )
     .run();
   let raw = JSON.stringify(workflow());

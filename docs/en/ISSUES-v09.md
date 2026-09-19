@@ -78,4 +78,4 @@ npm run test:codeowners
 
 Remote acceptance requires explicit TEST_ORIGIN, ALLOW_REMOTE_ACCEPTANCE=1, and a local token file, using isolated projects. HTTP/database/rendering checks while a Mac is locked do not prove actual drag/drop or form interaction.
 
-References: [GitLab boards](https://docs.gitlab.com/user/project/issue_board/), [issue management](https://docs.gitlab.com/user/project/issues/managing_issues/). This describes OneStorage behavior and limits, not full GitLab API compatibility.
+References: [GitLab boards](https://docs.gitlab.com/user/project/issue_board/), [issue management](https://docs.gitlab.com/user/project/issues/managing_issues/). This describes vexuni behavior and limits, not full GitLab API compatibility.

@@ -14,7 +14,7 @@ export async function packagePage(r, base, ap, h, id) {
       : n.toLocaleString(getLocale()) + " B";
   const registry = `${location.origin}/api${ap}/packages/npm/`,
     authPath = registry.replace(/^https?:/, "");
-  const guide = i18nHTML`<details class="panel"><summary>npm 发布与安装</summary><div class="detail-body"><p>npm 的 --access public 不会公开私有项目；包继承项目的${r.visibility === "public" ? i18nText("公开") : i18nText("私有")}可见性。开发者可发布、修改标签；维护者可撤回。使用个人访问令牌，发布需要写权限。</p><p>项目 .npmrc（令牌从环境变量读取）：</p><pre>${esc(`registry=${registry}\n${authPath}:_authToken=\${ONESTORAGE_TOKEN}`)}</pre><p>在终端设置 ONESTORAGE_TOKEN，然后运行：</p><pre>${esc(`npm publish --access public\nnpm install ${id ? "PACKAGE@VERSION" : "your-package@1.0.0"}\nnpm dist-tag add your-package@1.0.0 stable\nnpm unpublish your-package@1.0.0 --force`)}</pre><p class="hint">npm 包最大 16 MiB，解压后最大 64 MiB；支持普通文件和目录。名称与版本发布后不能覆盖，撤回后也不能重用。项目转移后请更新 registry 地址。通用构建 Runner 可通过 CI 变量提供令牌并执行相同命令。</p></div></details>`;
+  const guide = i18nHTML`<details class="panel"><summary>npm 发布与安装</summary><div class="detail-body"><p>npm 的 --access public 不会公开私有项目；包继承项目的${r.visibility === "public" ? i18nText("公开") : i18nText("私有")}可见性。开发者可发布、修改标签；维护者可撤回。使用个人访问令牌，发布需要写权限。</p><p>项目 .npmrc（令牌从环境变量读取）：</p><pre>${esc(`registry=${registry}\n${authPath}:_authToken=\${VEXUNI_TOKEN}`)}</pre><p>在终端设置 VEXUNI_TOKEN，然后运行：</p><pre>${esc(`npm publish --access public\nnpm install ${id ? "PACKAGE@VERSION" : "your-package@1.0.0"}\nnpm dist-tag add your-package@1.0.0 stable\nnpm unpublish your-package@1.0.0 --force`)}</pre><p class="hint">npm 包最大 16 MiB，解压后最大 64 MiB；支持普通文件和目录。名称与版本发布后不能覆盖，撤回后也不能重用。项目转移后请更新 registry 地址。通用构建 Runner 可通过 CI 变量提供令牌并执行相同命令。</p></div></details>`;
   const error = (e) => {
     if (current()) notice(e.message);
   };

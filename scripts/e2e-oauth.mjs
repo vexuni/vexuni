@@ -15,8 +15,8 @@ const secrets = JSON.parse(
     "utf8",
   ),
 );
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 const issuer =
   process.env.OAUTH_FIXTURE_ISSUER || "https://missing-oauth-fixture.invalid";
@@ -160,7 +160,7 @@ try {
   await form.locator("[name=protocol]").selectOption("gitlab");
   await form.locator("[name=name]").fill(name);
   await form.locator("[name=issuer]").fill(issuer);
-  await form.locator("[name=client_id]").fill("onestorage-acceptance-v33");
+  await form.locator("[name=client_id]").fill("vexuni-acceptance-v33");
   await form.locator("[name=client_secret]").fill(secrets.CLIENT_SECRET);
   await form.locator("[name=allowed_hosts]").fill(new URL(issuer).hostname);
   await form.locator("[name=email_domains]").fill("example.test");

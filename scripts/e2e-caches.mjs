@@ -7,8 +7,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let cookie = "",
   requests = 0,
@@ -113,10 +113,10 @@ async function runnerOnce(credential) {
     const child = spawn(process.execPath, ["scripts/runner.mjs"], {
       env: {
         ...process.env,
-        ONESTORAGE_ORIGIN: origin,
-        ONESTORAGE_RUNNER_TOKEN_FILE: credential,
-        ONESTORAGE_RUNNER_ONCE: "1",
-        ONESTORAGE_JOB_ENV: "",
+        VEXUNI_ORIGIN: origin,
+        VEXUNI_RUNNER_TOKEN_FILE: credential,
+        VEXUNI_RUNNER_ONCE: "1",
+        VEXUNI_JOB_ENV: "",
       },
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -210,7 +210,7 @@ try {
     "Failed workflow cannot replace a successful cache",
   );
   runner = await api(ap + "/ci/runners", "POST", { name: "Cache runner" }, 201);
-  dir = await mkdtemp(join(tmpdir(), "onestorage-cache-"));
+  dir = await mkdtemp(join(tmpdir(), "vexuni-cache-"));
   const credential = join(dir, "token");
   await writeFile(credential, runner.token, { mode: 0o600 });
   const external = {

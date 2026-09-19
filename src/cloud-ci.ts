@@ -20,7 +20,7 @@ export const cloudPath = z
     (s) =>
       !s.startsWith("/") &&
       !s.split("/").some((x) => !x || x === "." || x === "..") &&
-      !s.startsWith("__onestorage"),
+      !s.startsWith("__vexuni"),
   );
 export const cloudStep = z.object({
   type: z.literal("javascript"),
@@ -111,12 +111,12 @@ export async function executeJavaScript(
   const files = await sourceFiles(env, repo, run.sha, step.files),
     modules = modulesFor(files);
   const { variables, patterns } = await loadRunVariables(env, run);
-  modules["__onestorage_ci.js"] =
+  modules["__vexuni_ci.js"] =
     `import job from ${JSON.stringify("./" + step.entry)};
 export default { async fetch(request) { try { const input = await request.json(); const captured=[];for(const k of ["log","info","warn","error","debug"])console[k]=(...args)=>{if(captured.length<32)captured.push(args.map(v=>typeof v==="string"?v:JSON.stringify(v)).join(" ").slice(0,65536));}; const result = await job(input); if(!result || typeof result!=="object" || Array.isArray(result)) throw Error("Job must return an object"); return Response.json({...result,logs:[...captured,...(result?.logs||[])]}); } catch(e) { return Response.json({error: String(e?.stack || e)}, {status: 500}); } } };`;
   const worker = env.LOADER.load({
     compatibilityDate: "2026-09-01",
-    mainModule: "__onestorage_ci.js",
+    mainModule: "__vexuni_ci.js",
     modules,
     globalOutbound: null,
     limits: { cpuMs: step.cpu_ms, subRequests: 0 },

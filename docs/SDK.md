@@ -2,17 +2,17 @@
 
 **简体中文** · [English](en/SDK.md)
 
-三种 SDK 均使用 [OneStorage API](API.md)、HTTPS 和 PAT/客户端签名 JWT，禁止重定向并支持流式下载。源码随仓库提供，未宣称发布到 npm/PyPI。
+三种 SDK 均使用 [vexuni API](API.md)、HTTPS 和 PAT/客户端签名 JWT，禁止重定向并支持流式下载。源码随仓库提供，未宣称发布到 npm/PyPI。
 
 ## TypeScript
 
 导入 `sdk/index.ts`，使用标准 Web Crypto/fetch，无额外依赖：
 
 ```ts
-import { OneStorage } from "./sdk/index";
-const client = new OneStorage({
-  origin: "https://1s.hk",
-  token: process.env.ONESTORAGE_TOKEN,
+import { vexuni } from "./sdk/index";
+const client = new vexuni({
+  origin: "https://example.com",
+  token: process.env.VEXUNI_TOKEN,
 });
 const repo = client.repo("alice", "project");
 const commit = await repo
@@ -49,9 +49,9 @@ python3 -m pip install -e ./sdk/python
 
 ```python
 import asyncio, os
-from onestorage import OneStorage
+from vexuni import vexuni
 async def main():
-    client = OneStorage('https://1s.hk', token=os.environ['ONESTORAGE_TOKEN'])
+    client = vexuni('https://example.com', token=os.environ['VEXUNI_TOKEN'])
     repo = client.repo('alice', 'project')
     result = await repo.list_branches()
     with open('project.tar.gz', 'wb') as output:
@@ -64,13 +64,13 @@ asyncio.run(main())
 
 ## Go
 
-需要 Go 1.24+，仅标准库。模块路径保留 `git.1s.hk/1shk/nb/sdk/go` 以兼容现有用户；服务请求改用主域名。开发使用 workspace 或 replace 指向 `./sdk/go`，私有仓库先配置 Git 凭据。
+需要 Go 1.24+，仅标准库。模块路径为 `github.com/vexuni/vexuni/sdk/go`；服务请求使用实例主域名。开发使用 workspace 或 replace 指向 `./sdk/go`，私有仓库先配置 Git 凭据。
 
 ```go
-client, err := onestorage.New("https://1s.hk", token)
+client, err := vexuni.New("https://example.com", token)
 if err != nil { return err }
 repo := client.Repo("alice", "project")
-response, err := repo.GetArchive(ctx, onestorage.Options{"ref": "main"})
+response, err := repo.GetArchive(ctx, vexuni.Options{"ref": "main"})
 if err != nil { return err }
 defer response.Body.Close()
 _, err = io.Copy(output, response.Body)

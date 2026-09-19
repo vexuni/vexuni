@@ -319,8 +319,8 @@ export class GitRepository {
         fail(413, "File exceeds 1 MiB");
       tree = await this.editTree(tree, file.path.split("/"), file.content);
     }
-    const name = (b.author || "OneStorage").replace(/[\n\r<>\0]/g, ""),
-      email = (b.email || "noreply@1s.hk").replace(/[\n\r<>\0]/g, ""),
+    const name = (b.author || "vexuni").replace(/[\n\r<>\0]/g, ""),
+      email = (b.email || "noreply@vexuni.invalid").replace(/[\n\r<>\0]/g, ""),
       identity = `${name} <${email}> ${Math.floor(Date.now() / 1000)} +0000`;
     const c = await this.store.create(
       "commit",

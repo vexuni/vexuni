@@ -2,13 +2,13 @@
 
 [简体中文](../CI-BUILDS-v22.md) · **English**
 
-A `build` step runs esbuild 0.28.2 WASM in the private `onestorage-build` Worker. The control plane reads a fixed Git commit, invokes a Service Binding, stores artifacts/application versions in R2, and retains D1 leases, workflow gates, revocation, and environment CAS activation/rollback. No container, Node server, or external runner is needed for this supported compiler path.
+A `build` step runs esbuild 0.28.2 WASM in the private `vexuni-build` Worker. The control plane reads a fixed Git commit, invokes a Service Binding, stores artifacts/application versions in R2, and retains D1 leases, workflow gates, revocation, and environment CAS activation/rollback. No container, Node server, or external runner is needed for this supported compiler path.
 
 It bundles JS/TS/JSX/TSX, JSON, and CSS. It does not run arbitrary `npm run build`, lifecycle scripts, Vite/Next configuration, shell, native plugins, or TypeScript type checking; use a trusted external runner for those. The compiler does not execute input source or receive CI secret values. Initially it had no storage bindings; [v0.35](CI-NPM-CACHE-v35.md) adds only a dedicated public-npm R2 cache. Deployed applications remain isolated Dynamic Workers without outbound network/account bindings.
 
 ## Configuration
 
-Choose the TypeScript/npm template in CI/CD, save inline JSON or `.onestorage-ci.json`, or use a Worker child job in a DAG. Later JavaScript steps receive compiled `input.artifacts`; dependent jobs and deployments can also use them.
+Choose the TypeScript/npm template in CI/CD, save inline JSON or `.vexuni-ci.json`, or use a Worker child job in a DAG. Later JavaScript steps receive compiled `input.artifacts`; dependent jobs and deployments can also use them.
 
 ```json
 {
@@ -56,6 +56,6 @@ Deploy the compiler before the main Worker: `npm run deploy:build`, then `npm ru
 
 `npm run dev` starts main/compiler together; a separately running main process can use `dev:build` on 8788. Application acceptance uses a gateway bound to the same local D1/R2, normally `TEST_APPS_ORIGIN=http://localhost:8789`.
 
-Run `npm run check` and `npm run test:builds`. Remote tests require `ALLOW_REMOTE_ACCEPTANCE=1`, `TEST_ORIGIN`, and a mode-600 `ONESTORAGE_TOKEN_FILE`. Do not edit/deploy until cleanup finishes.
+Run `npm run check` and `npm run test:builds`. Remote tests require `ALLOW_REMOTE_ACCEPTANCE=1`, `TEST_ORIGIN`, and a mode-600 `VEXUNI_TOKEN_FILE`. Do not edit/deploy until cleanup finishes.
 
 Historical v0.22 verification on 2026-09-08: 245 unit tests/type checking; local builds 23 checks/47 API requests, production 23/61. Actual Preact 10.29.3 TSX compilation, SHA-512 verification, R2 output, Dynamic Worker execution, two releases, CAS rollback, stale activation rejection, static HTML/JS/CSS, wrong SRI, and `node:fs` rejection passed. Core 43 assertions/Git/LFS, workflows 23/97, local Git/DAG/fsck 22 and production 21, general UI 43 and workflow UI 19 passed. Fixtures/credentials were cleaned. An initial shared-state `SQLITE_BUSY` was resolved for testing with isolated compiler state; multi-Worker single-process development was separately checked. These small real applications do not establish compatibility with the entire npm ecosystem or maximum resource budgets.

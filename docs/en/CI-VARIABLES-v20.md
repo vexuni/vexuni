@@ -49,4 +49,4 @@ Writes atomically check current access/revision and audit. Back up and rehearse 
 
 ## Historical verification
 
-v0.20 passed 226 unit tests/type checking; local variable tests 41 checks, variable UI 16, general UI 43, core 43 assertions plus Git/LFS, workflow UI 18, workflows 23, and Git/DAG/fsck 21. Production passed 41 variable checks and 30 Git/DAG/fsck checks; assets, source fingerprint, health, backup recovery, and migration rehearsal passed. Cubelink was unchanged at that release. Run `test:variables` and `test:variable-ui` for focused acceptance; remote tests require explicit opt-in and temporary resources.
+v0.20 passed 226 unit tests/type checking; local variable tests 41 checks, variable UI 16, general UI 43, core 43 assertions plus Git/LFS, workflow UI 18, workflows 23, and Git/DAG/fsck 21. Production passed 41 variable checks and 30 Git/DAG/fsck checks; assets, source fingerprint, health, backup recovery, and migration rehearsal passed. legacy site was unchanged at that release. Run `test:variables` and `test:variable-ui` for focused acceptance; remote tests require explicit opt-in and temporary resources.

@@ -2,7 +2,7 @@
 
 [简体中文](../ROADMAP.md) · **English**
 
-The Code Storage comparison was recorded on 2026-09-08 against OneStorage v0.2/e72e52d. Research covered 101 distinct public documentation pages and OpenAPI. [parity.json](../parity.json) maps 40 preferred operations and 11 cross-cutting capabilities to real implementations/tests; upstream documentation was researched, not redistributed as project source.
+The Code Storage comparison was recorded on 2026-09-08 against vexuni v0.2/e72e52d. Research covered 101 distinct public documentation pages and OpenAPI. [parity.json](../parity.json) maps 40 preferred operations and 11 cross-cutting capabilities to real implementations/tests; upstream documentation was researched, not redistributed as project source.
 
 The initial six objectives covered authorization/ref isolation and signatures; complete bounded Git APIs; repository lifecycle; encrypted upstream connections and real synchronization; TypeScript/Python/Go SDKs, MCP, and agent examples; and successful/failing acceptance before deployment. v0.3 implemented all 51 mapped behaviors, with 40 preferred REST operations exercised on temporary Cloudflare projects. See [verification](VERIFICATION.md). Actual private GitHub App installations still need operator configuration; tests do not establish unlimited scale, SLA, every Git protocol, or full recursive-merge compatibility.
 

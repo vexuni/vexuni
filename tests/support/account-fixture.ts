@@ -72,7 +72,7 @@ export async function accountFixture() {
     path: string,
     method = "GET",
     body?: unknown,
-    cookie = "onestorage_session=fixture-session",
+    cookie = "vexuni_session=fixture-session",
     headers: Record<string, string> = {},
   ) {
     const r = await app.fetch(

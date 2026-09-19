@@ -2,7 +2,7 @@
 
 **简体中文** · [English](en/CI-NPM-CACHE-v35.md)
 
-Cloudflare 原生 `build` 步骤现在可以跨构建复用公共 npm 压缩包。独立编译 Worker 通过专用 R2 桶 `onestorage-npm-cache` 保存下载缓存，Git 对象、项目源码、私有包和 CI 密钥不进入该桶。缓存是可删除的派生数据，不是构建产物或包仓库。
+Cloudflare 原生 `build` 步骤现在可以跨构建复用公共 npm 压缩包。独立编译 Worker 通过专用 R2 桶 `vexuni-npm-cache` 保存下载缓存，Git 对象、项目源码、私有包和 CI 密钥不进入该桶。缓存是可删除的派生数据，不是构建产物或包仓库。
 
 ## 正确性与权限
 
@@ -21,8 +21,8 @@ CI 日志在编译成功行显示 `npm cache enabled`、命中/未命中/写入/
 自托管实例首次部署前执行：
 
 ```sh
-npx wrangler r2 bucket create onestorage-npm-cache
-npx wrangler r2 bucket lifecycle add onestorage-npm-cache public-npm-seven-days npm-v1/ --expire-days 7
+npx wrangler r2 bucket create vexuni-npm-cache
+npx wrangler r2 bucket lifecycle add vexuni-npm-cache public-npm-seven-days npm-v1/ --expire-days 7
 npm run deploy:build
 npm run deploy
 ```

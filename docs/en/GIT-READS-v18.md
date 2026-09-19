@@ -12,7 +12,7 @@ Lifecycle, sync, fork, and other exclusive work close admission as soon as queue
 
 Only one additional active snapshot response per isolate, even across repository DOs. Each repository queues at most four snapshots within the overall 16-request queue. Snapshot objects are at most 256 KiB, with 64 object accesses and 1 MiB cumulative returned object data/response. Cache hits count too; bytes are reserved before concurrent reads and large R2 objects fall back before consuming their bodies. No shared reachability-index updates occur.
 
-Buffered responses are limited to 2 MiB while retaining status, Range, HEAD, and conditional semantics. Budget excess, stale lifecycle cache, or a busy isolate slot drains started reads then re-enters the main queue without imposing a new user-visible file-size rejection. Twenty-second idle timeout and complete I/O draining apply. `X-OneStorage-Read-Mode: snapshot` identifies the path but grants no access. Component budgets are not total heap claims.
+Buffered responses are limited to 2 MiB while retaining status, Range, HEAD, and conditional semantics. Budget excess, stale lifecycle cache, or a busy isolate slot drains started reads then re-enters the main queue without imposing a new user-visible file-size rejection. Twenty-second idle timeout and complete I/O draining apply. `X-vexuni-Read-Mode: snapshot` identifies the path but grants no access. Component budgets are not total heap claims.
 
 ## Historical acceptance
 

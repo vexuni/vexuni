@@ -132,7 +132,7 @@ test("duplicate schedulers and queue consumers produce one run; missed slots coa
 test("queue failure keeps durable occurrence; 20-run backpressure retries the frozen code/config instead of newer branch", async () => {
   const f = setup();
   f.db.exec(
-    "UPDATE ci_pipelines SET config='null',source_path='.onestorage-ci.json'",
+    "UPDATE ci_pipelines SET config='null',source_path='.vexuni-ci.json'",
   );
   f.env.EVENTS = {
     send: async () => {
@@ -163,7 +163,7 @@ test("queue failure keeps durable occurrence; 20-run backpressure retries the fr
 test("invalid versioned config creates visible failed run; missing branch fails occurrence without poisoning later schedules", async () => {
   const f = setup();
   f.db.exec(
-    "UPDATE ci_pipelines SET config='null',source_path='.onestorage-ci.json'",
+    "UPDATE ci_pipelines SET config='null',source_path='.vexuni-ci.json'",
   );
   f.setBody("{bad");
   await publishSchedules(f.env, now);

@@ -125,13 +125,13 @@ function bindPasswordRecovery(h, recovery) {
       i18nHTML`<h3>现在保存密码恢复密钥</h3><p>离开页面后无法再次查看。旧密钥已失效。</p><pre class="recovery-key">${h.esc(issued.key)}</pre><p>到期：${h.esc(new Date(issued.expires_at).toLocaleString(getLocale()))}</p><button type="button" class="btn" id="download-password-key">下载恢复密钥</button> <button type="button" class="btn primary" id="saved-password-key">我已安全保存</button>`;
     document.querySelector("#saved-password-key").onclick = h.render;
     document.querySelector("#download-password-key").onclick = () => {
-      const content = i18nHTML`OneStorage 密码恢复密钥\n站点：${location.origin}\n用户：${h.user.username}\n到期：${new Date(issued.expires_at).toISOString()}\n\n${issued.key}\n\n在 ${location.origin}/login/recover 使用。启用 MFA 时仍需第二因子。请离线保存。\n`;
+      const content = i18nHTML`vexuni 密码恢复密钥\n站点：${location.origin}\n用户：${h.user.username}\n到期：${new Date(issued.expires_at).toISOString()}\n\n${issued.key}\n\n在 ${location.origin}/login/recover 使用。启用 MFA 时仍需第二因子。请离线保存。\n`;
       const url = URL.createObjectURL(
           new Blob([content], { type: "text/plain;charset=utf-8" }),
         ),
         a = document.createElement("a");
       a.href = url;
-      a.download = "onestorage-password-recovery.txt";
+      a.download = "vexuni-password-recovery.txt";
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     };

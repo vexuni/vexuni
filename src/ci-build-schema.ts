@@ -18,7 +18,7 @@ export const buildPath = z
             s === "node_modules" ||
             s === ".git",
         ) &&
-      !p.startsWith("__onestorage"),
+      !p.startsWith("__vexuni"),
   );
 export const buildStep = z
   .object({

@@ -52,7 +52,7 @@ test("documentation routes serve real language pages and never fall back to the 
   for (const lang of ["en", "zh-CN"]) {
     const landing = await app.request(
       "https://test/docs",
-      { headers: { cookie: `onestorage_locale=${lang}` } },
+      { headers: { cookie: `vexuni_locale=${lang}` } },
       env,
     );
     assert.equal(landing.headers.get("location"), `/docs/${lang}/index.html`);

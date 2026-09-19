@@ -135,7 +135,7 @@ export function registerDeployTokenRoutes(
         token = newDeploySecret(),
         hash = await digest(token),
         now = Date.now(),
-        username = b.username || "onestorage+deploy-" + id;
+        username = b.username || "vexuni+deploy-" + id;
       const row = await mutation(
         c,
         scope,

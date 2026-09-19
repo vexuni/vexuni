@@ -8,7 +8,7 @@ export async function completeLogin(h) {
   const pending = await api("/auth/oidc/pending");
   if (!h.current()) return;
   layout(
-    i18nHTML`<section class="panel"><form class="form" id="oidc-complete"><h1>${pending.stage === "mfa" ? i18nText("验证你的身份") : i18nText("完成账户创建")}</h1><p>已通过 ${esc(pending.provider)} 验证。</p>${pending.stage === "mfa" ? i18nText('<label>验证码或恢复码<input name="otp" autocomplete="one-time-code" maxlength="64" required></label>') : i18nText('<label>OneStorage 用户名<input name="username" pattern="[a-z0-9][a-z0-9_-]{0,47}" maxlength="48" required></label><p class="hint">新账户使用统一登录，稍后可在账户安全中设置本地密码。已有账户请先用原方式登录，再关联身份。</p>')}<button type="submit" class="btn primary">继续</button><a data-link href="/login">重新登录</a></form></section>`,
+    i18nHTML`<section class="panel"><form class="form" id="oidc-complete"><h1>${pending.stage === "mfa" ? i18nText("验证你的身份") : i18nText("完成账户创建")}</h1><p>已通过 ${esc(pending.provider)} 验证。</p>${pending.stage === "mfa" ? i18nText('<label>验证码或恢复码<input name="otp" autocomplete="one-time-code" maxlength="64" required></label>') : i18nText('<label>vexuni 用户名<input name="username" pattern="[a-z0-9][a-z0-9_-]{0,47}" maxlength="48" required></label><p class="hint">新账户使用统一登录，稍后可在账户安全中设置本地密码。已有账户请先用原方式登录，再关联身份。</p>')}<button type="submit" class="btn primary">继续</button><a data-link href="/login">重新登录</a></form></section>`,
     i18nText("统一登录"),
     "",
   );

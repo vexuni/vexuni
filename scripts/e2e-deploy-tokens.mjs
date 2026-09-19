@@ -8,15 +8,15 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
   remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-let ownerToken = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+let ownerToken = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   cookie = "",
   minted,
   checks = 0,
   requests = 0,
   browser;
-const root = await mkdtemp(join(tmpdir(), "onestorage-deploy-")),
+const root = await mkdtemp(join(tmpdir(), "vexuni-deploy-")),
   space = "deploy_v26_" + crypto.randomUUID().slice(0, 8),
   second = space + "b",
   createdSpaces = [],
@@ -94,7 +94,7 @@ const credentialsFile = join(root, "git.json"),
   askpass = join(root, "askpass.cjs");
 await writeFile(
   askpass,
-  '#!/usr/bin/env node\nconst fs=require("node:fs"),v=JSON.parse(fs.readFileSync(process.env.ONESTORAGE_TEST_GIT_AUTH,"utf8"));process.stdout.write(/username/i.test(process.argv[2]||"")?v.username:v.token);\n',
+  '#!/usr/bin/env node\nconst fs=require("node:fs"),v=JSON.parse(fs.readFileSync(process.env.VEXUNI_TEST_GIT_AUTH,"utf8"));process.stdout.write(/username/i.test(process.argv[2]||"")?v.username:v.token);\n',
   { mode: 0o700 },
 );
 async function command(executable, args, cwd, env = {}, success = true) {
@@ -143,7 +143,7 @@ async function git(args, cwd, auth, success = true) {
     {
       GIT_ASKPASS: askpass,
       GIT_TERMINAL_PROMPT: "0",
-      ONESTORAGE_TEST_GIT_AUTH: credentialsFile,
+      VEXUNI_TEST_GIT_AUTH: credentialsFile,
     },
     success,
   );
@@ -153,7 +153,7 @@ async function npm(args, cwd, deploy) {
     config = join(root, ".npmrc");
   await writeFile(
     config,
-    `${registry.replace(/^https?:/, "")}:_authToken=\${ONESTORAGE_DEPLOY_TOKEN}\n`,
+    `${registry.replace(/^https?:/, "")}:_authToken=\${VEXUNI_DEPLOY_TOKEN}\n`,
     { mode: 0o600 },
   );
   return command(
@@ -170,7 +170,7 @@ async function npm(args, cwd, deploy) {
     ],
     cwd,
     {
-      ONESTORAGE_DEPLOY_TOKEN: deploy.token,
+      VEXUNI_DEPLOY_TOKEN: deploy.token,
       npm_config_loglevel: "error",
       npm_config_update_notifier: "false",
     },
@@ -503,7 +503,7 @@ try {
     const context = await browser.newContext();
     await context.addCookies([
       {
-        name: "onestorage_session",
+        name: "vexuni_session",
         value: cookie.split("=").slice(1).join("="),
         url: origin,
       },
@@ -520,7 +520,7 @@ try {
     await page.locator("#deploy-secret-value").waitFor();
     const secret = await page.locator("#deploy-secret-value").inputValue();
     secrets.push(secret);
-    check(/^odt_/.test(secret), "Browser creates a scoped deploy token");
+    check(/^vdt_/.test(secret), "Browser creates a scoped deploy token");
     await page.getByRole("button", { name: "已保存，清除显示" }).click();
     const article = page
       .locator("[data-deploy-token]")

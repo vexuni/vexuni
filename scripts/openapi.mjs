@@ -178,7 +178,7 @@ for (const feature of parity.features) {
     summary: feature.name,
     description:
       feature.note ||
-      "See the OneStorage API contract in the source archive (docs/API.md).",
+      "See the vexuni API contract in the source archive (docs/API.md).",
     parameters,
     security: [{ bearerAuth: [] }],
     "x-required-scope": scope,
@@ -298,7 +298,7 @@ await writeFile(
     {
       openapi: "3.1.0",
       info: {
-        title: "OneStorage",
+        title: "vexuni",
         version: JSON.parse(
           await readFile(new URL("../package.json", import.meta.url), "utf8"),
         ).version,
@@ -318,7 +318,7 @@ await writeFile(
           sessionCookie: {
             type: "apiKey",
             in: "cookie",
-            name: "onestorage_session",
+            name: "vexuni_session",
             description:
               "Browser session; same-origin Origin header required for mutations.",
           },

@@ -8,8 +8,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787",
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
 let cookie = "",
-  token = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+  token = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   checks = 0;
 async function req(path, method = "GET", body, status = 200, auth = null) {
@@ -254,7 +254,7 @@ assert.equal(
   "2026-12-01",
 );
 // Verify enforcement through a real Git HTTPS/HTTP client, not only JSON endpoints.
-const gitDir = await mkdtemp(join(tmpdir(), "onestorage-protection-"));
+const gitDir = await mkdtemp(join(tmpdir(), "vexuni-protection-"));
 let temporaryToken;
 try {
   temporaryToken = token
@@ -268,14 +268,14 @@ try {
   const askpass = join(gitDir, "askpass.cjs");
   await writeFile(
     askpass,
-    '#!/usr/bin/env node\nprocess.stdout.write(process.argv[2].toLowerCase().includes("username")?"onestorage":process.env.ONESTORAGE_TEST_GIT_TOKEN);\n',
+    '#!/usr/bin/env node\nprocess.stdout.write(process.argv[2].toLowerCase().includes("username")?"vexuni":process.env.VEXUNI_TEST_GIT_TOKEN);\n',
     { mode: 0o700 },
   );
   const env = {
     ...process.env,
     GIT_ASKPASS: askpass,
     GIT_TERMINAL_PROMPT: "0",
-    ONESTORAGE_TEST_GIT_TOKEN: token || temporaryToken.token,
+    VEXUNI_TEST_GIT_TOKEN: token || temporaryToken.token,
   };
   async function git(args, expected = 0) {
     const result = await new Promise((resolve, reject) => {

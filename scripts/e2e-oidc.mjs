@@ -14,12 +14,12 @@ const secrets = JSON.parse(
     "utf8",
   ),
 );
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 const issuer =
   process.env.OIDC_FIXTURE_ISSUER ||
-  "https://onestorage-oidc-acceptance.xbitfun.workers.dev";
+  "https://vexuni-oidc-acceptance.example.workers.dev";
 const suffix = randomBytes(4).toString("hex"),
   adminName = "oidc_admin_" + suffix,
   newName = "oidc_user_" + suffix,
@@ -147,7 +147,7 @@ try {
     name = "OIDC acceptance " + suffix;
   await form.locator("[name=name]").fill(name);
   await form.locator("[name=issuer]").fill(issuer);
-  await form.locator("[name=client_id]").fill("onestorage-acceptance-v23");
+  await form.locator("[name=client_id]").fill("vexuni-acceptance-v23");
   await form.locator("[name=client_secret]").fill(secrets.CLIENT_SECRET);
   await form.locator("[name=allowed_hosts]").fill(new URL(issuer).hostname);
   await form.locator("[name=enabled]").check();

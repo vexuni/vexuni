@@ -14,8 +14,8 @@ if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
 const label = remote ? "production" : "local",
   prefix = `.data/v30-${label}-recovery`;
 await fs.mkdir(".data", { recursive: true });
-const token = process.env.ONESTORAGE_TOKEN_FILE
-  ? (await fs.readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+const token = process.env.VEXUNI_TOKEN_FILE
+  ? (await fs.readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
   : "";
 let admin = token ? { Authorization: `Bearer ${token}` } : {},
   checks = 0;

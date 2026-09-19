@@ -14,7 +14,7 @@ Validation: 387 tests pass. The local test:browse-cache acceptance verifies auto
 
 The following measurements describe historical v0.3.1 behavior. Language negotiation changed HTML ETag handling in v0.38.
 
-Measured on 2026-09-08 at `git.1s.hk`, using private repository `1shk/nb`. This historical release addressed the full-page “connecting” screen on refresh and slow page navigation.
+Measured on 2026-09-08 at `git.example.com`, using private repository `vexuni/nb`. This historical release addressed the full-page “connecting” screen on refresh and slow page navigation.
 
 ## Causes and changes
 

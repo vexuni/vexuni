@@ -1,5 +1,5 @@
 export type Locale = "zh-CN" | "en";
-export const LOCALE_COOKIE = "onestorage_locale";
+export const LOCALE_COOKIE = "vexuni_locale";
 export function supportedLocale(value?: string | null): Locale | null {
   const language = value?.toLowerCase();
   if (language === "zh" || language === "zh-cn" || language === "zh-hans")

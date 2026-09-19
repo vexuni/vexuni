@@ -7,8 +7,8 @@ const origin = process.env.TEST_ORIGIN || "http://localhost:8787";
 const remote = !["localhost", "127.0.0.1"].includes(new URL(origin).hostname);
 if (remote && process.env.ALLOW_REMOTE_ACCEPTANCE !== "1")
   throw Error("Remote acceptance requires opt-in");
-let token = process.env.ONESTORAGE_TOKEN_FILE
-    ? (await readFile(process.env.ONESTORAGE_TOKEN_FILE, "utf8")).trim()
+let token = process.env.VEXUNI_TOKEN_FILE
+    ? (await readFile(process.env.VEXUNI_TOKEN_FILE, "utf8")).trim()
     : "",
   cookie = "",
   temporaryToken,
@@ -16,7 +16,7 @@ let token = process.env.ONESTORAGE_TOKEN_FILE
   createdSpace = false;
 const space = "ci_git_" + crypto.randomUUID().slice(0, 8),
   ap = "/api/repos/" + space + "/project";
-const directory = await mkdtemp(join(tmpdir(), "onestorage-ci-git-")),
+const directory = await mkdtemp(join(tmpdir(), "vexuni-ci-git-")),
   work = join(directory, "work");
 await mkdir(work);
 let checks = 0;
@@ -102,7 +102,7 @@ try {
     201,
   );
   await api(ap + "/ci/config", "PUT", {
-    source_path: ".onestorage-ci.json",
+    source_path: ".vexuni-ci.json",
     enabled: true,
   });
   const config = {
@@ -127,7 +127,7 @@ try {
       },
     ],
   };
-  await writeFile(join(work, ".onestorage-ci.json"), JSON.stringify(config));
+  await writeFile(join(work, ".vexuni-ci.json"), JSON.stringify(config));
   await writeFile(join(work, "package.json"), '{"name":"native-ci-fixture"}');
   await writeFile(join(work, "README.md"), "# Native workflow\n");
   const tokenFile = join(directory, "token"),
@@ -135,15 +135,15 @@ try {
   await writeFile(tokenFile, token, { mode: 0o600 });
   await writeFile(
     askpass,
-    '#!/bin/sh\ncase "$1" in *Username*) printf "%s\\n" "$ONESTORAGE_GIT_USER" ;; *) cat "$ONESTORAGE_GIT_TOKEN_FILE" ;; esac\n',
+    '#!/bin/sh\ncase "$1" in *Username*) printf "%s\\n" "$VEXUNI_GIT_USER" ;; *) cat "$VEXUNI_GIT_TOKEN_FILE" ;; esac\n',
     { mode: 0o700 },
   );
   gitEnv = {
     ...process.env,
     GIT_ASKPASS: askpass,
     GIT_TERMINAL_PROMPT: "0",
-    ONESTORAGE_GIT_USER: owner.username,
-    ONESTORAGE_GIT_TOKEN_FILE: tokenFile,
+    VEXUNI_GIT_USER: owner.username,
+    VEXUNI_GIT_TOKEN_FILE: tokenFile,
   };
   await git(["init", "-b", "main"]);
   await git(["config", "user.name", "Workflow acceptance"]);
@@ -166,7 +166,7 @@ try {
   }
   assert.equal(run?.status, "succeeded", JSON.stringify(run));
   assert.equal(run.config_sha, sha);
-  assert.equal(run.config_path, ".onestorage-ci.json");
+  assert.equal(run.config_path, ".vexuni-ci.json");
   checks += 3;
   const detail = await api(ap + "/ci/runs/" + run.id);
   assert.equal(detail.jobs.length, 2);
@@ -175,9 +175,9 @@ try {
   );
   checks += 2;
   let writes;
-  if (process.env.ONESTORAGE_WRITE_ACCEPTANCE === "1") {
+  if (process.env.VEXUNI_WRITE_ACCEPTANCE === "1") {
     await api(ap + "/ci/config", "PUT", {
-      source_path: ".onestorage-ci.json",
+      source_path: ".vexuni-ci.json",
       enabled: false,
     });
     const commit = (content, expected) => ({

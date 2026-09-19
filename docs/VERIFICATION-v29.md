@@ -34,6 +34,6 @@ v0.28 源码推送退出 1、HTTP 500，但远端 main、随后 fetch 和独立�
 
 所有验收和清理进程退出 0，独立查询确认临时工作空间、项目、工作流和对应审计均已删除；本地新建测试 PAT 已撤销，原用户的生产 PAT 保留。
 
-功能验收提交 `d471a7d3bcea71a5eddb600e32244c09d5324f7a`，主 Worker 版本 `232090de-5ac3-4e5c-87c9-cc26dfa20549`。随后的发布记录补充没有修改已验收的运行时代码。本阶段只部署主 Worker，编译 Worker 和应用网关没有变更。源码包仍使用明确白名单生成，发布按 `scripts/verify-release.mjs` 核对线上资产、OpenAPI、源代码及 Cubelink。
+功能验收提交 `d471a7d3bcea71a5eddb600e32244c09d5324f7a`，主 Worker 版本 `232090de-5ac3-4e5c-87c9-cc26dfa20549`。随后的发布记录补充没有修改已验收的运行时代码。本阶段只部署主 Worker，编译 Worker 和应用网关没有变更。源码包仍使用明确白名单生成，发布按 `scripts/verify-release.mjs` 核对线上资产、OpenAPI、源代码及 旧站。
 
 历史 500/503 根因、其他 Git 编辑 API 的提交后审计、上游转发确认及完整平台其余功能仍需要继续推进。

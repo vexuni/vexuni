@@ -2,7 +2,7 @@
 
 [简体中文](../API.md) · **English**
 
-Base URL: `https://1s.hk/api` (local: `http://localhost:8787/api`). API examples use a short-lived personal token in `Authorization: Bearer <token>`. Do not put tokens in clone URLs, query strings or shell history. Browser session mutations additionally require the exact configured `Origin`.
+Base URL: `https://example.com/api` (local: `http://localhost:8787/api`). API examples use a short-lived personal token in `Authorization: Bearer <token>`. Do not put tokens in clone URLs, query strings or shell history. Browser session mutations additionally require the exact configured `Origin`.
 
 Responses use JSON. Errors contain `{ "error": "..." }`, and validation errors include `details`. Common status codes: 400 validation, 401 authentication, 403 permission, 404 hidden/missing resource, 409 conflict, 413 size limit, 429 saturation, 5xx transient/engine/storage failures.
 
@@ -54,7 +54,7 @@ File API: `content:null` deletes a path. `expected_sha:null` creates an absent b
 ## Git
 
 ```sh
-git clone https://1s.hk/alice/project.git
+git clone https://example.com/alice/project.git
 # Username: alice
 # Password: your PAT (never your account password)
 ```
@@ -63,7 +63,7 @@ Supports HTTPS smart HTTP `info/refs`, `git-upload-pack`, `git-receive-pack`, pr
 
 ## LFS
 
-Standard endpoint: `https://1s.hk/alice/project.git/info/lfs`.
+Standard endpoint: `https://example.com/alice/project.git/info/lfs`.
 
 - POST `/objects/batch`: `operation: upload|download`, `objects:[{oid,size}]`; basic transfer.
 - PUT `/objects/:sha256`: upload bytes, validate SHA-256 (16 MiB cap).
@@ -76,10 +76,10 @@ Actions contain the trusted application origin and carry the requesting Authoriz
 Copy/import `sdk/index.ts` in a TypeScript workspace:
 
 ```ts
-import { OneStorage } from "./sdk/index";
-const storage = new OneStorage({
-  origin: "https://1s.hk",
-  token: env.ONESTORAGE_TOKEN,
+import { vexuni } from "./sdk/index";
+const storage = new vexuni({
+  origin: "https://example.com",
+  token: env.VEXUNI_TOKEN,
 });
 await storage.createRepo({ name: "agent-memory", visibility: "private" });
 const repo = storage.repo("alice", "agent-memory");
@@ -102,7 +102,7 @@ All paths relative to `/repos/:namespace/:repo`, maintainer role required:
 
 Create accepts optional `events` filters. The `push` event records only published ref changes, with old/new SHAs, atomically persisted alongside refs in the DO. Rejected pushes and flush-only probes do not emit it. Sync events include `repo.sync.started`, `repo.sync.succeeded`, and `repo.sync.failed`. Collaboration audit events continue to use the D1 outbox. Deliveries are at least once; deduplicate IDs.
 
-Payload: `{id,event,repository_id,actor,detail,timestamp}`. Headers: `X-OneStorage-Delivery`, `X-OneStorage-Timestamp` (Unix seconds), `X-OneStorage-Signature` (`sha256=<hex>`). Compute HMAC-SHA256 over `timestamp + "." + rawBody` with the returned secret, compare in constant time, enforce a recent timestamp window, and deduplicate using the delivery ID. Responses must be 2xx within 10 seconds; redirects are not followed.
+Payload: `{id,event,repository_id,actor,detail,timestamp}`. Headers: `X-vexuni-Delivery`, `X-vexuni-Timestamp` (Unix seconds), `X-vexuni-Signature` (`sha256=<hex>`). Compute HMAC-SHA256 over `timestamp + "." + rawBody` with the returned secret, compare in constant time, enforce a recent timestamp window, and deduplicate using the delivery ID. Responses must be 2xx within 10 seconds; redirects are not followed.
 
 ## v0.3 authentication and naming
 
@@ -116,9 +116,9 @@ Git HTTP Basic accepts a PAT or JWT as password. For isolated temporary refs use
 
 ## Complete feature operation map
 
-The table maps the 40 preferred Code Storage operations to OneStorage routes. It is a behavior mapping, not a claim of wire compatibility. All paths below include `/api`. Machine-readable contract: `/openapi.json`; the JSON/NDJSON details and SDK types here are authoritative for request construction.
+The table maps the 40 preferred Code Storage operations to vexuni routes. It is a behavior mapping, not a claim of wire compatibility. All paths below include `/api`. Machine-readable contract: `/openapi.json`; the JSON/NDJSON details and SDK types here are authoritative for request construction.
 
-| Operation                  | Method | OneStorage path                                      |
+| Operation                  | Method | vexuni path                                      |
 | -------------------------- | ------ | ---------------------------------------------------- |
 | Get Repo Url By Id         | GET    | `/api/repo-url/{id}`                                 |
 | List Repos                 | GET    | `/api/repos`                                         |

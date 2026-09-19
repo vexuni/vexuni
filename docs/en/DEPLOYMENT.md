@@ -1,18 +1,18 @@
-# Deploy OneStorage
+# Deploy vexuni
 
 [简体中文](../DEPLOYMENT.md) · **English**
 
-## Current instance
+## Instance layout
 
-The canonical URL is **https://1s.hk**. OneStorage replaces Cubelink on the primary domain. Browser pages on `git.1s.hk` redirect to the primary domain; existing Git HTTPS and API URLs remain compatible. The independent Worker URL is `https://onestorage.xbitfun.workers.dev`. Browser sign-in and LFS should use the canonical URL matching APP_ORIGIN.
+Each vexuni instance has three Workers plus a set of storage resources: the main Worker `vexuni` serves the site, authentication, Git HTTPS, and APIs; the private compiler `vexuni-build` runs WASM builds; the separate `vexuni-apps` gateway serves published apps on its own domain. The data plane is D1 `vexuni` (metadata), R2 `vexuni-objects` and `vexuni-npm-cache` (objects and caches), Queue `vexuni-events` (background work), and the SQLite Durable Object class `Repository`. There are no Containers, Docker images, or external Git servers.
 
-Resources: main Worker `onestorage`, private compiler `onestorage-build`, D1 `onestorage`, R2 `onestorage-objects` and `onestorage-npm-cache`, Queue `onestorage-events`, and SQLite Durable Object class `Repository`. The separate `onestorage-apps` gateway serves apps. There are no Containers, Docker images, or external Git servers.
+The canonical origin is set by `APP_ORIGIN`; browser sign-in and LFS should use it. When migrating a previous domain, the optional `LEGACY_APP_ORIGIN` variable redirects only that domain's browser GET/HEAD pages to the canonical origin — native Git and API requests are never redirected. OIDC/OAuth callbacks should point at `<APP_ORIGIN>/api/auth/oidc/callback`.
 
 The operator chooses the initial administrator username and password in the website. The bootstrap secret is held in the Worker secrets and in an ignored local `.data/production-bootstrap-secret.txt` file with mode 0600. Never add it to source or publish it. Successful setup locks initialization in D1; BOOTSTRAP_SECRET can then be removed from the Worker.
 
 ## Primary domain and languages
 
-Use `APP_ORIGIN=https://1s.hk` and `LEGACY_APP_ORIGIN=https://git.1s.hk`. Both domains bind to the main Worker. Only browser page GET/HEAD requests redirect; native Git and API requests do not. Sign in again on the new domain. Change OIDC/OAuth provider callbacks to `https://1s.hk/api/auth/oidc/callback`. Repository UUIDs, D1, R2, DOs, and encryption keys remain unchanged.
+When changing the primary domain, both domains can bind to the same main Worker; users sign in again on the new domain and OIDC/OAuth callback domains are updated accordingly. Repository UUIDs, D1, R2, DOs, and encryption keys remain unchanged.
 
 The platform supports Simplified Chinese and English. The language menu saves the browser preference; first visits negotiate the browser language. Use `?lang=en` or `?lang=zh-CN` to choose explicitly. `/docs` opens the selected documentation language, and each document links to its counterpart. Code, filenames, issue bodies, and other user content are not translated.
 
@@ -24,10 +24,10 @@ Requires a Cloudflare account with Workers, D1, R2, SQLite Durable Objects, Queu
 npm ci
 npx wrangler login
 npx wrangler whoami
-npx wrangler d1 create onestorage
-npx wrangler r2 bucket create onestorage-objects
-npx wrangler r2 bucket create onestorage-npm-cache
-npx wrangler queues create onestorage-events
+npx wrangler d1 create vexuni
+npx wrangler r2 bucket create vexuni-objects
+npx wrangler r2 bucket create vexuni-npm-cache
+npx wrangler queues create vexuni-events
 ```
 
 Run create commands only for new instances. Existing resources must not be recreated. Put the database UUID in `wrangler.jsonc` and `wrangler.apps.jsonc`. Their DB / OBJECTS bindings must share this instance’s database and Git object bucket. `NPM_CACHE` in `wrangler.build.jsonc` uses a separate cache bucket; see [npm caching](CI-NPM-CACHE-v35.md) for cleanup configuration.
@@ -59,7 +59,7 @@ Check `/api/health`, HTTPS, and static pages. Initialize the administrator, crea
 
 ## One-click deployment
 
-[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2FDropKbit%2FOneStorage%2Ftree%2Fdeploy) uses the [GitHub deploy branch](https://github.com/DropKbit/OneStorage/tree/deploy). It includes complete source and portable configuration, without the current instance’s domain, database ID, or credentials.
+[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fvexuni%2Fvexuni%2Ftree%2Fdeploy) uses the [GitHub deploy branch](https://github.com/vexuni/vexuni/tree/deploy). It includes complete source and portable configuration, without the current instance’s domain, database ID, or credentials.
 
 The Cloudflare form creates or selects D1, two R2 buckets, and a Queue, then writes real resource identifiers into the configuration. URLs are generated automatically. Worker names must contain 2–50 lowercase letters, digits, or hyphens, begin with a letter, and end with a letter or digit. Reserve the derived `<name>-build` and `<name>-apps` names too. New instances must not reuse existing-instance resources; check whether dropdowns automatically selected matching existing names.
 
@@ -87,7 +87,7 @@ If a legacy snapshot pointer exists without `refs.v2`, the first request parses 
 
 WEBHOOK_ALLOWED_HOSTS defaults to empty, disabling outbound delivery. Operators may allow trusted HTTPS hosts such as `build.example.net,hooks.example.net`, excluding tenant-controlled DNS and internal addresses.
 
-Maintainers create `{url}` through the API and receive a signing secret once. Events include event name, repository UUID, actor, detail, and time, not code or credentials. Audit records and outbox rows share a D1 batch. A five-minute Cron retries queue submission failures. Delivery attempts are capped at five and exposed through the deliveries API. Receivers must verify timestamp/HMAC and deduplicate X-OneStorage-Delivery.
+Maintainers create `{url}` through the API and receive a signing secret once. Events include event name, repository UUID, actor, detail, and time, not code or credentials. Audit records and outbox rows share a D1 batch. A five-minute Cron retries queue submission failures. Delivery attempts are capped at five and exposed through the deliveries API. Receivers must verify timestamp/HMAC and deduplicate X-vexuni-Delivery.
 
 Git references and push events are atomically recorded in the DO, then idempotently projected into D1 by alarms. Receivers still handle duplicates/delays and periodically compare references. Git and collaboration metadata do not form a distributed transaction.
 
@@ -125,4 +125,4 @@ See [v0.2 historical verification](VERIFICATION-v0.2.md) and [verification](VERI
 
 ## Repeatable cloud acceptance
 
-`scripts/verify-cloud.mjs` refuses to run by default. After confirming a test instance, set ALLOW_REMOTE_ACCEPTANCE=1, ONESTORAGE_ORIGIN, ONESTORAGE_NAMESPACE, and ONESTORAGE_TOKEN, then run `node --import tsx scripts/verify-cloud.mjs`. Inject tokens securely, not through command-line arguments or configuration files. The script creates random accept_v03_ private repositories and deletes them in finally; it reads public GitHub without writing upstream. ACCEPTANCE_REPORT optionally saves a credential-free report in an ignored directory.
+`scripts/verify-cloud.mjs` refuses to run by default. After confirming a test instance, set ALLOW_REMOTE_ACCEPTANCE=1, VEXUNI_ORIGIN, VEXUNI_NAMESPACE, and VEXUNI_TOKEN, then run `node --import tsx scripts/verify-cloud.mjs`. Inject tokens securely, not through command-line arguments or configuration files. The script creates random accept_v03_ private repositories and deletes them in finally; it reads public GitHub without writing upstream. ACCEPTANCE_REPORT optionally saves a credential-free report in an ignored directory.

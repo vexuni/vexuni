@@ -61,6 +61,6 @@ npm run test:reviews
 npm run test:collaboration
 ```
 
-生产脚本要求 `TEST_ORIGIN=https://git.1s.hk`、`ALLOW_REMOTE_ACCEPTANCE=1` 及仅本地保存的 `ONESTORAGE_TOKEN_FILE`。脚本只操作新建的隔离空间和测试仓库，结束后清理仓库、空间、用户凭证。
+生产脚本要求 `TEST_ORIGIN=https://git.example.com`、`ALLOW_REMOTE_ACCEPTANCE=1` 及仅本地保存的 `VEXUNI_TOKEN_FILE`。脚本只操作新建的隔离空间和测试仓库，结束后清理仓库、空间、用户凭证。
 
-行为研究参考：[GitLab CODEOWNERS](https://docs.gitlab.com/user/project/codeowners/reference/)、[GitLab Issue 自动关闭](https://docs.gitlab.com/user/project/issues/managing_issues/)。上文描述 OneStorage 自身实现及明确差异，不是完整 GitLab API/语法兼容声明。
+行为研究参考：[GitLab CODEOWNERS](https://docs.gitlab.com/user/project/codeowners/reference/)、[GitLab Issue 自动关闭](https://docs.gitlab.com/user/project/issues/managing_issues/)。上文描述 vexuni 自身实现及明确差异，不是完整 GitLab API/语法兼容声明。

@@ -120,11 +120,11 @@ export async function consume(
         signal: AbortSignal.timeout(10000),
         headers: {
           "Content-Type": "application/json",
-          "X-OneStorage-Delivery": row.id,
-          "X-OneStorage-Event": JSON.parse(row.payload).event,
-          "User-Agent": "OneStorage-Webhook/1.0",
-          "X-OneStorage-Timestamp": timestamp,
-          "X-OneStorage-Signature": await signature(
+          "X-vexuni-Delivery": row.id,
+          "X-vexuni-Event": JSON.parse(row.payload).event,
+          "User-Agent": "vexuni-Webhook/1.0",
+          "X-vexuni-Timestamp": timestamp,
+          "X-vexuni-Signature": await signature(
             row.secret,
             timestamp,
             row.payload,

@@ -56,7 +56,7 @@ for (const dir of [
   await collect(dir);
 const chunks = [];
 for (const file of files.sort()) {
-  const path = "onestorage/" + file;
+  const path = "vexuni/" + file;
   if (Buffer.byteLength(path) > 100)
     throw Error("Source archive path too long: " + path);
   const data = await readFile(file),
@@ -71,8 +71,8 @@ for (const file of files.sort()) {
   header[156] = 48;
   header.write("ustar\0", 257);
   header.write("00", 263);
-  header.write("onestorage", 265);
-  header.write("onestorage", 297);
+  header.write("vexuni", 265);
+  header.write("vexuni", 297);
   const sum = header.reduce((n, b) => n + b, 0);
   header.write(sum.toString(8).padStart(6, "0") + "\0 ", 148);
   chunks.push(header, data, Buffer.alloc((512 - (data.length % 512)) % 512));

@@ -53,7 +53,7 @@ export async function githubHeaders(
         Authorization: "Bearer " + jwt,
         Accept: "application/vnd.github+json",
         "Content-Type": "application/json",
-        "User-Agent": "OneStorage",
+        "User-Agent": "vexuni",
         "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({ repositories: [base.name] }),

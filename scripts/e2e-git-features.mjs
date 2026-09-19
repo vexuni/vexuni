@@ -56,7 +56,7 @@ const token = (refs) =>
 const ordinary = await token([]),
   verified = await token([["main", ["verify-sig"]]]),
   blocked = await token([["*", ["no-push"]]]);
-const temp = await mkdtemp(join(tmpdir(), "onestorage-git-features-"));
+const temp = await mkdtemp(join(tmpdir(), "vexuni-git-features-"));
 let signing;
 function git(args, cwd = temp, secret = ordinary, ok = true) {
   const p = spawnSync("git", args, {

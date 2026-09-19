@@ -28,22 +28,22 @@ jobs:
           PYTHON_BINARY: python
           GO_BINARY: go
         run: |
-          npm run dev > /tmp/onestorage-dev.log 2>&1 &
+          npm run dev > /tmp/vexuni-dev.log 2>&1 &
           APP_PID=$!
           trap 'kill "$APP_PID" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://localhost:8787/api/health; then break; fi
             sleep 1
           done
-          npm run test:e2e && npm run test:features && npm run test:git-features && npm run test:sdks || { cat /tmp/onestorage-dev.log; exit 1; }
+          npm run test:e2e && npm run test:features && npm run test:git-features && npm run test:sdks || { cat /tmp/vexuni-dev.log; exit 1; }
       - name: Public GitHub interoperability (manual runs)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          npm run dev > /tmp/onestorage-dev.log 2>&1 &
+          npm run dev > /tmp/vexuni-dev.log 2>&1 &
           APP_PID=$!
           trap 'kill "$APP_PID" 2>/dev/null || true' EXIT
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://localhost:8787/api/health; then break; fi
             sleep 1
           done
-          npm run test:sync || { cat /tmp/onestorage-dev.log; exit 1; }
+          npm run test:sync || { cat /tmp/vexuni-dev.log; exit 1; }

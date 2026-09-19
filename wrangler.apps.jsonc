@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "onestorage-apps",
+  "name": "vexuni-apps",
   "main": "src/apps-gateway.ts",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -12,14 +12,15 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "onestorage",
-      "database_id": "d2e2b162-f443-4d8f-9a85-e726048ae356",
+      "database_name": "vexuni",
+      // Must match the main Worker's D1 database_id in wrangler.jsonc.
+      "database_id": "00000000-0000-0000-0000-000000000000",
     },
   ],
   "r2_buckets": [
     {
       "binding": "OBJECTS",
-      "bucket_name": "onestorage-objects",
+      "bucket_name": "vexuni-objects",
     },
   ],
   "workers_dev": true,

@@ -21,7 +21,7 @@ const sha = "a".repeat(40);
 async function setup(secret = true, tokenScopes = ["read_package_registry"]) {
   const f = fixture(),
     project = crypto.randomUUID(),
-    token = "odt_" + "a".repeat(64),
+    token = "vdt_" + "a".repeat(64),
     tokenId = crypto.randomUUID(),
     fileId = crypto.randomUUID();
   f.env.APP_ORIGIN = "http://localhost";

@@ -39,7 +39,7 @@ test("public shell and versioned assets bypass identity storage; API authorizati
       new Request("https://git.example.com" + path, {
         headers: {
           Authorization: "Bearer invalid",
-          Cookie: "onestorage_session=invalid",
+          Cookie: "vexuni_session=invalid",
         },
       }),
       env,
