@@ -21,6 +21,8 @@
     "db:remote": "wrangler d1 migrations apply DB --remote",
     "build:production": "wrangler deploy --dry-run --outdir dist/production",
     "format": "prettier --write src sdk public scripts tests docs *.md *.json *.jsonc .github",
+    "web": "npm --prefix web run build",
+    "presource": "npm run web",
     "source": "node scripts/source.mjs",
     "predeploy": "npm run source",
     "prebuild": "npm run source",

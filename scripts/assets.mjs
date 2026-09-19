@@ -1,88 +1,16 @@
 import "./i18n.mjs";
 import "./content.mjs";
 import "./highlight.mjs";
-// Content-version the public entry points. HTML revalidates; versioned assets can stay cached.
-import { readFile, writeFile, readdir } from "node:fs/promises";
+// The web UI is a Vite build (web/) emitting public/app.js + public/style.css.
+// Content-version the entry points: HTML revalidates; versioned assets stay cached.
+import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 const hash = (s) => createHash("sha256").update(s).digest("hex").slice(0, 16);
 async function update(path, content) {
   if ((await readFile(path, "utf8")) !== content)
     await writeFile(path, content);
 }
-const localeVersion = hash(await readFile("public/i18n.js"));
-for (const file of (await readdir("public")).filter(
-  (f) => f.endsWith(".js") && f !== "i18n.js",
-)) {
-  const path = "public/" + file;
-  await update(
-    path,
-    (await readFile(path, "utf8")).replace(
-      /(["'])(\.\/i18n\.js)(?:\?v=[a-f0-9]+)?\1/g,
-      (_, quote, name) => `${quote}${name}?v=${localeVersion}${quote}`,
-    ),
-  );
-}
-const oidcVersion = hash(await readFile("public/oidc.js"));
-await update(
-  "public/account.js",
-  (await readFile("public/account.js", "utf8")).replace(
-    /from "\.\/oidc\.js(?:\?v=[a-f0-9]+)?"/,
-    `from "./oidc.js?v=${oidcVersion}"`,
-  ),
-);
-const cacheVersion = hash(await readFile("public/ci-cache.js"));
-await update(
-  "public/manage.js",
-  (await readFile("public/manage.js", "utf8")).replace(
-    /from "\.\/ci-cache\.js(?:\?v=[a-f0-9]+)?"/,
-    `from "./ci-cache.js?v=${cacheVersion}"`,
-  ),
-);
-const variableVersion = hash(await readFile("public/ci-variables.js"));
-await update(
-  "public/manage.js",
-  (await readFile("public/manage.js", "utf8")).replace(
-    /from "\.\/ci-variables\.js(?:\?v=[a-f0-9]+)?"/,
-    `from "./ci-variables.js?v=${variableVersion}"`,
-  ),
-);
-let notebook = await readFile("public/notebook.js", "utf8");
-for (const name of ["markdown", "highlight"]) {
-  const version = hash(await readFile(`public/${name}.js`));
-  notebook = notebook.replace(
-    new RegExp(`(["'])(\\.\\/${name}\\.js)(?:\\?v=[a-f0-9]+)?\\1`, "g"),
-    (_, quote, path) => `${quote}${path}?v=${version}${quote}`,
-  );
-}
-await update("public/notebook.js", notebook);
-const forge = hash(await readFile("public/forge.js"));
-let app = await readFile("public/app.js", "utf8");
-for (const name of [
-  "search",
-  "deploy-tokens",
-  "packages",
-  "manage",
-  "issues",
-  "highlight",
-  "collaboration",
-  "account",
-  "oidc",
-  "markdown",
-  "notebook",
-  "qr",
-]) {
-  const version = hash(await readFile(`public/${name}.js`));
-  app = app.replace(
-    new RegExp(`(["'\"])(\\.\\/${name}\\.js)(?:\\?v=[a-f0-9]+)?\\1`, "g"),
-    (_, quote, path) => `${quote}${path}?v=${version}${quote}`,
-  );
-}
-app = app.replace(
-  /from "\.\/forge\.js(?:\?v=[a-f0-9]+)?"/,
-  `from "./forge.js?v=${forge}"`,
-);
-await update("public/app.js", app);
-const appHash = hash(app),
+const appHash = hash(await readFile("public/app.js")),
   styleHash = hash(await readFile("public/style.css"));
 let html = await readFile("public/index.html", "utf8");
 html = html
@@ -91,12 +19,5 @@ html = html
     `href="/style.css?v=${styleHash}"`,
   )
   .replace(/src="\/app\.js(?:\?v=[a-f0-9]+)?"/, `src="/app.js?v=${appHash}"`);
-html = html.replace(
-  /\s*<link rel="modulepreload" href="\/forge\.js[^\"]*"\s*\/?>(?:\n)?/,
-  "\n",
-);
-html = html.replace(
-  '    <script type="module"',
-  `    <link rel="modulepreload" href="/forge.js?v=${forge}" />\n    <script type="module"`,
-);
+html = html.replace(/\s*<link rel="modulepreload"[^>]*>(?:\n)?/g, "");
 await update("public/index.html", html);
