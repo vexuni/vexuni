@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
-  "limits": { "subrequests": 250000 },
   "services": [{ "binding": "BUILDER", "service": "vexuni-build" }],
   "worker_loaders": [{ "binding": "LOADER" }],
   "assets": {
