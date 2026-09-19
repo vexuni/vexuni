@@ -16,7 +16,7 @@
     // Operator domains: APP_ORIGIN is the canonical origin and
     // APPS_ORIGIN the application gateway's origin.
     "APPS_ORIGIN": "https://apps.vexuni.site",
-    "APP_ORIGIN": "https://vexuni.site",
+    "APP_ORIGIN": "https://www.vexuni.site",
     "WEBHOOK_ALLOWED_HOSTS": "",
   },
   "d1_databases": [

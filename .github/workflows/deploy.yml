@@ -145,5 +145,11 @@ jobs:
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url/" || echo 000)
             echo "$url -> $code"
           done
-          echo "--- /api/bootstrap"
-          curl -s --max-time 20 "https://vexuni.site/api/bootstrap" | head -c 400 || true
+          echo "--- GET / (body check)"
+          curl -s --max-time 20 "https://www.vexuni.site/" | head -c 200 || true
+          echo
+          echo "--- GET /api/bootstrap"
+          curl -s --max-time 20 "https://www.vexuni.site/api/bootstrap" | head -c 400 || true
+          echo
+          echo "--- GET /login (SPA route)"
+          curl -s --max-time 20 "https://www.vexuni.site/login" | head -c 200 || true
