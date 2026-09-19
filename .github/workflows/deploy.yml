@@ -121,8 +121,11 @@ jobs:
             if [ "$code" = "409" ]; then
               echo "$1: clearing externally-managed DNS records"
               ZAPI="https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records"
-              for rid in $(curl -s -H "$AUTH" "$ZAPI?name.exact=$1" | jq -r '.result[] | select(.type=="A" or .type=="AAAA" or .type=="CNAME") | .id'); do
-                curl -s -X DELETE -H "$AUTH" "$ZAPI/$rid" | jq -r '.success'
+              curl -s -H "$AUTH" "$ZAPI?name.exact=$1&per_page=100" \
+                | jq -r '.result[] | "\(.type) \(.name) -> \(.content)"' || true
+              for rid in $(curl -s -H "$AUTH" "$ZAPI?name.exact=$1&per_page=100" \
+                | jq -r '.result[] | select(.type != "NS" and .type != "SOA" and .type != "DS" and .type != "DNSKEY") | .id'); do
+                curl -s -X DELETE -H "$AUTH" "$ZAPI/$rid" | jq -r '"deleted: \(.success)"'
               done
               code=$(try_attach "$1" "$2")
             fi
