@@ -61,20 +61,31 @@ jobs:
 
       - name: Provision D1 database
         run: |
-          npx wrangler d1 create vexuni || true
-          DB_ID=$(npx wrangler d1 info vexuni | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1)
+          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          AUTH="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          DB_ID=$(curl -sf -H "$AUTH" "$API/d1/database?name=vexuni" | jq -r '.result[0].uuid // empty')
           if [ -z "$DB_ID" ]; then
-            echo "::error::Could not resolve D1 database_id for 'vexuni'"
+            DB_ID=$(curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+              -d '{"name":"vexuni"}' "$API/d1/database" | jq -r '.result.uuid // empty')
+          fi
+          if [ -z "$DB_ID" ]; then
+            echo "::error::Could not provision D1 database 'vexuni'"
             exit 1
           fi
-          node -e 'const fs=require("fs");const id=process.argv[1];for(const f of ["wrangler.jsonc","wrangler.apps.jsonc"]){fs.writeFileSync(f,fs.readFileSync(f,"utf8").replace(/00000000-0000-0000-0000-000000000000/g,id))}' "$DB_ID"
+          node -e 'const fs=require("fs");const id=process.argv[1];for(const f of ["wrangler.jsonc","wrangler.apps.jsonc"]){fs.writeFileSync(f,fs.readFileSync(f,"utf8").replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g,m=>id))}' "$DB_ID"
           echo "D1 database_id: $DB_ID"
 
       - name: Provision R2 buckets and queue
         run: |
-          npx wrangler r2 bucket create vexuni-objects || true
-          npx wrangler r2 bucket create vexuni-npm-cache || true
-          npx wrangler queues create vexuni-events || true
+          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          AUTH="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          curl -sf -X PUT -H "$AUTH" "$API/r2/buckets/vexuni-objects" | jq -r '.success' || true
+          curl -sf -X PUT -H "$AUTH" "$API/r2/buckets/vexuni-npm-cache" | jq -r '.success' || true
+          Q=$(curl -sf -H "$AUTH" "$API/queues?name=vexuni-events" | jq -r '.result[0].queue_name // empty')
+          if [ -z "$Q" ]; then
+            curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+              -d '{"queue_name":"vexuni-events"}' "$API/queues" | jq -r '.success' || true
+          fi
 
       - name: Apply D1 migrations
         run: yes | npx wrangler d1 migrations apply DB --remote
