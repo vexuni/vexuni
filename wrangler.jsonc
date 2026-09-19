@@ -15,10 +15,10 @@
     "run_worker_first": true,
   },
   "vars": {
-    // Operator domains: set APP_ORIGIN to your canonical origin and
-    // APPS_ORIGIN to the application gateway's origin before deploying.
-    "APPS_ORIGIN": "https://apps.example.com",
-    "APP_ORIGIN": "https://example.com",
+    // Operator domains: APP_ORIGIN is the canonical origin and
+    // APPS_ORIGIN the application gateway's origin.
+    "APPS_ORIGIN": "https://apps.vexuni.site",
+    "APP_ORIGIN": "https://vexuni.site",
     "WEBHOOK_ALLOWED_HOSTS": "",
   },
   "d1_databases": [

@@ -1,0 +1,110 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - src/**
+      - web/**
+      - public/**
+      - migrations/**
+      - scripts/**
+      - "wrangler*.jsonc"
+      - package.json
+      - package-lock.json
+      - .github/workflows/deploy.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm --prefix web ci
+
+      - name: Build frontend, docs, and source archive
+        run: npm run source
+
+      - name: Resolve Cloudflare account
+        run: |
+          ACCOUNT_ID=$(curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[0].id // empty')
+          if [ -z "$ACCOUNT_ID" ]; then
+            echo "::error::Could not resolve a Cloudflare account from CLOUDFLARE_API_TOKEN"
+            exit 1
+          fi
+          echo "CLOUDFLARE_ACCOUNT_ID=$ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "Using account $ACCOUNT_ID"
+
+      - name: Provision D1 database
+        run: |
+          npx wrangler d1 create vexuni || true
+          DB_ID=$(npx wrangler d1 info vexuni | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1)
+          if [ -z "$DB_ID" ]; then
+            echo "::error::Could not resolve D1 database_id for 'vexuni'"
+            exit 1
+          fi
+          node -e 'const fs=require("fs");const id=process.argv[1];for(const f of ["wrangler.jsonc","wrangler.apps.jsonc"]){fs.writeFileSync(f,fs.readFileSync(f,"utf8").replace(/00000000-0000-0000-0000-000000000000/g,id))}' "$DB_ID"
+          echo "D1 database_id: $DB_ID"
+
+      - name: Provision R2 buckets and queue
+        run: |
+          npx wrangler r2 bucket create vexuni-objects || true
+          npx wrangler r2 bucket create vexuni-npm-cache || true
+          npx wrangler queues create vexuni-events || true
+
+      - name: Apply D1 migrations
+        run: yes | npx wrangler d1 migrations apply DB --remote
+
+      - name: Upload worker secrets
+        run: |
+          echo "${{ secrets.BOOTSTRAP_SECRET }}" | npx wrangler secret put BOOTSTRAP_SECRET
+          echo "${{ secrets.CREDENTIAL_ENCRYPTION_KEY }}" | npx wrangler secret put CREDENTIAL_ENCRYPTION_KEY
+
+      - name: Deploy workers
+        run: |
+          npx wrangler deploy --config wrangler.build.jsonc
+          npx wrangler deploy --config wrangler.apps.jsonc
+          npx wrangler deploy
+
+      - name: Attach custom domains
+        run: |
+          ZONE_ID=$(curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=vexuni.site" | jq -r '.result[0].id // empty')
+          if [ -z "$ZONE_ID" ]; then
+            echo "::warning::Zone vexuni.site is not in this Cloudflare account; workers are live on workers.dev only."
+            exit 0
+          fi
+          attach() {
+            curl -sf -X PUT "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+              -d "{\"environment\":\"production\",\"hostname\":\"$1\",\"service\":\"$2\",\"zone_id\":\"$ZONE_ID\"}" \
+              | jq -r '"\(.success // false) \(.result.hostname // .errors[0].message // "unknown")"' \
+              || echo "WARN: attach $1 -> $2 failed"
+          }
+          attach vexuni.site vexuni
+          attach www.vexuni.site vexuni
+          attach apps.vexuni.site vexuni-apps
