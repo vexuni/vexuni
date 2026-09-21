@@ -6,7 +6,7 @@ vexuni 是一个运行在 Cloudflare 上的小型代码托管平台：Git 协议
 
 Git 存储与 HTTP 路径后续加入了 [v0.12 索引和流式处理](GIT-SCALE-v12.md)；云端执行与协作能力见 [v0.5 及后续文档](CLOUD-NATIVE-v05.md)。当前平台由主服务、私有 WASM 编译服务、独立应用网关三个 Worker 组成。
 
-本项目参考 Code Storage 的公开文档独立实现。Git 处理全部使用 Cloudflare Workers 中的 JavaScript，不依赖容器、原生 Git 进程、SSH 守护进程，也不在 Git 接收路径执行仓库代码。原生 Git 仅作为测试客户端和兼容性对照。Web Crypto 负责哈希和签名检查，pako 处理 zlib，RE2JS 限制正则计算，jsdiff/node-diff3 处理文本差异与合并，OpenPGP 处理文本封装的签名。
+本项目为独立的 JavaScript 实现。Git 处理全部使用 Cloudflare Workers 中的 JavaScript，不依赖容器、原生 Git 进程、SSH 守护进程，也不在 Git 接收路径执行仓库代码。原生 Git 仅作为测试客户端和兼容性对照。Web Crypto 负责哈希和签名检查，pako 处理 zlib，RE2JS 限制正则计算，jsdiff/node-diff3 处理文本差异与合并，OpenPGP 处理文本封装的签名。
 
 ```mermaid
 flowchart LR

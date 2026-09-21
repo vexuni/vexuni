@@ -1,5 +1,4 @@
 {
-  "reference": "https://code.storage/docs/",
   "reviewed_at": "2026-09-08",
   "baseline": "e72e52d",
   "features": [
@@ -669,7 +668,10 @@
       "id": "jwt",
       "name": "JWT key registration, exact scopes, repository restriction and revocation",
       "status": "implemented",
-      "evidence": ["tests/forge.test.ts", "scripts/e2e-features.mjs"],
+      "evidence": [
+        "tests/forge.test.ts",
+        "scripts/e2e-features.mjs"
+      ],
       "verification": "local-workerd and native-Git tests",
       "cloud_verified": false
     },
@@ -736,7 +738,7 @@
       ],
       "verification": "Local workerd/native-Git coverage plus operator-owned Cloudflare acceptance; see VERIFICATION.md for tested cases and limits.",
       "cloud_verified": true,
-      "note": "vexuni additionally copies available reachable LFS objects; Code Storage documents Git history only."
+      "note": "vexuni additionally copies available reachable LFS objects; the reference API documents Git history only."
     },
     {
       "id": "sync",

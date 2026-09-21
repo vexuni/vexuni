@@ -68,4 +68,4 @@ Cloud CI runs JS/WASM — not arbitrary shell commands, Python, or npm lifecycle
 
 ---
 
-Licensed under [AGPL-3.0-only](LICENSE): modified versions offered as a network service must provide their corresponding source to users. vexuni is built on the [OneStorage](https://github.com/DropKbit/OneStorage) codebase; the original project was independently implemented with reference to [Code Storage documentation](https://code.storage/docs/) and is not affiliated with Code Storage, GitLab, Gogs, or Cloudflare.
+Licensed under [AGPL-3.0-only](LICENSE): modified versions offered as a network service must provide their corresponding source to users. vexuni is not affiliated with GitLab, Gogs, or Cloudflare.

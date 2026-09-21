@@ -13,7 +13,7 @@
 | `npm run test:e2e`             | 43 项基础 API 断言及真实 Git clone/push/clone、pack、并发、LFS、R2/DO 持久化通过                   |
 | `npm run test:features`        | 76 项高级 HTTP 验证通过：JWT、撤销、引用策略、临时命名空间、流式提交、Notes、Range、Fork、生命周期 |
 | `npm run test:git-features`    | 原生 Git 签名提交、未签名/撤销拒绝、临时与导入 remote、Notes 通过                                  |
-| `npm run test:parity`          | 51 项 Code Storage 对照能力具有实现与验证映射                                                      |
+| `npm run test:parity`          | 51 项对照能力具有实现与验证映射                                                      |
 | `npm run build:production`     | Wrangler 生产构建通过                                                                              |
 | `scripts/e2e-account.mjs` 本地 | 41 项请求检查通过；显式保留临时账户供浏览器视觉验收                                                |
 | 同脚本真实 Cloudflare          | 43 项请求检查通过；包含临时账户停用、凭据撤销、仓库软删除、停用用户资料 404                        |

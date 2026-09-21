@@ -57,29 +57,19 @@ Use at least 32 random bytes for BOOTSTRAP_SECRET and enter it at the Wrangler p
 
 Check `/api/health`, HTTPS, and static pages. Initialize the administrator, create a private acceptance project and temporary PAT, and exercise real push, clone, fetch, merge, and LFS operations. Revoke test credentials afterward. DNS propagation and local negative caching can differ; do not disable TLS verification to diagnose DNS.
 
-## One-click deployment
+## Automated deployment
 
-[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fvexuni%2Fvexuni%2Ftree%2Fdeploy) uses the [GitHub deploy branch](https://github.com/vexuni/vexuni/tree/deploy). It includes complete source and portable configuration, without the current instance’s domain, database ID, or credentials.
+The repository ships `.github/workflows/deploy.yml`, which builds the frontend, docs, and source archive; provisions D1, both R2 buckets, and the events queue idempotently; applies remote D1 migrations; uploads worker secrets; deploys the compiler, gateway, and main Worker in order; attaches configured custom domains; and smoke-tests the result. It runs on pushes to `main` that touch deployable code and on manual dispatch.
 
-The Cloudflare form creates or selects D1, two R2 buckets, and a Queue, then writes real resource identifiers into the configuration. URLs are generated automatically. Worker names must contain 2–50 lowercase letters, digits, or hyphens, begin with a letter, and end with a letter or digit. Reserve the derived `<name>-build` and `<name>-apps` names too. New instances must not reuse existing-instance resources; check whether dropdowns automatically selected matching existing names.
+Required repository secrets: `CLOUDFLARE_API_TOKEN` (Workers Scripts, D1, R2, Queues, and Workers Domains permissions), `BOOTSTRAP_SECRET`, and `CREDENTIAL_ENCRYPTION_KEY`. Generate two separate random values: `openssl rand -hex 32` for BOOTSTRAP_SECRET and `openssl rand -base64 32` for CREDENTIAL_ENCRYPTION_KEY. The former initializes the administrator; the latter encrypts credentials and must be securely retained across upgrades.
 
-Generate two separate random values: `openssl rand -hex 32` for BOOTSTRAP_SECRET and `openssl rand -base64 32` for CREDENTIAL_ENCRYPTION_KEY. The former initializes the administrator; the latter encrypts credentials and must be securely retained across upgrades.
+Worker names must contain 2–50 lowercase letters, digits, or hyphens, begin with a letter, and end with a letter or digit. Reserve the derived `<name>-build` and `<name>-apps` names too. New instances must not reuse existing-instance resources. Enable required services/quotas first; resource usage is billed normally. Failure does not delete existing data. Fix configuration and redeploy; cleanup of incomplete instances is separate.
 
-Build command: `npm run build`. Deploy command: `npm run deploy`. The script applies all D1 migrations, deploys the private compiler and independent gateway, then deploys the main Worker. Main and gateway share DB / OBJECTS; the compiler receives only NPM_CACHE. BUILDER and service URLs are connected automatically. Compiler/gateway deployments remove CI names and tags reserved for the primary Worker to avoid overwriting one another.
+## Upgrades and migrations
 
-This adds orchestration above the official single-Worker button. The build token needs account permissions to manage Workers Scripts, D1, R2, and Queues. If the generated token lacks permissions, choose an appropriate deployment token in Workers Builds and retry. Enable required services/quotas first; resource usage is billed normally. Failure does not delete existing data. Fix configuration and redeploy; cleanup of incomplete instances is separate.
+Apply pending numbered SQL migrations before deploying the main Worker; the gateway and compiler only need redeployment when their own code changes. Existing project variables, sessions, and run snapshots stay compatible across upgrades. Preserve CREDENTIAL_ENCRYPTION_KEY. Configure OIDC providers at `/admin/identity`; callbacks use APP_ORIGIN plus `/api/auth/oidc/callback`. See [OIDC](OIDC-v23.md).
 
-GitHub main and the self-hosted repository contain normal source. The deploy branch contains transformed release configuration. Maintainers update it in a separate checkout using `node scripts/prepare-deploy.mjs <checkout-directory>`, never over an existing instance’s configuration. See [official button requirements](https://developers.cloudflare.com/workers/platform/deploy-buttons/).
-
-Verification status, 2026-09-09: the official form parsed the template. Running the same script with independent resources verified migrations, all three Worker deployments, shared bindings, automatic URLs, and initial administrator setup. The complete browser-triggered build remains unverified: the test account returned `Your GitHub authorization has expired` before creating its repository. This authorization is separate from Wrangler login and repository deploy keys. Restore it using [Cloudflare’s GitHub integration instructions](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#reinstall-the-cloudflare-github-app). Reinstalling a shared GitHub App affects other build connections and should be handled by the account administrator.
-
-## Upgrades and v0.1 migration
-
-For v0.24, apply `0019_workspace_ci_variables.sql` before the main Worker. Other Workers need no deployment for that upgrade. Existing project variables and run snapshots stay compatible; shared values use the original encryption key and workspace-specific scope. See [workspace variables](CI-WORKSPACE-VARIABLES-v24.md).
-
-For v0.23, apply `0018_oidc.sql` before the main Worker; gateway/compiler need no redeployment for that upgrade. Passwords and sessions remain compatible. Preserve CREDENTIAL_ENCRYPTION_KEY. Configure providers at `/admin/identity`; callbacks use APP_ORIGIN plus `/api/auth/oidc/callback`. See [OIDC migration](OIDC-v23.md). Test providers are not retained as production defaults.
-
-Keep Worker names, DO classes, migration history, D1 UUIDs, and repository UUID mappings stable. Back up and validate independently before applying numbered migrations and deploying. This deployment originally started with v0.2 and has no remote legacy Container class. Independently deployed older instances must preserve applied DO migration history and explicitly retire Container classes rather than rewriting history.
+Keep Worker names, DO classes, migration history, D1 UUIDs, and repository UUID mappings stable. Back up and validate independently before applying numbered migrations and deploying. Instances deployed from older snapshots must preserve applied DO migration history and explicitly retire superseded classes rather than rewriting history.
 
 If a legacy snapshot pointer exists without `refs.v2`, the first request parses its tar in the Worker, imports Git objects into R2, then atomically publishes references. macOS AppleDouble metadata is supported. The old snapshot is retained, but later writes do not update it: rolling back to the old engine hides new changes. Repositories exceeding new budgets need an offline migration plan; do not create an empty repository to conceal import failures.
 
@@ -109,9 +99,9 @@ Back up D1, R2 repos/ and lfs/, and every DO’s refs.v2 and any unmigrated snap
 - Accidental deletion: stop repository writes and restore required components from a consistent backup.
 - Never apply blind expiration to Git objects. GC must enumerate reliable active references, compute reachability, and enforce retention and concurrency protection.
 
-## v0.3 upgrade and connections
+## Upstream sync and connections
 
-Back up D1/objects/references, apply `0004_forge_features.sql`, and deploy the v0.3 Worker. CREDENTIAL_ENCRYPTION_KEY is **32 random bytes encoded as base64**, generated with `openssl rand -base64 32` in a secure terminal and entered through Wrangler. Never log it, commit it, or use local test values. Retain the key if encrypted data already exists; replacement makes credentials unreadable. New instances may configure secrets before or after initial deployment. Missing encryption configuration returns 503 for connection management.
+CREDENTIAL_ENCRYPTION_KEY is **32 random bytes encoded as base64**, generated with `openssl rand -base64 32` in a secure terminal and entered through Wrangler. Never log it, commit it, or use local test values. Retain the key if encrypted data already exists; replacement makes credentials unreadable. New instances may configure secrets before or after initial deployment. Missing encryption configuration returns 503 for connection management.
 
 SYNC_ALLOWED_HOSTS optionally allows comma-separated trusted public HTTPS hosts for self-hosted Gitea/Forgejo/GitLab, without ports, paths, or IP addresses. Common public providers are built in. WEBHOOK_ALLOWED_HOSTS remains empty by default.
 
@@ -121,7 +111,7 @@ The sync page shows durable jobs/errors and supports retries. Uncertain upstream
 
 `npm run test:sync` pulls public GitHub into a local instance without modifying that upstream. SDK acceptance requires Python ≥3.10 with cryptography and Go ≥1.24. CI includes local HTTP/native Git/SDK checks. Actual private App installation acceptance requires operator configuration and is distinct from repeatable provider simulations.
 
-See [v0.2 historical verification](VERIFICATION-v0.2.md) and [verification](VERIFICATION.md). Statements such as uninitialized/no deletion GC in old reports apply only to those releases.
+See [verification](VERIFICATION.md) for the current acceptance record. Statements in historical reports apply only to the development stages they describe.
 
 ## Repeatable cloud acceptance
 

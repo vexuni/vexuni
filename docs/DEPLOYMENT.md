@@ -57,29 +57,19 @@ npx wrangler secret put CREDENTIAL_ENCRYPTION_KEY
 
 访问 `/api/health`，确认 HTTPS 与静态页面可用，然后初始化管理员、创建私有验收项目和临时 PAT，执行真实 push、clone、fetch、merge 与 LFS。验证后撤销验收凭证。公开 DNS 和本地负缓存传播可能有时间差；不要为排查 DNS 而关闭 TLS 校验。
 
-## 关于一键部署
+## 自动部署
 
-[Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fvexuni%2Fvexuni%2Ftree%2Fdeploy) 使用 [GitHub 的 deploy 分支](https://github.com/vexuni/vexuni/tree/deploy)。它包含完整源码和独立部署配置，不使用现有 `git.example.com` 的域名、数据库 ID 或凭据。
+仓库内置 `.github/workflows/deploy.yml`：构建前端、文档与源码包；幂等创建 D1、两个 R2 桶与事件队列；应用远程 D1 migrations；写入 Worker secrets；依次部署编译 Worker、应用网关与主 Worker；绑定配置的自定义域名并完成冒烟验证。改动涉及可部署代码时推送到 `main` 自动执行，也可手动触发。
 
-Cloudflare 的部署表单创建或选择 D1、两个 R2 桶和 Queue，并把实际资源写入配置。服务地址由脚本自动生成，不需要在表单中填写。Worker 名使用 2–50 个小写字母、数字或连字符，且以字母开头、以字母或数字结尾。选择名称时，为衍生的 `<名称>-build` 和 `<名称>-apps` 也预留空闲名称；新实例不要复用已有实例的资源，尤其要检查下拉框是否自动选中了同名资源。
+需要的仓库 secrets：`CLOUDFLARE_API_TOKEN`（需具备 Workers Scripts、D1、R2、Queues 与 Workers Domains 权限）、`BOOTSTRAP_SECRET`、`CREDENTIAL_ENCRYPTION_KEY`。生成两个独立随机值：`BOOTSTRAP_SECRET` 用 `openssl rand -hex 32`，`CREDENTIAL_ENCRYPTION_KEY` 用 `openssl rand -base64 32`。前者用于网页首次初始化，后者用于加密凭据，必须妥善保管且升级时保持不变。
 
-填写两个独立的随机值：`BOOTSTRAP_SECRET` 使用 `openssl rand -hex 32` 生成；`CREDENTIAL_ENCRYPTION_KEY` 使用 `openssl rand -base64 32` 生成。前者用于网页首次初始化，后者用于加密凭据，必须妥善保管且升级时保持不变。
+Worker 名使用 2–50 个小写字母、数字或连字符，以字母开头、以字母或数字结尾；为衍生的 `<名称>-build` 与 `<名称>-apps` 预留空闲名称。新实例不要复用已有实例的资源。首次使用需启用相关服务与额度，费用按实际资源使用计费。失败不会删除已有数据；修复配置后重新部署即可，自动清理未完成实例需另行操作。
 
-构建命令为 `npm run build`，部署命令为 `npm run deploy`。模板中的部署脚本先应用所有 D1 migrations，再发布私有编译 Worker 和独立应用网关，最后发布主 Worker。主服务共享 DB / OBJECTS，编译服务仅获得 NPM_CACHE；`BUILDER` 和应用地址由脚本自动连接。编译与网关部署会移除主 Worker 专用的 CI 名称/标识，避免把三个服务覆盖到同一个 Worker 上。
+## 更新与迁移
 
-该流程在 Cloudflare 官方单 Worker 按钮之上增加部署编排。构建使用的 Cloudflare API token 需要本账户 Workers Scripts、D1、R2、Queues 的对应管理权限；若平台生成的 token 权限不足，在 Workers Builds 中选择具有这些权限的部署 token 后重试。首次使用需启用相关服务与额度，费用按实际资源使用计费。失败不会删除已有数据；修复配置后重新部署即可，自动清理未完成实例需另行操作。
+升级前先应用待执行的编号 SQL migration，再发布主 Worker；应用网关与编译 Worker 仅在自身代码变化时需要重新部署。现有项目变量、会话与运行快照保持兼容，必须保留 `CREDENTIAL_ENCRYPTION_KEY`。管理员在 `/admin/identity` 配置 OIDC 提供方，回调为 APP_ORIGIN 加 `/api/auth/oidc/callback`；详见 [统一登录](OIDC-v23.md)。
 
-GitHub `main` 与自托管仓库保存常规源码；`deploy` 是配置经过转换的发布分支。维护者在独立 checkout 中运行 `node scripts/prepare-deploy.mjs <checkout目录>` 更新模板，不能直接在现有实例目录覆盖配置。官方入口要求及限制见 [Cloudflare 文档](https://developers.cloudflare.com/workers/platform/deploy-buttons/)。
-
-验证状态（2026-09-09）：模板已通过官方部署表单解析；使用独立资源运行同一部署脚本，已验证数据库迁移、三个 Worker 发布、共享绑定、自动地址和首次管理员初始化。官方按钮的完整在线构建尚未验证：测试账户在创建 GitHub 仓库前返回 `Your GitHub authorization has expired`。这与 Wrangler 登录及仓库部署密钥不同，需要按 [Cloudflare GitHub 集成说明](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#reinstall-the-cloudflare-github-app) 恢复授权；重装共享 GitHub App 会影响其他项目的构建连接，应由账号管理员处理。
-
-## 更新和 v0.1 迁移
-
-v0.24 升级先应用 `0019_workspace_ci_variables.sql`，再发布主 Worker；无需部署其他 Worker。原项目变量及运行快照保持兼容，共享值使用原加密密钥和独立空间作用域。详见 [空间变量](CI-WORKSPACE-VARIABLES-v24.md)。
-
-v0.23 升级先应用 `0018_oidc.sql`，再发布主 Worker；应用网关和编译 Worker 无需随本次升级重新部署。现有密码与会话保持兼容，必须保留 `CREDENTIAL_ENCRYPTION_KEY`。管理员在 `/admin/identity` 配置自己的 OIDC 应用，回调为 APP_ORIGIN 加 `/api/auth/oidc/callback`；详见 [统一登录与迁移](OIDC-v23.md)。测试用提供方不作为默认生产登录方式保留。
-
-保持 Worker 名、DO 类名、migration 历史、D1 UUID 和仓库 UUID 映射稳定。先备份并在独立环境验证，再应用新的编号 SQL migration 和部署。当前配置首次部署即为 v0.2，不存在旧远程 Container 类。若你曾独立部署旧版，须保留已应用的 DO migration 记录，并制定旧 Container 类的退役 migration；不能直接重写历史。
+保持 Worker 名、DO 类名、migration 历史、D1 UUID 和仓库 UUID 映射稳定。先备份并在独立环境验证，再应用新的编号 SQL migration 和部署。由旧快照部署的实例须保留已应用的 DO migration 记录，并制定被取代类的退役 migration；不能直接重写历史。
 
 旧 `snapshot` 指针存在、`refs.v2` 尚不存在时，首次请求会在 Worker 内解析 tar，导入 Git 对象到 R2，再原子提交 refs。兼容 macOS AppleDouble 元数据。旧快照不会被删，但迁移后的新写入不会同步回旧快照，因此直接回滚旧引擎会丢失新版本可见的更新。超出新引擎预算的旧仓库需要离线迁移方案；不要初始化空仓库掩盖导入失败。
 
@@ -109,9 +99,9 @@ Git ref 与 push 事件现在在 DO 中原子写入，再由 alarm 幂等投影�
 - 误删：停止该仓库写入，从一致备份恢复必要组件。
 - 不为 Git 对象配置盲目到期策略。任何 GC 必须先枚举可靠的活动 refs、计算可达性，并设置保留期和并发保护。
 
-## v0.3 升级与连接配置
+## 上游同步与连接配置
 
-先备份 D1/对象/引用，应用 `0004_forge_features.sql`，再发布 v0.3 Worker。为 `CREDENTIAL_ENCRYPTION_KEY` 配置 **32 随机字节的 base64**，例如在安全终端用 `openssl rand -base64 32` 生成，通过 Wrangler secret 提示输入。不要输出到日志、提交源码或使用本地测试值。已存在加密数据时必须保留原密钥；直接替换会使凭证无法解密。新实例可以先设置 secrets，或先部署空实例再设置；未配置时连接管理明确返回 503。
+为 `CREDENTIAL_ENCRYPTION_KEY` 配置 **32 随机字节的 base64**，例如在安全终端用 `openssl rand -base64 32` 生成，通过 Wrangler secret 提示输入。不要输出到日志、提交源码或使用本地测试值。已存在加密数据时必须保留原密钥；直接替换会使凭证无法解密。新实例可以先设置 secrets，或先部署空实例再设置；未配置时连接管理明确返回 503。
 
 `SYNC_ALLOWED_HOSTS` 可选，逗号分隔，用于自托管 Gitea/Forgejo/GitLab 主机；只填可信公网 HTTPS 主机名，无端口/路径/IP。常见公共提供方已内置允许。`WEBHOOK_ALLOWED_HOSTS` 仍默认空。
 
@@ -121,7 +111,7 @@ GitHub App 在网页“密钥与连接”配置 app_id、installation_id、RSA p
 
 `npm run test:sync` 只对本地实例拉取公共 GitHub，不修改该外部仓库。SDK 验收需要 Python ≥3.10 + cryptography 和 Go ≥1.24；CI 已包含本地 HTTP/native Git/SDK 组合。真实私有 App 安装的验收需操作者自身配置，区别于可重复的提供方模拟测试。
 
-历史验收见 [v0.2 记录](VERIFICATION-v0.2.md)，当前验证见 [VERIFICATION.md](VERIFICATION.md)。历史文档中的“未初始化/无删除 GC”描述仅针对当时版本，不能用于当前实例的操作判断。
+当前验收见 [VERIFICATION.md](VERIFICATION.md)。历史报告中的描述仅针对其对应的开发阶段，不能用于当前实例的操作判断。
 
 ## 可重复的云端验收
 

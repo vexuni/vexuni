@@ -1,6 +1,6 @@
 {
   "name": "vexuni",
-  "version": "0.39.0",
+  "version": "0.1.0-beta",
   "private": true,
   "description": "Git hosting implemented in JavaScript on Cloudflare Workers, R2 and Durable Objects",
   "license": "AGPL-3.0-only",

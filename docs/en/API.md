@@ -116,7 +116,7 @@ Git HTTP Basic accepts a PAT or JWT as password. For isolated temporary refs use
 
 ## Complete feature operation map
 
-The table maps the 40 preferred Code Storage operations to vexuni routes. It is a behavior mapping, not a claim of wire compatibility. All paths below include `/api`. Machine-readable contract: `/openapi.json`; the JSON/NDJSON details and SDK types here are authoritative for request construction.
+The table maps the 40 preferred forge operations to vexuni routes. It is a behavior mapping, not a claim of wire compatibility. All paths below include `/api`. Machine-readable contract: `/openapi.json`; the JSON/NDJSON details and SDK types here are authoritative for request construction.
 
 | Operation                  | Method | vexuni path                                      |
 | -------------------------- | ------ | ---------------------------------------------------- |

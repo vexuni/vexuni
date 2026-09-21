@@ -6,7 +6,7 @@ Date: 2026-09-08, Asia/Singapore. Baseline v0.2 commit `e72e52d`. Runtime: local
 
 ## Reference and acceptance scope
 
-Reviewed the public Code Storage docs index, 101 unique Markdown pages and OpenAPI. `parity.json` maps 40 preferred operations and 11 cross-cutting capabilities to implementation files and test evidence. `test:parity` validates the manifest; it is not a substitute for behavioral tests or a claim of cloud verification. API paths, SDK packages, storage architecture and capacity differ from the reference.
+`parity.json` maps 40 preferred operations and 11 cross-cutting capabilities to implementation files and test evidence. `test:parity` validates the manifest; it is not a substitute for behavioral tests or a claim of cloud verification. API paths, SDK packages, storage architecture and capacity differ from the reference.
 
 ## Local results
 
@@ -41,4 +41,4 @@ Two initial full-source push attempts returned an object/ref persistence failure
 
 ## Limits not validated as production guarantees
 
-No load/region-failure/complete disaster-recovery exercise, independent security audit, SHA1DC equivalence, native git-lfs CLI or TB-scale claim. No real private GitHub App installation test. The merge/blame/rename and protocol limits in README/API are intentional exposed boundaries; future scale, quotas, active-object GC, backup tooling and full GitLab organization/CI features are outside this Code Storage feature mapping.
+No load/region-failure/complete disaster-recovery exercise, independent security audit, SHA1DC equivalence, native git-lfs CLI or TB-scale claim. No real private GitHub App installation test. The merge/blame/rename and protocol limits in README/API are intentional exposed boundaries; future scale, quotas, active-object GC, backup tooling and full GitLab organization/CI features are outside the current feature mapping.

@@ -6,7 +6,7 @@
 
 ## 对照与本地验证
 
-研究 Code Storage 的公开索引、101 个独立 Markdown 页面和 OpenAPI，parity.json 将 40 个首选操作与 11 项横向能力映射到实现和证据。test:parity 只检查映射，不代替行为或云端验收；API 路径、SDK、存储与容量并非完全兼容。
+parity.json 将 40 个首选操作与 11 项横向能力映射到实现和证据。test:parity 只检查映射，不代替行为或云端验收；API 路径、SDK、存储与容量并非完全兼容。
 
 类型检查及57项测试通过；核心43次HTTP断言加原生v0/v2、二进制/模式/标签/thin pack、CAS、LFS、权限、Issue、固定MR、CSRF/撤销通过。高级65项真实workerd/D1/R2/DO检查覆盖scope/策略/隔离/NDJSON/Notes/Range/Fork/生命周期/凭据/MCP。
 

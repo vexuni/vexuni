@@ -18,7 +18,7 @@ import { pkt, FLUSH, DELIM, readPackets } from "./pkt";
 import { parsePack } from "./pack";
 import type { PackCache } from "./pack-cache";
 import { packChunks, streamResponse } from "./pack-stream";
-const agent = "agent=vexuni/0.5";
+const agent = "agent=vexuni/0.1.0-beta";
 const uploadCaps = `side-band-64k ofs-delta no-progress multi_ack_detailed no-done ${agent} object-format=sha1`;
 const receiveCaps = `report-status delete-refs ofs-delta atomic ${agent} object-format=sha1`;
 export function gitResponse(

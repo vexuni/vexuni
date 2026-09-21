@@ -39,24 +39,7 @@ test("every catalog translation preserves its placeholders", () => {
   }
 });
 test("all application-owned Chinese UI literals are explicitly localized and covered", async () => {
-  const names = [
-    "account",
-    "app",
-    "ci-cache",
-    "ci-variables",
-    "collaboration",
-    "deploy-tokens",
-    "forge",
-    "issues",
-    "manage",
-    "oidc",
-    "packages",
-    "search",
-  ];
-  const files = [
-    ...names.map((n) => `public/${n}.js`),
-    "src/browser/notebook.js",
-  ];
+  const files = ["src/browser/notebook.js"];
   const han = /\p{Script=Han}/u;
   for (const file of files) {
     const source = await fs.readFile(
@@ -115,4 +98,45 @@ test("known API errors translate without altering unknown server or user text", 
     translateError("user text: Invalid username or password", "zh-CN"),
     "user text: Invalid username or password",
   );
+});
+test("React frontend keeps Chinese text inside the i18n catalog", async () => {
+  // UI strings live in web/src/lib/i18n.tsx and are referenced through t().
+  // The only permitted raw Han literal outside the catalog is the locale's
+  // own display name used by language pickers.
+  const han = /\p{Script=Han}/u;
+  const allowed = new Set(["简体中文"]);
+  const root = new URL("../web/src/", import.meta.url);
+  const scan = async (dir) => {
+    for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
+      const p = new URL(entry.name + (entry.isDirectory() ? "/" : ""), dir);
+      if (entry.isDirectory()) {
+        await scan(p);
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(entry.name)) continue;
+      if (p.pathname.endsWith("lib/i18n.tsx")) continue;
+      const source = await fs.readFile(p, "utf8");
+      for (const m of source.matchAll(/\p{Script=Han}+/gu)) {
+        assert.ok(
+          allowed.has(m[0]),
+          `${entry.name}: untranslated literal ${m[0].slice(0, 60)}`,
+        );
+      }
+    }
+  };
+  await scan(root);
+});
+test("React frontend zh and en catalogs carry identical keys", async () => {
+  const source = await fs.readFile(
+    new URL("../web/src/lib/i18n.tsx", import.meta.url),
+    "utf8",
+  );
+  const grab = (name) => {
+    const m = source.match(new RegExp(`const ${name}[^=]*= \\{([\\s\\S]*?)\\};`));
+    assert.ok(m, `catalog ${name} not found`);
+    return new Set([...m[1].matchAll(/^\s*"([^"]+)":/gm)].map((x) => x[1]));
+  };
+  const en = grab("en");
+  const zh = grab("zh");
+  assert.deepEqual([...en].sort(), [...zh].sort());
 });

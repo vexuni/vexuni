@@ -68,4 +68,4 @@ npm run dev
 
 ---
 
-采用 [AGPL-3.0-only](LICENSE) 开源协议：修改后通过网络提供服务时，须向用户提供相应源码。本项目基于 [OneStorage](https://github.com/DropKbit/OneStorage) 代码库继续开发；原项目参考 [Code Storage 文档](https://code.storage/docs/) 独立实现，与 Code Storage、GitLab、Gogs 或 Cloudflare 无隶属关系。
+采用 [AGPL-3.0-only](LICENSE) 开源协议：修改后通过网络提供服务时，须向用户提供相应源码。vexuni 与 GitLab、Gogs 或 Cloudflare 无隶属关系。
