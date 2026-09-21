@@ -13,9 +13,10 @@ import {
   ErrorBox,
   Field,
   Modal,
-  Spinner,
+  SkeletonRows,
 } from "../components/ui";
 import { Icon } from "../components/icons";
+import { useToast } from "../components/toast";
 import { Routes, Route } from "react-router-dom";
 
 function SettingsShell({
@@ -58,6 +59,7 @@ function ProfilePage() {
     "/profile",
   );
   const [msg, setMsg] = useState("");
+  const toast = useToast();
 
   async function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,9 +67,11 @@ function ProfilePage() {
     try {
       await api.put("/profile", d);
       await refresh();
-      setMsg(t("settings.saved"));
+      setMsg("");
+      toast(t("common.saved"));
     } catch (err) {
       setMsg((err as Error).message);
+      toast((err as Error).message, "err");
     }
   }
 
@@ -99,6 +103,7 @@ function ProfilePage() {
 function SecurityPage() {
   const { t } = useT();
   const [msg, setMsg] = useState("");
+  const toast = useToast();
   const { data: security } = useApi<{ totp?: boolean; sessions?: unknown[] }>(
     "/account/security",
   );
@@ -113,9 +118,11 @@ function SecurityPage() {
         password: d.password,
       });
       form.reset();
-      setMsg(t("settings.saved"));
+      setMsg("");
+      toast(t("common.saved"));
     } catch (err) {
       setMsg((err as Error).message);
+      toast((err as Error).message, "err");
     }
   }
 
@@ -192,7 +199,7 @@ function TokensPage() {
           </button>
         </div>
         {error && <ErrorBox error={error} />}
-        {loading && <Spinner />}
+        {loading && <SkeletonRows />}
         {tokens && tokens.length === 0 && (
           <Empty icon="key" title={t("common.empty")} />
         )}

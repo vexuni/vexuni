@@ -5,7 +5,7 @@ import { useT } from "../lib/i18n";
 import { timeAgo } from "../lib/format";
 import type { Notification } from "../lib/types";
 import { PageTitle, Shell } from "../components/layout";
-import { Empty, ErrorBox, Spinner } from "../components/ui";
+import { Empty, ErrorBox, SkeletonRows } from "../components/ui";
 
 export function NotificationsPage() {
   const { t } = useT();
@@ -32,7 +32,7 @@ export function NotificationsPage() {
         }
       />
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {items &&
         (items.length === 0 ? (
           <div className="panel">

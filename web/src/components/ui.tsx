@@ -1,12 +1,38 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { Icon } from "./icons";
+import { useToast } from "./toast";
 
 export function Spinner() {
   const { t } = useT();
   return (
     <div className="spinner" role="status" aria-label={t("common.loading")} />
+  );
+}
+
+/** Content-shaped placeholder while a list loads — kinder than a bare spinner. */
+export function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`sk ${className}`} aria-hidden="true" />;
+}
+
+export function SkeletonRows({ rows = 5 }: { rows?: number }) {
+  const { t } = useT();
+  return (
+    <div className="panel" role="status" aria-label={t("common.loading")}>
+      <div className="panelhead">
+        <Skeleton className="sk-w-140" />
+      </div>
+      {Array.from({ length: rows }, (_, i) => (
+        <div className="sk-row" key={i}>
+          <Skeleton className="sk-ic" />
+          <div className="grow">
+            <Skeleton className={i % 3 === 1 ? "sk-w-60" : "sk-w-40"} />
+            <Skeleton className={i % 2 ? "sk-w-30" : "sk-w-50"} />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -58,9 +84,17 @@ export function Dot({ tone }: { tone?: string }) {
   return <i className={`dot${tone ? " " + tone : ""}`} aria-hidden="true" />;
 }
 
+const AV_HUES = 8;
+
 export function Avatar({ name }: { name?: string }) {
   const initial = (name || "?").trim().charAt(0).toUpperCase();
-  return <span className="avatar" aria-hidden="true">{initial}</span>;
+  let hash = 0;
+  for (const ch of name || "") hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return (
+    <span className={`avatar av-${hash % AV_HUES}`} aria-hidden="true">
+      {initial}
+    </span>
+  );
 }
 
 export function Chip({ children }: { children: ReactNode }) {
@@ -99,15 +133,22 @@ export function Pager({
 
 export function CopyButton({ text }: { text: string }) {
   const { t } = useT();
+  const toast = useToast();
   const [done, setDone] = useState(false);
   return (
     <button
-      className="copy-btn"
+      className={`copy-btn${done ? " ok" : ""}`}
       title={done ? t("common.copied") : t("common.copy")}
       aria-label={t("common.copy")}
       onClick={async () => {
-        await navigator.clipboard.writeText(text);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          toast(t("err.load"), "err");
+          return;
+        }
         setDone(true);
+        toast(t("common.copied"));
         setTimeout(() => setDone(false), 1500);
       }}
     >
@@ -151,16 +192,42 @@ export function Modal({
   onClose: () => void;
   actions?: ReactNode;
 }) {
+  const { t } = useT();
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    // Initial focus: first form control, else the dialog itself for Esc focus.
+    const first = ref.current?.querySelector<HTMLElement>(
+      "input, textarea, select, button:not([data-nofocus])",
+    );
+    (first || ref.current)?.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
   return (
     <div className="modal-veil" onClick={onClose} role="presentation">
       <div
+        ref={ref}
         className="modal"
         role="dialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3>{title}</h3>
+        <div className="modal-head">
+          <h3>{title}</h3>
+          <button
+            className="btn text icon-btn"
+            data-nofocus
+            onClick={onClose}
+            aria-label={t("common.close")}
+          >
+            <Icon name="x" size={15} />
+          </button>
+        </div>
         {children}
         <div className="actions">{actions}</div>
       </div>

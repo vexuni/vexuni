@@ -11,7 +11,7 @@ import {
   Empty,
   ErrorBox,
   Field,
-  Spinner,
+  SkeletonRows,
   StatePill,
 } from "../../components/ui";
 import { Icon } from "../../components/icons";
@@ -55,7 +55,7 @@ export function MergesPage() {
         </Link>
       </div>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {merges &&
         (merges.length === 0 ? (
           <div className="panel">
@@ -126,7 +126,7 @@ export function MergeDetailPage() {
     }
   }
 
-  if (loading) return <Spinner />;
+  if (loading) return <SkeletonRows />;
   if (error || !mr) return <ErrorBox error={error || new Error("404")} onRetry={reload} />;
 
   return (

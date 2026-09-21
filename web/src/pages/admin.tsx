@@ -4,7 +4,7 @@ import { useT } from "../lib/i18n";
 import { fullDate } from "../lib/format";
 import type { Repository, User, Workspace } from "../lib/types";
 import { PageTitle, Shell } from "../components/layout";
-import { Empty, ErrorBox, Pill, Spinner } from "../components/ui";
+import { Empty, ErrorBox, Pill, SkeletonRows } from "../components/ui";
 import { Icon } from "../components/icons";
 
 interface Overview {
@@ -55,7 +55,7 @@ export function AdminPage() {
             <strong>{t("admin.users")}</strong>
             <span className="muted small">{users.data?.users.length}</span>
           </div>
-          {users.loading && <Spinner />}
+          {users.loading && <SkeletonRows rows={4} />}
           {users.error && <ErrorBox error={users.error} />}
           {users.data?.users.slice(0, 20).map((u) => (
             <div className="row" key={u.id}>

@@ -4,7 +4,7 @@ import { useApi } from "../lib/hooks";
 import { useT } from "../lib/i18n";
 import type { SearchHit } from "../lib/types";
 import { PageTitle, Shell } from "../components/layout";
-import { Empty, ErrorBox, Spinner } from "../components/ui";
+import { Empty, ErrorBox, SkeletonRows } from "../components/ui";
 import { Icon } from "../components/icons";
 
 interface SearchResponse {
@@ -95,7 +95,7 @@ export function SearchPage() {
         </button>
       </form>
       {error && <ErrorBox error={error} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {!q && (
         <div className="panel">
           <Empty icon="search" title={t("search.empty")} body={t("search.emptyBody")} />

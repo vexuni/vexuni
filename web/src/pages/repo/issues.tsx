@@ -13,7 +13,7 @@ import {
   ErrorBox,
   Field,
   Pill,
-  Spinner,
+  SkeletonRows,
   StatePill,
 } from "../../components/ui";
 import { Icon } from "../../components/icons";
@@ -53,7 +53,7 @@ export function IssuesPage() {
         </Link>
       </div>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {issues &&
         (issues.length === 0 ? (
           <div className="panel">
@@ -131,7 +131,7 @@ export function IssueDetailPage() {
     reload();
   }
 
-  if (loading) return <Spinner />;
+  if (loading) return <SkeletonRows />;
   if (error || !issue) return <ErrorBox error={error || new Error("404")} onRetry={reload} />;
 
   return (

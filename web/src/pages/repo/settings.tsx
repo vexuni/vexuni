@@ -6,12 +6,14 @@ import { useT } from "../../lib/i18n";
 import { useAuth } from "../../lib/auth";
 import type { Member, Webhook } from "../../lib/types";
 import {
+  Avatar,
   ErrorBox,
   Field,
   Modal,
-  Spinner,
+  SkeletonRows,
 } from "../../components/ui";
 import { Icon } from "../../components/icons";
+import { useToast } from "../../components/toast";
 import { useRepo } from "./layout";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -40,6 +42,7 @@ export function RepoSettingsPage() {
   );
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const toast = useToast();
   const [confirming, setConfirming] = useState<"delete" | null>(null);
 
   async function saveGeneral(e: FormEvent<HTMLFormElement>) {
@@ -55,9 +58,11 @@ export function RepoSettingsPage() {
         default_branch: d.default_branch,
       });
       setSaved(true);
+      toast(t("common.saved"));
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       setError((err as Error).message);
+      toast((err as Error).message, "err");
     }
   }
 
@@ -67,12 +72,17 @@ export function RepoSettingsPage() {
       string,
       string
     >;
-    await api.put(repoPath(ns, name) + "/members", {
-      username: d.username,
-      role: d.role || "write",
-    });
-    (e.target as HTMLFormElement).reset();
-    members.reload();
+    try {
+      await api.put(repoPath(ns, name) + "/members", {
+        username: d.username,
+        role: d.role || "write",
+      });
+      (e.target as HTMLFormElement).reset();
+      members.reload();
+      toast(t("common.saved"));
+    } catch (err) {
+      toast((err as Error).message, "err");
+    }
   }
 
   async function addWebhook(e: FormEvent<HTMLFormElement>) {
@@ -81,12 +91,17 @@ export function RepoSettingsPage() {
       string,
       string
     >;
-    await api.post(repoPath(ns, name) + "/webhooks", {
-      url: d.url,
-      events: d.events ? d.events.split(",").map((s) => s.trim()) : ["*"],
-    });
-    (e.target as HTMLFormElement).reset();
-    webhooks.reload();
+    try {
+      await api.post(repoPath(ns, name) + "/webhooks", {
+        url: d.url,
+        events: d.events ? d.events.split(",").map((s) => s.trim()) : ["*"],
+      });
+      (e.target as HTMLFormElement).reset();
+      webhooks.reload();
+      toast(t("common.saved"));
+    } catch (err) {
+      toast((err as Error).message, "err");
+    }
   }
 
   async function archive() {
@@ -129,22 +144,26 @@ export function RepoSettingsPage() {
       </Section>
 
       <Section title={t("settings.members")}>
-        {members.loading && <Spinner />}
+        {members.loading && <SkeletonRows rows={3} />}
         {members.data?.members?.map((m) => (
           <div className="row row-flush" key={m.username}>
-            <span className="avatar">{m.username?.charAt(0)?.toUpperCase()}</span>
+            <Avatar name={m.username} />
             <span className="grow">{m.username}</span>
             <span className="faint small">{m.role}</span>
             <button
               className="copy-btn"
               title={t("common.delete")}
               onClick={async () => {
-                await api.del(
-                  repoPath(ns, name) +
-                    "/members/" +
-                    encodeURIComponent(m.username),
-                );
-                members.reload();
+                try {
+                  await api.del(
+                    repoPath(ns, name) +
+                      "/members/" +
+                      encodeURIComponent(m.username),
+                  );
+                  members.reload();
+                } catch (err) {
+                  toast((err as Error).message, "err");
+                }
               }}
             >
               <Icon name="trash" size={14} />
@@ -174,8 +193,12 @@ export function RepoSettingsPage() {
               className="copy-btn"
               title={t("common.delete")}
               onClick={async () => {
-                await api.del(repoPath(ns, name) + "/webhooks/" + w.id);
-                webhooks.reload();
+                try {
+                  await api.del(repoPath(ns, name) + "/webhooks/" + w.id);
+                  webhooks.reload();
+                } catch (err) {
+                  toast((err as Error).message, "err");
+                }
               }}
             >
               <Icon name="trash" size={14} />

@@ -5,7 +5,7 @@ import { useApi } from "../lib/hooks";
 import { useT } from "../lib/i18n";
 import type { Workspace } from "../lib/types";
 import { PageTitle, Shell } from "../components/layout";
-import { Empty, ErrorBox, Field, Modal, Spinner } from "../components/ui";
+import { Empty, ErrorBox, Field, Modal, SkeletonRows } from "../components/ui";
 import { Icon } from "../components/icons";
 
 export function SpacesPage() {
@@ -44,7 +44,7 @@ export function SpacesPage() {
         }
       />
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {spaces &&
         (spaces.length === 0 ? (
           <div className="panel">

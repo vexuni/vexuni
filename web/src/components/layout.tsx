@@ -3,7 +3,8 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { useT, type Locale } from "../lib/i18n";
 import { useTheme, type Theme } from "../lib/theme";
-import { Avatar, Pill } from "./ui";
+import { Avatar, Modal, Pill } from "./ui";
+import { CommandPalette } from "./palette";
 import { Icon } from "./icons";
 
 export function Wordmark() {
@@ -116,8 +117,15 @@ function UserMenu() {
     const close = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
   if (!user) return null;
   return (
@@ -154,6 +162,39 @@ function UserMenu() {
   );
 }
 
+function isTyping(el: EventTarget | null): boolean {
+  const node = el as HTMLElement | null;
+  return (
+    !!node &&
+    (node.tagName === "INPUT" ||
+      node.tagName === "TEXTAREA" ||
+      node.tagName === "SELECT" ||
+      node.isContentEditable)
+  );
+}
+
+function ShortcutsHelp({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+  const rows: [string, string][] = [
+    ["⌘K / Ctrl+K", t("help.palette")],
+    ["/", t("help.palette")],
+    ["?", t("help.this")],
+    ["Esc", t("help.esc")],
+  ];
+  return (
+    <Modal title={t("help.title")} onClose={onClose}>
+      <div className="help-grid">
+        {rows.map(([key, desc]) => (
+          <div className="help-row" key={key}>
+            <kbd>{key}</kbd>
+            <span>{desc}</span>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
 /** App frame: sidebar + sticky topbar + content column. */
 export function Shell({
   crumbs,
@@ -165,6 +206,30 @@ export function Shell({
   const { t } = useT();
   const { user } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
+  const [palOpen, setPalOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key;
+      if ((e.metaKey || e.ctrlKey) && k.toLowerCase() === "k") {
+        e.preventDefault();
+        setPalOpen((v) => !v);
+        return;
+      }
+      if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (k === "/") {
+        e.preventDefault();
+        setPalOpen(true);
+      } else if (k === "?") {
+        e.preventDefault();
+        setHelpOpen(true);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="shell">
       <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
@@ -190,6 +255,15 @@ export function Shell({
             ))}
           </div>
           <div className="right">
+            <button
+              className="search-trigger"
+              onClick={() => setPalOpen(true)}
+              aria-label={t("top.search")}
+            >
+              <Icon name="search" size={14} />
+              <span className="st-label">{t("top.search")}</span>
+              <kbd>⌘K</kbd>
+            </button>
             <Pill>{t("top.selfhosted")}</Pill>
             {user ? (
               <UserMenu />
@@ -202,6 +276,8 @@ export function Shell({
         </header>
         <div className="content">{children}</div>
       </div>
+      <CommandPalette open={palOpen} onClose={() => setPalOpen(false)} />
+      {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
     </div>
   );
 }

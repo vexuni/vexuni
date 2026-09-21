@@ -2,7 +2,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { qs, repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
-import { Empty, ErrorBox, Spinner } from "../../components/ui";
+import { Empty, ErrorBox, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
 
@@ -39,7 +39,7 @@ export function RepoSearchPage() {
         </button>
       </form>
       {error && <ErrorBox error={error} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {!q && (
         <div className="panel">
           <Empty

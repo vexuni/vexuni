@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useOutletContext, useParams } from "react-router-dom";
 import { repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
 import type { Repository, RepoURL } from "../../lib/types";
 import { Shell, Tabs } from "../../components/layout";
-import { CopyButton, ErrorBox, Pill, Spinner } from "../../components/ui";
+import { CopyButton, ErrorBox, Pill, Skeleton, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 
 export interface RepoCtx {
@@ -32,6 +32,22 @@ export function RepoLayout() {
   ]);
   const [cloneOpen, setCloneOpen] = useState(false);
 
+  useEffect(() => {
+    if (!cloneOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setCloneOpen(false);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(".menu-wrap")) setCloneOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onClick);
+    };
+  }, [cloneOpen]);
+
   const crumbs = [
     { label: t("repos.title"), to: "/" },
     { label: `${ns} / ${name}` },
@@ -40,7 +56,10 @@ export function RepoLayout() {
   if (loading) {
     return (
       <Shell crumbs={crumbs}>
-        <Spinner />
+        <div className="titlebar">
+          <Skeleton className="sk-w-40" />
+        </div>
+        <SkeletonRows rows={6} />
       </Shell>
     );
   }

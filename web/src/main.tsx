@@ -5,6 +5,7 @@ import App from "./App";
 import { AuthProvider } from "./lib/auth";
 import { I18nProvider } from "./lib/i18n";
 import { ThemeProvider } from "./lib/theme";
+import { ToastProvider } from "./components/toast";
 import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("app")!).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("app")!).render(
       <I18nProvider>
         <AuthProvider>
           <BrowserRouter>
-            <App />
+            <ToastProvider>
+              <App />
+            </ToastProvider>
           </BrowserRouter>
         </AuthProvider>
       </I18nProvider>

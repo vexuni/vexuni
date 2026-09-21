@@ -12,7 +12,7 @@ import {
   Field,
   Modal,
   Pill,
-  Spinner,
+  SkeletonRows,
 } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
@@ -54,7 +54,7 @@ export function BranchesPage() {
   return (
     <>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {data && (
         <div className="panel">
           <div className="panelhead">
@@ -164,7 +164,7 @@ export function TagsPage() {
   return (
     <>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {data && (
         <div className="panel">
           <div className="panelhead">

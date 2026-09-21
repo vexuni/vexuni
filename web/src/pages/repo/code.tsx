@@ -6,7 +6,7 @@ import { bytes } from "../../lib/format";
 import type { Blob, Branch, Tree } from "../../lib/types";
 import { CodeView } from "../../components/code";
 import { Readme } from "../../components/markdown";
-import { Empty, ErrorBox, Spinner } from "../../components/ui";
+import { Empty, ErrorBox, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
 
@@ -117,7 +117,7 @@ export function RepoCodePage() {
       </div>
       <div className="filetree">
         {error && <ErrorBox error={error} />}
-        {loading && <Spinner />}
+        {loading && <SkeletonRows />}
         {tree && sorted.length === 0 && (
           <Empty
             icon="repo"
@@ -198,7 +198,7 @@ export function RepoFilePage() {
       </div>
       <div className="codewrap">
         {error && <ErrorBox error={error} />}
-        {loading && <Spinner />}
+        {loading && <SkeletonRows />}
         {blob &&
           (blob.binary ? (
             <Empty icon="file" title={filePath.split("/").pop() || ""} body={t("code.binary")} />

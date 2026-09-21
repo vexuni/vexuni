@@ -5,7 +5,7 @@ import { useT } from "../../lib/i18n";
 import { fullDate, shortSha } from "../../lib/format";
 import type { CommitItem } from "../../lib/types";
 import { DiffView } from "../../components/code";
-import { Empty, ErrorBox, Chip, Spinner } from "../../components/ui";
+import { Empty, ErrorBox, Chip, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
 
@@ -41,7 +41,7 @@ export function CommitsPage() {
         </div>
       )}
       {error && <ErrorBox error={error} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {commits && commits.length === 0 && (
         <Empty icon="commit" title={t("commits.empty")} />
       )}
@@ -90,7 +90,7 @@ export function CommitDetailPage() {
   return (
     <>
       {error && <ErrorBox error={error} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {commit && (
         <div className="stack">
           <div className="panel panelpad">

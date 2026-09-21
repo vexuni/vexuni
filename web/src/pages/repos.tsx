@@ -7,7 +7,7 @@ import { useApi } from "../lib/hooks";
 import { fullDate } from "../lib/format";
 import type { Repository } from "../lib/types";
 import { Shell, PageTitle } from "../components/layout";
-import { Empty, ErrorBox, Field, Pager, Pill, Spinner } from "../components/ui";
+import { Empty, ErrorBox, Field, Pager, Pill, SkeletonRows } from "../components/ui";
 import { Icon } from "../components/icons";
 
 export function ReposPage() {
@@ -81,7 +81,7 @@ export function ReposPage() {
         <span className="faint small">↓ {t("repos.recent")}</span>
       </form>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {repos && (
         <div className="panel">
           <div className="panelhead">

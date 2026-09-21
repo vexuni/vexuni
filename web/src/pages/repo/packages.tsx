@@ -3,7 +3,7 @@ import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
 import { timeAgo } from "../../lib/format";
 import type { PackageItem } from "../../lib/types";
-import { Empty, ErrorBox, Pill, Spinner } from "../../components/ui";
+import { Empty, ErrorBox, Pill, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
 
@@ -18,7 +18,7 @@ export function PackagesPage() {
   return (
     <>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {packages &&
         (packages.length === 0 ? (
           <div className="panel">

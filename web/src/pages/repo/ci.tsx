@@ -5,7 +5,7 @@ import { useT } from "../../lib/i18n";
 import { fullDate, shortSha } from "../../lib/format";
 import { useAuth } from "../../lib/auth";
 import type { CIRun } from "../../lib/types";
-import { Chip, Empty, ErrorBox, Spinner, StatePill } from "../../components/ui";
+import { Chip, Empty, ErrorBox, SkeletonRows, StatePill } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
 
@@ -33,7 +33,7 @@ export function CIPage() {
   return (
     <>
       {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <Spinner />}
+      {loading && <SkeletonRows />}
       {runs &&
         (runs.length === 0 ? (
           <div className="panel">
@@ -83,7 +83,7 @@ export function CIRunPage() {
     reload();
   }
 
-  if (loading) return <Spinner />;
+  if (loading) return <SkeletonRows />;
   if (error || !run) return <ErrorBox error={error || new Error("404")} onRetry={reload} />;
 
   return (
