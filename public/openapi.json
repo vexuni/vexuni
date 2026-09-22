@@ -12340,6 +12340,539 @@
         }
       }
     },
+    "/api/webauthn/register/options": {
+      "post": {
+        "operationId": "passkey_register_options",
+        "summary": "passkey register options",
+        "description": "Begin public registration with a WebAuthn creation ceremony. The passkey is created first; the username is chosen in the second step. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/register/verify": {
+      "post": {
+        "operationId": "passkey_register_verify",
+        "summary": "passkey register verify",
+        "description": "Verify the attestation, create the account bound to the passkey and issue a browser session. Challenges are single-use, ten-minute expiry. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "maxLength": 48
+                  },
+                  "response": {
+                    "type": "object",
+                    "properties": {
+                      "clientDataJSON": {
+                        "type": "string",
+                        "maxLength": 8192
+                      },
+                      "attestationObject": {
+                        "type": "string",
+                        "maxLength": 65536
+                      },
+                      "transports": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 32
+                        }
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "username",
+                  "response"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/login/options": {
+      "post": {
+        "operationId": "passkey_login_options",
+        "summary": "passkey login options",
+        "description": "Begin a passkey sign-in. Without a username the browser offers discoverable credentials for this site. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "maxLength": 48
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/login/verify": {
+      "post": {
+        "operationId": "passkey_login_verify",
+        "summary": "passkey login verify",
+        "description": "Verify the assertion signature against the stored credential and issue a browser session. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credential": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "maxLength": 2048
+                      },
+                      "response": {
+                        "type": "object",
+                        "properties": {
+                          "clientDataJSON": {
+                            "type": "string",
+                            "maxLength": 8192
+                          },
+                          "authenticatorData": {
+                            "type": "string",
+                            "maxLength": 8192
+                          },
+                          "signature": {
+                            "type": "string",
+                            "maxLength": 16384
+                          },
+                          "userHandle": {
+                            "type": "string",
+                            "maxLength": 2048
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "credential"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/credentials": {
+      "get": {
+        "operationId": "passkey_list",
+        "summary": "passkey list",
+        "description": "List passkeys on the signed-in account. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/manage/options": {
+      "post": {
+        "operationId": "passkey_manage_options",
+        "summary": "passkey manage options",
+        "description": "Begin a ceremony to add another passkey to the signed-in account; existing credentials are excluded. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/manage/verify": {
+      "post": {
+        "operationId": "passkey_manage_verify",
+        "summary": "passkey manage verify",
+        "description": "Verify the attestation and attach the new passkey to the signed-in account (maximum 10). See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  },
+                  "response": {
+                    "type": "object",
+                    "properties": {
+                      "clientDataJSON": {
+                        "type": "string",
+                        "maxLength": 8192
+                      },
+                      "attestationObject": {
+                        "type": "string",
+                        "maxLength": 65536
+                      },
+                      "transports": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 32
+                        }
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "response"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
+    "/api/webauthn/credentials/{id}": {
+      "patch": {
+        "operationId": "passkey_rename",
+        "summary": "passkey rename",
+        "description": "Rename a passkey owned by the signed-in account. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          }
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "passkey_delete",
+        "summary": "passkey delete",
+        "description": "Delete a passkey owned by the signed-in account. The last passkey cannot be removed while it is the only sign-in method. See docs/ACCOUNT-v06.md. Cookie-authenticated mutations require a same-origin Origin header.",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          }
+        ],
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Sign in required"
+          },
+          "403": {
+            "description": "Session, role or verification required"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "409": {
+            "description": "Concurrent account change or expired setup"
+          },
+          "429": {
+            "description": "Verification rate limit"
+          }
+        }
+      }
+    },
     "/api/account/password-recovery": {
       "get": {
         "operationId": "password_recovery_status",

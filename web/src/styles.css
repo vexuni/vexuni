@@ -1648,3 +1648,46 @@ textarea {
     transform: translateY(6px) scale(0.98);
   }
 }
+
+/* ---------- passkey / auth extras ---------- */
+.auth-form .auth-block {
+  max-width: 340px;
+  width: 100%;
+}
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 2px;
+  color: var(--ink-3);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+.linklike:hover {
+  text-decoration: underline;
+}
+.btn.wide {
+  width: 100%;
+  justify-content: center;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}

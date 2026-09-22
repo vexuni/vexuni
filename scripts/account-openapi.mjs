@@ -95,6 +95,102 @@ export function addAccountPaths(paths) {
       null,
       "Read a Git blob as PNG, JPEG, GIF or WebP using byte signatures. Requires repository read access; private no-store, 5 MiB maximum.",
     ],
+    [
+      "post",
+      "/api/webauthn/register/options",
+      "passkey_register_options",
+      null,
+      "Begin public registration with a WebAuthn creation ceremony. The passkey is created first; the username is chosen in the second step.",
+    ],
+    [
+      "post",
+      "/api/webauthn/register/verify",
+      "passkey_register_verify",
+      object(
+        {
+          username: str(48),
+          response: object({
+            clientDataJSON: str(8192),
+            attestationObject: str(65536),
+            transports: { type: "array", items: str(32) },
+          }),
+        },
+        ["username", "response"],
+      ),
+      "Verify the attestation, create the account bound to the passkey and issue a browser session. Challenges are single-use, ten-minute expiry.",
+    ],
+    [
+      "post",
+      "/api/webauthn/login/options",
+      "passkey_login_options",
+      object({ username: str(48) }),
+      "Begin a passkey sign-in. Without a username the browser offers discoverable credentials for this site.",
+    ],
+    [
+      "post",
+      "/api/webauthn/login/verify",
+      "passkey_login_verify",
+      object(
+        {
+          credential: object({
+            id: str(2048),
+            response: object({
+              clientDataJSON: str(8192),
+              authenticatorData: str(8192),
+              signature: str(16384),
+              userHandle: str(2048),
+            }),
+          }),
+        },
+        ["credential"],
+      ),
+      "Verify the assertion signature against the stored credential and issue a browser session.",
+    ],
+    [
+      "get",
+      "/api/webauthn/credentials",
+      "passkey_list",
+      null,
+      "List passkeys on the signed-in account.",
+    ],
+    [
+      "post",
+      "/api/webauthn/manage/options",
+      "passkey_manage_options",
+      null,
+      "Begin a ceremony to add another passkey to the signed-in account; existing credentials are excluded.",
+    ],
+    [
+      "post",
+      "/api/webauthn/manage/verify",
+      "passkey_manage_verify",
+      object(
+        {
+          name: str(60),
+          response: object({
+            clientDataJSON: str(8192),
+            attestationObject: str(65536),
+            transports: { type: "array", items: str(32) },
+          }),
+        },
+        ["response"],
+      ),
+      "Verify the attestation and attach the new passkey to the signed-in account (maximum 10).",
+    ],
+    [
+      "patch",
+      "/api/webauthn/credentials/{id}",
+      "passkey_rename",
+      object({ name: str(60) }, ["name"]),
+      "Rename a passkey owned by the signed-in account.",
+    ],
+    [
+      "delete",
+      "/api/webauthn/credentials/{id}",
+      "passkey_delete",
+      null,
+      "Delete a passkey owned by the signed-in account. The last passkey cannot be removed while it is the only sign-in method.",
+    ],
   ];
   for (const [method, path, id, schema, description] of routes) {
     const publicProfile = id === "public_profile",

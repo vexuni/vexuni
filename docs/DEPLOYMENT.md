@@ -84,6 +84,7 @@ Git ref 与 push 事件现在在 DO 中原子写入，再由 alarm 幂等投影�
 ## 运行与成本
 
 - APP_ORIGIN 必须与浏览器规范地址一致，影响 Cookie 写操作和 LFS action URL。
+- 公开注册以通行密钥为先：`POST /api/webauthn/register/*` 在选择用户名之前先验证 WebAuthn attestation。Relying Party ID 默认取 APP_ORIGIN 主机名去掉 `www.` 前缀；可用 `WEBAUTHN_RP_ID` 覆盖，`WEBAUTHN_ORIGINS`（逗号分隔）可追加开发服务器等额外来源。
 - 每仓库一个 DO，最多 16 个请求排队；操作串行执行。没有 Container 实例数/启动延迟。
 - R2 逐对象保存 canonical 数据；传输时重新生成 pack。每次请求的 R2 读取数量和历史大小会影响延迟与成本。
 - 应用限额见 [使用边界](LIMITS.md)；Worker/DO CPU、内存、子请求等平台限额仍独立生效。大仓库尚不适用。

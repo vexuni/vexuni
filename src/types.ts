@@ -14,6 +14,8 @@ export interface Env {
   CREDENTIAL_ENCRYPTION_KEY?: string;
   SYNC_ALLOWED_HOSTS?: string;
   CI_ALLOWED_HOSTS?: string;
+  WEBAUTHN_RP_ID?: string;
+  WEBAUTHN_ORIGINS?: string;
 }
 export interface User {
   id: string;

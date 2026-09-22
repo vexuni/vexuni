@@ -17,7 +17,22 @@ import {
 } from "../components/ui";
 import { Icon } from "../components/icons";
 import { useToast } from "../components/toast";
+import {
+  ceremonyError,
+  createPasskey,
+  passkeySupported,
+  type CreationOptions,
+} from "../lib/webauthn";
 import { Routes, Route } from "react-router-dom";
+
+interface Passkey {
+  id: string;
+  name: string;
+  transports: string;
+  sign_count: number;
+  last_used_at: number | null;
+  created_at: string;
+}
 
 function SettingsShell({
   active,
@@ -114,8 +129,8 @@ function SecurityPage() {
     const d = Object.fromEntries(new FormData(form)) as Record<string, string>;
     try {
       await api.post("/password", {
-        current: d.current,
-        password: d.password,
+        current_password: d.current,
+        new_password: d.password,
       });
       form.reset();
       setMsg("");
@@ -150,7 +165,135 @@ function SecurityPage() {
           </p>
         </div>
       )}
+      <PasskeyPanel />
     </SettingsShell>
+  );
+}
+
+function PasskeyPanel() {
+  const { t } = useT();
+  const toast = useToast();
+  const { data, error, loading, reload } = useApi<{ credentials: Passkey[] }>(
+    "/webauthn/credentials",
+  );
+  const [adding, setAdding] = useState(false);
+  const [renaming, setRenaming] = useState("");
+  const supported = passkeySupported();
+
+  async function add(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(e.currentTarget)) as Record<
+      string,
+      string
+    >;
+    setAdding(true);
+    try {
+      const options = await api.post<CreationOptions>(
+        "/webauthn/manage/options",
+        {},
+      );
+      const attestation = await createPasskey(options);
+      await api.post("/webauthn/manage/verify", {
+        name: d.name || "Passkey",
+        response: attestation,
+      });
+      toast(t("account.passkeyAdded"));
+      setAdding(false);
+      reload();
+    } catch (err) {
+      toast(ceremonyError(err, t("auth.passkeyCancelled")), "err");
+      setAdding(false);
+    }
+  }
+
+  async function rename(id: string, name: string) {
+    try {
+      await api.patch(`/webauthn/credentials/${id}`, { name });
+      setRenaming("");
+      reload();
+    } catch (err) {
+      toast((err as Error).message, "err");
+    }
+  }
+
+  async function remove(id: string) {
+    try {
+      await api.del(`/webauthn/credentials/${id}`);
+      toast(t("common.saved"));
+      reload();
+    } catch (err) {
+      toast((err as Error).message, "err");
+    }
+  }
+
+  return (
+    <div className="panel panelpad narrow mt">
+      <div className="row row-flush">
+        <h3 className="mt-sm">{t("account.passkeys")}</h3>
+      </div>
+      <p className="muted mt-sm">{t("account.passkeysHint")}</p>
+      {error && <ErrorBox error={error} onRetry={reload} />}
+      {loading && <SkeletonRows rows={2} />}
+      {data && data.credentials.length === 0 && (
+        <p className="muted">{t("account.passkeyNone")}</p>
+      )}
+      {data?.credentials.map((k) => (
+        <div className="row" key={k.id}>
+          <Icon name="key" />
+          {renaming === k.id ? (
+            <form
+              className="row row-flush grow"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const name = new FormData(e.currentTarget).get("name");
+                if (name) rename(k.id, String(name));
+              }}
+            >
+              <input name="name" defaultValue={k.name} maxLength={60} required />
+              <button className="btn small">{t("common.save")}</button>
+            </form>
+          ) : (
+            <>
+              <span className="grow">
+                <strong>{k.name}</strong>
+                <span className="muted small">
+                  {" "}
+                  · {t("account.passkeyLastUsed")}{" "}
+                  {k.last_used_at ? timeAgo(k.last_used_at) : t("tokens.never")}
+                </span>
+              </span>
+              <button
+                className="btn small text"
+                onClick={() => setRenaming(k.id)}
+                title={t("account.passkeyRename")}
+              >
+                <Icon name="edit" />
+              </button>
+              <button
+                className="btn small text danger"
+                onClick={() => remove(k.id)}
+                title={t("common.delete")}
+              >
+                <Icon name="trash" />
+              </button>
+            </>
+          )}
+        </div>
+      ))}
+      {supported && (
+        <form onSubmit={add} className="mt row row-flush">
+          <input
+            name="name"
+            placeholder={t("account.passkeyName")}
+            maxLength={60}
+            className="grow"
+          />
+          <button className="btn" type="submit" disabled={adding}>
+            <Icon name="plus" /> {t("account.passkeyAdd")}
+          </button>
+        </form>
+      )}
+    </div>
   );
 }
 

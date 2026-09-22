@@ -84,6 +84,7 @@ Git references and push events are atomically recorded in the DO, then idempoten
 ## Operations and costs
 
 - APP_ORIGIN must match the browser’s canonical URL; it affects cookie-authenticated writes and LFS action URLs.
+- Public registration is passkey-first: `POST /api/webauthn/register/*` verifies a WebAuthn attestation before the username step. The relying-party ID defaults to APP_ORIGIN's hostname minus a leading `www.`; set `WEBAUTHN_RP_ID` to override and `WEBAUTHN_ORIGINS` (comma-separated) to accept extra origins such as a dev server.
 - Each repository has one DO, with at most 16 queued requests and serialized operations. There are no container counts or startup delays.
 - R2 stores canonical objects individually; packs are generated for transport. Read count and history size affect latency and cost.
 - [Application limits](LIMITS.md) coexist with independent Worker/DO CPU, memory, and subrequest limits. Large repositories remain outside the intended scope.

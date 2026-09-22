@@ -17,6 +17,7 @@
     // APPS_ORIGIN the application gateway's origin.
     "APPS_ORIGIN": "https://apps.vexuni.site",
     "APP_ORIGIN": "https://www.vexuni.site",
+    "WEBAUTHN_RP_ID": "vexuni.site",
     "WEBHOOK_ALLOWED_HOSTS": "",
   },
   "d1_databases": [

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { LoginPage, RecoverPage } from "./pages/auth";
+import { LoginPage, RecoverPage, RegisterPage } from "./pages/auth";
 import { NewRepoPage, ReposPage } from "./pages/repos";
 import { SearchPage } from "./pages/search";
 import { NotificationsPage } from "./pages/notifications";
@@ -22,6 +22,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/recover" element={<RecoverPage />} />
       <Route path="/" element={<ReposPage />} />
       <Route path="/new" element={<NewRepoPage />} />

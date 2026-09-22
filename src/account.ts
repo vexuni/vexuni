@@ -72,17 +72,23 @@ export async function passwordProof(c: Context<App>, password: string) {
     .bind(user.id)
     .first<{ password: string; auth_epoch: number; has_password: number }>();
   if (row && !row.has_password) {
+    const fresh = Date.now() - 300000;
     if (
       c.get("kind") !== "session" ||
-      !(await c.env.DB.prepare(
+      (!(await c.env.DB.prepare(
         "SELECT c.hash FROM credentials c JOIN oidc_providers p ON p.id=c.oidc_provider_id WHERE c.hash=? AND c.user_id=? AND c.kind='session' AND c.expires_at>? AND c.authenticated_at>? AND p.enabled=1",
       )
-        .bind(c.get("credential"), user.id, Date.now(), Date.now() - 300000)
-        .first())
+        .bind(c.get("credential"), user.id, Date.now(), fresh)
+        .first()) &&
+        !(await c.env.DB.prepare(
+          "SELECT 1 FROM credentials WHERE hash=? AND user_id=? AND kind='session' AND expires_at>? AND auth_method='webauthn' AND authenticated_at>?",
+        )
+          .bind(c.get("credential"), user.id, Date.now(), fresh)
+          .first()))
     )
       fail(
         403,
-        "Complete OIDC sign-in again before changing security settings",
+        "Complete a fresh sign-in before changing security settings",
       );
     return row;
   }

@@ -35,6 +35,7 @@ const paths: Record<string, string> = {
   diff: "M8 3v18 M8 12h8 M16 3v4 M12 21h8",
   menu: "M3 6h18 M3 12h18 M3 18h18",
   home: "M3 10.5L12 3l9 7.5 M5 9v12h14V9",
+  edit: "M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z",
   send: "M22 2L11 13 M22 2l-7 20-4-9-9-4z",
   alert: "M12 9v4 M12 17h.01 M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z",
 };

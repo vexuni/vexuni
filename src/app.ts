@@ -40,6 +40,7 @@ import { registerForgeRoutes } from "./forge-routes";
 import { verifyDelegation, requireScope } from "./delegation";
 import { registerIdentityRoutes } from "./identity-routes";
 import { registerOIDC } from "./oidc-routes";
+import { registerWebAuthn } from "./webauthn/routes";
 import { Hono, type Context } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
@@ -567,6 +568,7 @@ app.use("*", async (c, next) => {
 registerSearch(app);
 registerIdentityRoutes(app);
 registerAccount(app);
+registerWebAuthn(app);
 registerPasswordRecovery(app);
 registerWorkspaceRoutes(app, { engine });
 registerOIDC(app);
