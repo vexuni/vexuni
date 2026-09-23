@@ -100,6 +100,16 @@ export function ReposPage() {
                         <span>
                           <Icon name="branch" size={12} /> {r.default_branch}
                         </span>
+                        {(r.stars ?? 0) > 0 && (
+                          <span>
+                            <Icon name="star" size={12} /> {r.stars}
+                          </span>
+                        )}
+                        {(r.forks ?? 0) > 0 && (
+                          <span>
+                            <Icon name="fork" size={12} /> {r.forks}
+                          </span>
+                        )}
                         {r.created_at && (
                           <span>
                             {t("common.created")} {fullDate(r.created_at)}

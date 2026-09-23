@@ -38,6 +38,10 @@ const paths: Record<string, string> = {
   edit: "M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z",
   send: "M22 2L11 13 M22 2l-7 20-4-9-9-4z",
   alert: "M12 9v4 M12 17h.01 M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z",
+  star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z",
+  fork: "M6 3v6 M6 3a2.5 2.5 0 1 0 .01 0 M18 3v6 M18 3a2.5 2.5 0 1 0 .01 0 M6 9c0 6 6 4 6 9v3 M18 9c0 6-6 4-6 9 M12 21a2.5 2.5 0 1 0 .01 0",
+  release: "M20 12l-8 8-9-9V4h7z M7 7h.01 M11 8h5 M11 12h3",
+  milestone: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18 M8 12l3 3 5-6",
 };
 
 export function Icon({ name, size }: { name: string; size?: number }) {

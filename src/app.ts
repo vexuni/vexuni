@@ -401,6 +401,8 @@ app.get("*", async (c, next) => {
   const url = new URL(c.req.url),
     asset =
       staticPaths.has(path) ||
+      // Vite emits lazy route chunks under /assets/ with content hashes.
+      path.startsWith("/assets/") ||
       /^\/docs\/(?:site\.css|(?:en|zh-CN)\/(?:[A-Za-z0-9_.-]+\.html)?)$/.test(
         path,
       );
@@ -424,7 +426,9 @@ app.get("*", async (c, next) => {
     "Cache-Control",
     c.env.APP_ORIGIN.startsWith("http://localhost")
       ? "no-store"
-      : asset && /^[a-f0-9]{16}$/.test(url.searchParams.get("v") || "")
+      : asset &&
+          (path.startsWith("/assets/") ||
+            /^[a-f0-9]{16}$/.test(url.searchParams.get("v") || ""))
         ? "public, max-age=31536000, immutable"
         : "public, max-age=0, must-revalidate",
   );
@@ -886,7 +890,7 @@ app.get("/api/repos", async (c) => {
       fail(400, "Invalid repository cursor");
     }
   }
-  const query = `SELECT DISTINCT r.* FROM repositories r LEFT JOIN members m ON m.repo_id=r.id AND m.user_id=? LEFT JOIN workspace_members wm ON wm.workspace_id=r.workspace_id AND wm.user_id=? WHERE r.deleted_at IS NULL AND ${delegation ? "((r.workspace_id IS NULL AND r.owner_id=?) OR m.user_id IS NOT NULL OR wm.user_id IS NOT NULL)" : "(r.visibility='public' OR (r.workspace_id IS NULL AND r.owner_id=?) OR m.user_id IS NOT NULL OR wm.user_id IS NOT NULL)"} AND (?='' OR r.namespace=?) AND (r.name LIKE ? ESCAPE '\\' OR r.description LIKE ? ESCAPE '\\') ORDER BY r.created_at DESC,r.id LIMIT ? OFFSET ?`;
+  const query = `SELECT DISTINCT r.*,(SELECT count(*) FROM repository_stars s WHERE s.repo_id=r.id) AS stars,(SELECT count(*) FROM repositories f WHERE f.fork_source=r.id AND f.deleted_at IS NULL) AS forks FROM repositories r LEFT JOIN members m ON m.repo_id=r.id AND m.user_id=? LEFT JOIN workspace_members wm ON wm.workspace_id=r.workspace_id AND wm.user_id=? WHERE r.deleted_at IS NULL AND ${delegation ? "((r.workspace_id IS NULL AND r.owner_id=?) OR m.user_id IS NOT NULL OR wm.user_id IS NOT NULL)" : "(r.visibility='public' OR (r.workspace_id IS NULL AND r.owner_id=?) OR m.user_id IS NOT NULL OR wm.user_id IS NOT NULL)"} AND (?='' OR r.namespace=?) AND (r.name LIKE ? ESCAPE '\\' OR r.description LIKE ? ESCAPE '\\') ORDER BY r.created_at DESC,r.id LIMIT ? OFFSET ?`;
   const pattern = "%" + search.replace(/[\\%_]/g, "\\$&") + "%";
   const result = await c.env.DB.prepare(query)
     .bind(
@@ -1044,8 +1048,27 @@ app.post("/api/repos", async (c) => {
 });
 app.get("/api/repos/:namespace/:repo", async (c) => {
   const r = await repoAccess(c);
+  // Counts and viewer social state ride on the detail payload so the header
+  // renders without a second round trip; /social stays for other consumers.
+  const viewer = c.get("user")?.id || "";
+  const counts = await c.env.DB.prepare(
+    "SELECT (SELECT count(*) FROM repository_stars WHERE repo_id=?) AS stars,(SELECT count(*) FROM repositories WHERE fork_source=? AND deleted_at IS NULL) AS forks,(SELECT f.namespace||'/'||f.name FROM repositories f WHERE f.id=?) AS forked_from,EXISTS(SELECT 1 FROM repository_stars WHERE repo_id=? AND user_id=?) AS starred,EXISTS(SELECT 1 FROM repository_watches WHERE repo_id=? AND user_id=?) AS watching",
+  )
+    .bind(r.id, r.id, r.fork_source || "", r.id, viewer, r.id, viewer)
+    .first<{
+      stars: number;
+      forks: number;
+      forked_from: string | null;
+      starred: number;
+      watching: number;
+    }>();
   return c.json({
     ...r,
+    stars: counts?.stars ?? 0,
+    forks: counts?.forks ?? 0,
+    forked_from: counts?.forked_from ?? null,
+    starred: !!counts?.starred,
+    watching: !!counts?.watching,
     role: c.get("repoRole"),
     clone_url: `${c.env.APP_ORIGIN}/${r.namespace}/${encodeURIComponent(r.name)}.git`,
   });
@@ -1294,7 +1317,7 @@ app.get("/api/repos/:namespace/:repo/merges", async (c) => {
   return c.json({
     merges: (
       await c.env.DB.prepare(
-        "SELECT m.*,u.username AS author FROM merge_requests m JOIN users u ON u.id=m.author_id WHERE repo_id=? ORDER BY m.id DESC LIMIT 100",
+        "SELECT m.*,u.username AS author,sr.namespace AS source_namespace,sr.name AS source_name FROM merge_requests m JOIN users u ON u.id=m.author_id LEFT JOIN repositories sr ON sr.id=m.source_repo_id WHERE repo_id=? ORDER BY m.id DESC LIMIT 100",
       )
         .bind(r.id)
         .all()

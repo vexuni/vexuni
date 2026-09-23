@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet, useOutletContext, useParams } from "react-router-dom";
-import { repoPath } from "../../lib/api";
+import { Link, Outlet, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { api, repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
+import { useAuth } from "../../lib/auth";
+import { useToast } from "../../components/toast";
 import { fullDate } from "../../lib/format";
-import type { Repository, RepoURL } from "../../lib/types";
+import type { Repository } from "../../lib/types";
 import { Shell, Tabs } from "../../components/layout";
 import { CopyButton, Empty, ErrorBox, Pill, Skeleton, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
@@ -22,16 +24,54 @@ export function useRepo() {
 
 export function RepoLayout() {
   const { t } = useT();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
   const { ns = "", repo: name = "" } = useParams();
   const base = `/${ns}/${name}`;
   const { data: repo, error, loading, reload } = useApi<Repository>(
     repoPath(ns, name),
     [ns, name],
   );
-  const { data: urls } = useApi<RepoURL>(repo ? `/repo-url/${repo.id}` : null, [
-    repo?.id,
-  ]);
   const [cloneOpen, setCloneOpen] = useState(false);
+  const [forkBusy, setForkBusy] = useState(false);
+
+  // Social actions need an account; routing anonymous clicks to login beats
+  // a dead 401 from the endpoint.
+  const needUser = () => {
+    if (user) return true;
+    navigate("/login");
+    return false;
+  };
+  const toggle = async (kind: "star" | "watch", on?: boolean) => {
+    if (!needUser()) return;
+    try {
+      if (on) await api.del(repoPath(ns, name) + "/" + kind);
+      else await api.put(repoPath(ns, name) + "/" + kind);
+      // The mutation cleared the GET cache, so this detail refetch is fresh.
+      reload();
+    } catch (e) {
+      toast((e as Error).message, "err");
+    }
+  };
+  const fork = async () => {
+    if (!needUser() || forkBusy) return;
+    setForkBusy(true);
+    try {
+      const r = await api.post<Repository>("/repos", {
+        name,
+        base_repo: { id: `${ns}/${name}` },
+        // A fork of public content must stay public — the source remains
+        // readable regardless of the fork's visibility flag.
+        visibility: repo?.visibility === "public" ? "public" : "private",
+        description: repo?.description || "",
+      });
+      navigate(`/${r.namespace}/${encodeURIComponent(r.name)}`);
+    } catch (e) {
+      toast((e as Error).message, "err");
+      setForkBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!cloneOpen) return;
@@ -91,8 +131,10 @@ export function RepoLayout() {
     );
   }
 
+  // The detail payload carries clone_url — a second /repo-url round trip per
+  // page view only re-derived the same string server-side.
   const cloneURL =
-    urls?.url || `${location.origin}/${ns}/${name}.git`;
+    repo.clone_url || `${location.origin}/${ns}/${name}.git`;
 
   return (
     <Shell crumbs={crumbs} wide>
@@ -100,7 +142,10 @@ export function RepoLayout() {
         <div className="titlebar">
           <div>
             <h1 className="repo-name">
-              <span className="ns">{repo.namespace} / </span>
+              <Link className="ns rowlink" to={`/${repo.namespace}`}>
+                {repo.namespace}
+              </Link>
+              <span className="ns"> / </span>
               {repo.name}{" "}
               <Pill tone={repo.visibility === "private" ? "yellow" : ""}>
                 {repo.visibility === "private"
@@ -109,6 +154,14 @@ export function RepoLayout() {
               </Pill>{" "}
               {repo.archived_at && <Pill tone="red">{t("repo.archived")}</Pill>}
             </h1>
+            {repo.forked_from && (
+              <p className="faint small">
+                {t("repo.forkedFrom")}{" "}
+                <Link className="mono" to={`/${repo.forked_from}`}>
+                  {repo.forked_from}
+                </Link>
+              </p>
+            )}
             {repo.description && <p className="sub">{repo.description}</p>}
             <div className="rowmeta repo-meta">
               <span>
@@ -121,11 +174,34 @@ export function RepoLayout() {
               )}
             </div>
           </div>
-          <div className="btn-group menu-wrap">
-            <button className="btn" onClick={() => setCloneOpen(!cloneOpen)}>
-              <Icon name="download" /> {t("repo.clone")}{" "}
-              <Icon name="chevD" size={12} />
+          <div className="btn-group">
+            <button
+              className={`btn social-btn${repo.starred ? " on" : ""}`}
+              onClick={() => toggle("star", repo.starred)}
+              title={repo.starred ? t("repo.unstar") : t("repo.star")}
+            >
+              <Icon name="star" /> {repo.stars ?? 0}
             </button>
+            <button
+              className={`btn social-btn${repo.watching ? " on" : ""}`}
+              onClick={() => toggle("watch", repo.watching)}
+              title={repo.watching ? t("repo.unwatch") : t("repo.watch")}
+            >
+              <Icon name="eye" />
+            </button>
+            <button
+              className="btn social-btn"
+              onClick={fork}
+              disabled={forkBusy}
+              title={t("repo.fork")}
+            >
+              <Icon name="fork" /> {repo.forks ?? 0}
+            </button>
+            <span className="menu-wrap">
+              <button className="btn primary" onClick={() => setCloneOpen(!cloneOpen)}>
+                <Icon name="download" /> {t("repo.clone")}{" "}
+                <Icon name="chevD" size={12} />
+              </button>
             {cloneOpen && (
               <div className="menu clone-menu" role="menu">
                 <div className="menu-label">{t("repo.cloneUrl")}</div>
@@ -140,6 +216,7 @@ export function RepoLayout() {
                 </div>
               </div>
             )}
+            </span>
           </div>
         </div>
       </div>
@@ -150,6 +227,7 @@ export function RepoLayout() {
           { to: "/issues", label: t("repo.issues"), icon: "issue" },
           { to: "/merges", label: t("repo.merges"), icon: "merge" },
           { to: "/commits", label: t("repo.commits"), icon: "commit" },
+          { to: "/releases", label: t("repo.releases"), icon: "release" },
           { to: "/ci", label: t("repo.ci"), icon: "ci" },
           { to: "/packages", label: t("repo.packages"), icon: "box" },
           { to: "/search", label: t("repo.search"), icon: "search" },

@@ -2071,3 +2071,180 @@ textarea {
   flex: 1;
   min-width: 0;
 }
+
+/* ---------- GitHub-parity expansion ---------- */
+.fs-md { font-size: 19px; }
+.avatar-lg {
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+  border-radius: 14px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.check input { margin: 0; }
+
+/* Namespace page */
+.ns-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.ns-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .ns-grid { grid-template-columns: 1fr; }
+  .ns-head { flex-wrap: wrap; }
+}
+
+/* Language bar — quantized widths keep CSP happy (no inline styles). */
+.langbar { padding: 10px 14px 12px; border-top: 1px solid var(--line); }
+.langbar-track {
+  display: flex;
+  height: 7px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface-3);
+}
+.langbar-seg { min-width: 2px; }
+.lg1 { flex-grow: 5; } .lg2 { flex-grow: 10; } .lg3 { flex-grow: 15; }
+.lg4 { flex-grow: 20; } .lg5 { flex-grow: 25; } .lg6 { flex-grow: 30; }
+.lg7 { flex-grow: 35; } .lg8 { flex-grow: 40; } .lg9 { flex-grow: 45; }
+.lg10 { flex-grow: 50; } .lg11 { flex-grow: 55; } .lg12 { flex-grow: 60; }
+.lg13 { flex-grow: 65; } .lg14 { flex-grow: 70; } .lg15 { flex-grow: 75; }
+.lg16 { flex-grow: 80; } .lg17 { flex-grow: 85; } .lg18 { flex-grow: 90; }
+.lg19 { flex-grow: 95; } .lg20 { flex-grow: 100; }
+.lc0 { background: #4a8ec2; } .lc1 { background: #2e6b50; }
+.lc2 { background: #c08a3e; } .lc3 { background: #8a5f9e; }
+.lc4 { background: #b05c4e; } .lc5 { background: #4e7e6b; }
+.lc6 { background: #96742f; } .lc7 { background: #6b7fa8; }
+.lcx { background: var(--ink-3); }
+.langbar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.langbar-legend .dot { margin-right: 5px; }
+
+/* Social buttons in the repo head */
+.social-btn { display: inline-flex; align-items: center; gap: 6px; }
+.social-btn.on { color: var(--accent-ink); border-color: var(--accent); }
+.social-btn .count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Web editor */
+.editor-area {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  resize: vertical;
+  tab-size: 2;
+}
+.editor-area:focus { outline: none; box-shadow: inset 0 0 0 2px var(--focus); }
+
+/* Inline diff preview (edit page) */
+.diffview { margin: 0; font-family: var(--mono); font-size: 12px; }
+.dline {
+  display: flex;
+  gap: 8px;
+  padding: 1px 14px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.dline .dsign { width: 12px; flex: none; color: var(--ink-3); }
+.dline.add { background: var(--accent-soft); }
+.dline.del { background: var(--danger-soft); }
+.dline.gap { color: var(--ink-3); padding: 2px 14px; }
+
+/* Issue two-column layout + sidebar */
+.issue-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .issue-layout { grid-template-columns: 1fr; }
+  .issue-side { order: -1; }
+}
+.issue-side {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: 4px 14px 12px;
+}
+.side-block { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.side-block:last-child { border-bottom: 0; }
+.side-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.side-edit { display: flex; gap: 6px; }
+.side-edit input { flex: 1; min-width: 0; }
+.label-list { display: flex; flex-direction: column; gap: 2px; }
+.issue-side .label-list .check { justify-content: flex-start; }
+.inline-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0 4px;
+}
+.inline-form input[name="name"],
+.inline-form input[name="title"] { flex: 1; min-width: 0; }
+
+/* Merge gate + discussions */
+.gate-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.gate-list li { display: flex; align-items: center; gap: 7px; }
+.gate-list .icon { color: var(--danger); flex: none; }
+.notebox.warn {
+  border-color: var(--line-strong);
+  background: var(--mark);
+  color: var(--ink);
+}
+
+/* Releases */
+.release { margin-bottom: 14px; }
+.release h2 { margin: 8px 0 4px; }
+.release-foot {
+  border-top: 1px solid var(--line);
+  padding: 8px 14px;
+  display: flex;
+  gap: 16px;
+}

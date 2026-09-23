@@ -12,8 +12,10 @@ export default defineConfig({
     target: "es2020",
     rollupOptions: {
       output: {
+        // Stable entry name keeps index.html static; lazy page chunks land in
+        // /assets/ with content hashes so the Worker can cache them immutable.
         entryFileNames: "app.js",
-        inlineDynamicImports: true,
+        chunkFileNames: "assets/[name]-[hash].js",
         assetFileNames: (asset) =>
           asset.name?.endsWith(".css") ? "style.css" : "assets/[name][extname]",
       },

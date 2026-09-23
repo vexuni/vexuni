@@ -71,7 +71,7 @@ export function registerCollaboration(app: Hono<App>, h: Helpers) {
   ) => {
     const repo = await access(c, level);
     const mr = await c.env.DB.prepare(
-      "SELECT m.*,u.username AS author FROM merge_requests m JOIN users u ON u.id=m.author_id WHERE m.repo_id=? AND m.id=?",
+      "SELECT m.*,u.username AS author,sr.namespace AS source_namespace,sr.name AS source_name FROM merge_requests m JOIN users u ON u.id=m.author_id LEFT JOIN repositories sr ON sr.id=m.source_repo_id WHERE m.repo_id=? AND m.id=?",
     )
       .bind(repo.id, c.req.param("id"))
       .first<any>();
@@ -862,28 +862,17 @@ function registerCommunity(
     );
   });
   app.get("/api/notifications", async (c) => {
-    const u = identity(c),
-      rows = (
-        await c.env.DB.prepare(
-          "SELECT n.*,r.namespace,r.name,r.visibility,r.owner_id,r.workspace_id,r.id AS repository_id FROM notifications n JOIN repositories r ON r.id=n.repo_id WHERE n.user_id=? AND r.deleted_at IS NULL ORDER BY n.id DESC LIMIT 100",
-        )
-          .bind(u.id)
-          .all<any>()
-      ).results;
-    const visible = [];
-    for (const row of rows)
-      if (
-        row.visibility === "public" ||
-        roleRank[
-          await repositoryRole(
-            c.env,
-            { ...row, id: row.repository_id } as Repo,
-            u,
-          )
-        ] > 0
+    const u = identity(c);
+    // One visibility-filtered query: resolving repositoryRole per row cost a
+    // handful of D1 round trips ×100 rows on every page load.
+    const rows = (
+      await c.env.DB.prepare(
+        `SELECT n.*,r.namespace,r.name,r.visibility,r.owner_id,r.workspace_id,r.id AS repository_id FROM notifications n JOIN repositories r ON r.id=n.repo_id WHERE n.user_id=? AND r.deleted_at IS NULL AND (r.visibility='public' OR (r.workspace_id IS NULL AND r.owner_id=?) OR EXISTS(SELECT 1 FROM members m WHERE m.repo_id=r.id AND m.user_id=?) OR EXISTS(SELECT 1 FROM workspace_members w WHERE w.workspace_id=r.workspace_id AND w.user_id=?)) ORDER BY n.id DESC LIMIT 100`,
       )
-        visible.push(row);
-    return c.json({ notifications: visible });
+        .bind(u.id, u.id, u.id, u.id)
+        .all<any>()
+    ).results;
+    return c.json({ notifications: rows });
   });
   app.post("/api/notifications/read", async (c) => {
     const u = identity(c),

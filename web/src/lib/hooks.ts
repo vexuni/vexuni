@@ -19,13 +19,13 @@ export function useApi<T>(path: string | null, deps: unknown[] = []): Async<T> {
   const [loading, setLoading] = useState(!!path);
   const generation = useRef(0);
   const lastPath = useRef<string | null>(null);
-  const load = useCallback(async () => {
+  const load = useCallback(async (fresh = false) => {
     if (!path) return;
     const gen = ++generation.current;
     setLoading(true);
     setError(undefined);
     try {
-      const result = await api.get<T>(path);
+      const result = fresh ? await api.getFresh<T>(path) : await api.get<T>(path);
       if (gen === generation.current) setData(result);
     } catch (e) {
       if (gen === generation.current) setError(e as Error);
@@ -45,5 +45,5 @@ export function useApi<T>(path: string | null, deps: unknown[] = []): Async<T> {
       generation.current++;
     };
   }, [load]);
-  return { data, error, loading, reload: load };
+  return { data, error, loading, reload: () => load(true) };
 }

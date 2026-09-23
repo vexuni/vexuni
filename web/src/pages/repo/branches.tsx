@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api, repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
+import { useAuth } from "../../lib/auth";
 import { shortSha } from "../../lib/format";
 import type { Branch, Tag } from "../../lib/types";
 import {
@@ -19,6 +20,7 @@ import { useRepo } from "./layout";
 
 export function BranchesPage() {
   const { t } = useT();
+  const { user } = useAuth();
   const { repo, ns, name, base } = useRepo();
   const { data, error, loading, reload } = useApi<{ branches: Branch[] }>(
     repoPath(ns, name) + "/branches",
@@ -59,9 +61,11 @@ export function BranchesPage() {
         <div className="panel">
           <div className="panelhead">
             <strong>{t("branches.title")}</strong>
-            <button className="btn small" onClick={() => setCreating(true)}>
-              <Icon name="plus" /> {t("branches.new")}
-            </button>
+            {user && (
+              <button className="btn small" onClick={() => setCreating(true)}>
+                <Icon name="plus" /> {t("branches.new")}
+              </button>
+            )}
           </div>
           {data.branches.map((b) => (
             <div className="row" key={b.name}>
@@ -78,7 +82,7 @@ export function BranchesPage() {
                 )}
               </div>
               <Chip>{shortSha(b.sha)}</Chip>
-              {b.name !== repo.default_branch && (
+              {user && b.name !== repo.default_branch && (
                 <button
                   className="copy-btn"
                   title={t("common.delete")}
@@ -129,6 +133,7 @@ export function BranchesPage() {
 
 export function TagsPage() {
   const { t } = useT();
+  const { user } = useAuth();
   const { ns, name, base } = useRepo();
   const { data, error, loading, reload } = useApi<{ tags: Tag[] }>(
     repoPath(ns, name) + "/tags",
@@ -169,9 +174,11 @@ export function TagsPage() {
         <div className="panel">
           <div className="panelhead">
             <strong>{t("tags.title")}</strong>
-            <button className="btn small" onClick={() => setCreating(true)}>
-              <Icon name="plus" /> {t("tags.new")}
-            </button>
+            {user && (
+              <button className="btn small" onClick={() => setCreating(true)}>
+                <Icon name="plus" /> {t("tags.new")}
+              </button>
+            )}
           </div>
           {tags.length === 0 && <Empty icon="tag" title={t("common.empty")} />}
           {tags.map((tag) => (
@@ -181,13 +188,15 @@ export function TagsPage() {
                 {tag.name}
               </Link>
               <Chip>{shortSha(tag.sha)}</Chip>
-              <button
-                className="copy-btn"
-                title={t("common.delete")}
-                onClick={() => remove(tag.name)}
-              >
-                <Icon name="trash" size={14} />
-              </button>
+              {user && (
+                <button
+                  className="copy-btn"
+                  title={t("common.delete")}
+                  onClick={() => remove(tag.name)}
+                >
+                  <Icon name="trash" size={14} />
+                </button>
+              )}
             </div>
           ))}
         </div>

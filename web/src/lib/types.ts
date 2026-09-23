@@ -22,6 +22,14 @@ export interface Repository {
   workspace_id?: string | null;
   archived_at?: number | null;
   base_repo?: unknown;
+  stars?: number;
+  forks?: number;
+  forked_from?: string | null;
+  fork_source?: string | null;
+  role?: string;
+  clone_url?: string;
+  starred?: boolean;
+  watching?: boolean;
 }
 
 export interface TreeEntry {
@@ -72,6 +80,8 @@ export interface Issue {
   author?: string;
   assignee?: string | null;
   milestone?: string | null;
+  milestone_id?: string | null;
+  revision?: number;
   created_at?: number | string;
   updated_at?: number | string;
   closed_at?: number | string | null;
@@ -81,7 +91,7 @@ export interface Issue {
 }
 
 export interface Label {
-  id: number;
+  id: string;
   name: string;
   color?: string;
 }
@@ -98,8 +108,11 @@ export interface MergeRequest {
   title: string;
   body?: string;
   state: "open" | "merged" | "closed" | string;
-  source_branch: string;
-  target_branch: string;
+  /** DB columns are source/target; source_namespace+source_name mark forks. */
+  source: string;
+  target: string;
+  source_namespace?: string | null;
+  source_name?: string | null;
   author?: string;
   created_at?: number | string;
   merged_sha?: string | null;
@@ -189,4 +202,107 @@ export interface SearchHit {
   title?: string;
   id?: number;
   description?: string;
+}
+
+export interface Social {
+  stars: number;
+  starred: number | boolean;
+  watching: number | boolean;
+}
+
+export interface Profile {
+  profile: {
+    id: string;
+    username: string;
+    created_at?: number | string;
+    display_name?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+  };
+  repositories: Repository[];
+  activity: {
+    id: number;
+    action: string;
+    detail?: string;
+    created_at?: number | string;
+    namespace: string;
+    name: string;
+  }[];
+  next: number | null;
+}
+
+export interface WorkspaceDetail {
+  id: string;
+  slug: string;
+  name?: string;
+  description?: string;
+  role?: string;
+  member_count?: number;
+  created_at?: number | string;
+}
+
+export interface Release {
+  id: string;
+  tag: string;
+  sha?: string;
+  title: string;
+  body?: string;
+  prerelease?: number | boolean;
+  author?: string;
+  created_at?: number | string;
+}
+
+export interface Milestone {
+  id: string;
+  title: string;
+  description?: string;
+  state?: string;
+  total?: number;
+  closed?: number;
+  due_date?: string | null;
+}
+
+export interface MergeDiscussion {
+  id: number | string;
+  author?: string;
+  body: string;
+  created_at?: number | string;
+  resolved?: number | boolean;
+  kind?: string;
+  path?: string | null;
+  line?: number | null;
+  revision?: number;
+}
+
+export interface MergeDetail extends MergeRequest {
+  author_id?: string;
+  source_sha?: string;
+  target_sha?: string;
+  source_repo_id?: string | null;
+  revision?: number;
+  diff?: string;
+  discussions?: MergeDiscussion[];
+  discussions_next?: number | string | null;
+  closing_issues?: { id: number; title: string; state?: string }[];
+  gate?: {
+    allowed?: boolean;
+    reasons?: string[];
+    approvals?: number;
+    changes?: number;
+    unresolved?: number;
+    reviews?: MergeReview[];
+    ci?: { status?: string; required?: boolean } | null;
+    rule?: unknown;
+    codeowners?: unknown;
+  } | null;
+  stale?: boolean;
+}
+
+export interface MergeReview {
+  user_id?: string;
+  username?: string;
+  verdict: string;
+  body?: string;
+  created_at?: number | string;
 }

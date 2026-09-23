@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { qs, repoPath, revisionMissing } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
+import { useAuth } from "../../lib/auth";
 import { bytes, extOf } from "../../lib/format";
 import type { Blob, Branch, Tag, Tree } from "../../lib/types";
 import { CodeView } from "../../components/code";
@@ -142,9 +143,61 @@ function BranchPicker({ ns, name, branches, refName }: { ns: string; name: strin
   );
 }
 
+const LANGS: Record<string, string> = {
+  ts: "TypeScript", tsx: "TypeScript", js: "JavaScript", jsx: "JavaScript",
+  mjs: "JavaScript", cjs: "JavaScript", py: "Python", rs: "Rust", go: "Go",
+  java: "Java", kt: "Kotlin", c: "C", h: "C", cc: "C++", cpp: "C++", cs: "C#",
+  rb: "Ruby", php: "PHP", swift: "Swift", css: "CSS", scss: "SCSS",
+  html: "HTML", vue: "Vue", svelte: "Svelte", md: "Markdown", json: "JSON",
+  yml: "YAML", yaml: "YAML", toml: "TOML", xml: "XML", sql: "SQL", sh: "Shell",
+  bash: "Shell", zsh: "Shell", dockerfile: "Dockerfile", tf: "Terraform",
+};
+
+/** Extension histogram over the visible tree — a language mix bar like
+ *  GitHub's, computed client-side since the tree API already lists names. */
+function LanguageBar({ entries }: { entries: { name: string; type: string }[] }) {
+  const langs = useMemo(() => {
+    const counts = new Map<string, number>();
+    let files = 0;
+    for (const e of entries) {
+      if (e.type !== "blob") continue;
+      files++;
+      const lang = LANGS[e.name.toLowerCase() === "dockerfile" ? "dockerfile" : extOf(e.name)] || "Other";
+      counts.set(lang, (counts.get(lang) || 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([lang, n]) => ({ lang, pct: (n / Math.max(1, files)) * 100 }));
+  }, [entries]);
+  if (!langs.length) return null;
+  // CSP forbids inline styles — segment width comes from quantized flex-grow
+  // classes and colors from a fixed palette, not per-element style attrs.
+  return (
+    <div className="langbar">
+      <div className="langbar-track">
+        {langs.map((l, i) => (
+          <span
+            key={l.lang}
+            className={`langbar-seg lg${Math.max(1, Math.round(l.pct / 5))} ${l.lang === "Other" ? "lcx" : "lc" + (i % 8)}`}
+          />
+        ))}
+      </div>
+      <div className="langbar-legend">
+        {langs.slice(0, 6).map((l, i) => (
+          <span key={l.lang} className="small">
+            <i className={`dot ${l.lang === "Other" ? "lcx" : "lc" + (i % 8)}`} />
+            {l.lang} <span className="faint">{l.pct.toFixed(0)}%</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Repository code browser — tree listing at ?ref= + path param. */
 export function RepoCodePage() {
   const { t } = useT();
+  const { user } = useAuth();
   const { repo, ns, name, base } = useRepo();
   const params = useParams();
   const [search] = useSearchParams();
@@ -196,6 +249,16 @@ export function RepoCodePage() {
         )}
         <Crumbs root={base} base={`${base}/tree`} path={subpath} refName={ref} />
         <span className="mark-read" />
+        {user && (
+          <Link
+            className="copy-btn"
+            title={t("edit.newFile")}
+            aria-label={t("edit.newFile")}
+            to={`${base}/new/${subpath}?ref=${encodeURIComponent(ref)}`}
+          >
+            <Icon name="plus" size={14} />
+          </Link>
+        )}
         <Link className="faint small" to={`${base}/branches`}>
           {branches?.branches.length ?? "—"} {t("repo.branches")}
         </Link>
@@ -206,6 +269,7 @@ export function RepoCodePage() {
           {t("repo.commits")}
         </Link>
       </div>
+      {tree && sorted.length > 0 && <LanguageBar entries={tree.entries} />}
       <div className="filetree">
         {emptyRepo && <EmptyRepo ns={ns} name={name} />}
         {!emptyRepo && (
@@ -251,6 +315,7 @@ export function RepoCodePage() {
 /** Single file view with syntax highlighting. */
 export function RepoFilePage() {
   const { t } = useT();
+  const { user } = useAuth();
   const { repo, ns, name, base } = useRepo();
   const params = useParams();
   const [search] = useSearchParams();
@@ -311,6 +376,28 @@ export function RepoFilePage() {
           <button className="copy-btn" title={t("code.download")} aria-label={t("code.download")} onClick={download}>
             <Icon name="download" size={14} />
           </button>
+        )}
+        {/* The /file streaming endpoint takes ~20s+ through the engine — a raw
+            link would look broken. Download covers the same need client-side. */}
+        {user && !blob?.binary && (
+          <Link
+            className="copy-btn"
+            title={t("edit.editFile")}
+            aria-label={t("edit.editFile")}
+            to={`${base}/edit/${filePath}?ref=${encodeURIComponent(ref)}`}
+          >
+            <Icon name="edit" size={14} />
+          </Link>
+        )}
+        {user && (
+          <Link
+            className="copy-btn danger"
+            title={t("edit.deleteFile")}
+            aria-label={t("edit.deleteFile")}
+            to={`${base}/edit/${filePath}?ref=${encodeURIComponent(ref)}&mode=delete`}
+          >
+            <Icon name="trash" size={14} />
+          </Link>
         )}
         <Link
           className="faint small"
