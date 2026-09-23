@@ -86,12 +86,17 @@ export function LoginPage() {
           username: data.username,
           password: data.password,
         });
+        await api.post("/login", {
+          username: data.username,
+          password: data.password,
+        });
+      } else {
+        await api.post("/login", {
+          username: data.username,
+          password: data.password,
+          otp: data.otp || undefined,
+        });
       }
-      await api.post("/login", {
-        username: data.username,
-        password: data.password,
-        otp: data.otp || undefined,
-      });
       await refresh();
       navigate("/");
     } catch (err) {
@@ -100,54 +105,82 @@ export function LoginPage() {
     }
   }
 
+  if (setupRequired)
+    return (
+      <AuthFrame>
+        <form onSubmit={submit}>
+          <h2>{t("auth.setup")}</h2>
+          <p className="muted">{t("auth.setupHint")}</p>
+          {error && <div className="errbox">{error}</div>}
+          <Field label={t("auth.secret")}>
+            <input
+              name="secret"
+              required
+              autoFocus
+              autoComplete="off"
+            />
+          </Field>
+          <Field label={t("auth.username")}>
+            <input
+              name="username"
+              required
+              autoComplete="username"
+              pattern="[a-z0-9][a-z0-9_\-]{0,47}"
+            />
+          </Field>
+          <Field label={t("auth.password")} hint={t("auth.passwordHint")}>
+            <input
+              name="password"
+              type="password"
+              required
+              minLength={12}
+              autoComplete="new-password"
+            />
+          </Field>
+          <button className="btn primary" type="submit" disabled={busy}>
+            {t("auth.submitSetup")} →
+          </button>
+          <div className="alt">
+            <Link to="/register">{t("auth.registerLink")}</Link>
+          </div>
+        </form>
+      </AuthFrame>
+    );
+
   return (
     <AuthFrame>
       <form onSubmit={submit}>
-        <h2>{setupRequired ? t("auth.setup") : t("auth.welcome")}</h2>
-        <p className="muted">
-          {setupRequired ? t("auth.setupHint") : t("auth.loginHint")}
-        </p>
+        <h2>{t("auth.welcome")}</h2>
+        <p className="muted">{t("auth.loginHint")}</p>
         {error && <div className="errbox">{error}</div>}
-        {setupRequired && (
-          <Field label={t("auth.secret")}>
-            <input name="secret" type="password" required autoComplete="off" />
-          </Field>
-        )}
         <Field label={t("auth.username")}>
           <input name="username" required autoComplete="username" autoFocus />
         </Field>
-        <Field
-          label={t("auth.password")}
-          hint={setupRequired ? t("auth.passwordHint") : undefined}
-        >
+        <Field label={t("auth.password")}>
           <input
             name="password"
             type="password"
             required
-            autoComplete={setupRequired ? "new-password" : "current-password"}
+            autoComplete="current-password"
           />
         </Field>
-        {!setupRequired && (
-          <Field label={t("auth.otp")} optional>
-            <input
-              name="otp"
-              maxLength={64}
-              autoComplete="one-time-code"
-              placeholder={t("auth.otpHint")}
-            />
-          </Field>
-        )}
+        <Field label={t("auth.otp")} optional>
+          <input
+            name="otp"
+            maxLength={64}
+            autoComplete="one-time-code"
+            placeholder={t("auth.otpHint")}
+          />
+        </Field>
         <button className="btn primary" type="submit" disabled={busy}>
-          {setupRequired ? t("auth.submitSetup") : t("auth.submit")} →
+          {t("auth.submit")} →
         </button>
-        {!setupRequired && <PasskeySignIn />}
-        {!setupRequired && (
-          <div className="alt">
-            <Link to="/recover">{t("auth.forgot")}</Link>
-            <Link to="/register">{t("auth.registerLink")}</Link>
-            <Link to="/">{t("auth.browse")} →</Link>
-          </div>
-        )}
+        <PasskeySignIn />
+        <div className="alt">
+          <Link to="/recover">{t("auth.forgot")}</Link>
+          <Link to="/register">{t("auth.registerLink")}</Link>
+          <Link to="/">{t("auth.browse")} →</Link>
+        </div>
       </form>
     </AuthFrame>
   );

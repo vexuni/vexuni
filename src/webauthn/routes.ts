@@ -163,6 +163,8 @@ export function registerWebAuthn(app: Hono<App>) {
 
   app.post("/api/webauthn/register/verify", async (c) => {
     await throttle(c, "register");
+    if (c.get("user"))
+      fail(409, "You are already signed in to an account");
     const b = z
       .object({ username: slug, response: attestationResponse })
       .parse(await jsonInput(c));
@@ -195,9 +197,12 @@ export function registerWebAuthn(app: Hono<App>) {
     )
       fail(409, "Username already taken");
     try {
+      // Public passkey registration always creates a regular user. The
+      // administrator is provisioned by the operator via POST /api/setup
+      // (BOOTSTRAP_SECRET); one passkey can only back one account.
       await c.env.DB.batch([
         c.env.DB.prepare(
-          "INSERT INTO users(id,username,password,has_password) VALUES(?,?,?,0)",
+          "INSERT INTO users(id,username,password,has_password,admin) VALUES(?,?,?,0,0)",
         ).bind(
           userId,
           b.username.toLowerCase(),
@@ -250,7 +255,14 @@ export function registerWebAuthn(app: Hono<App>) {
         .bind(now)
         .run(),
     );
-    return c.json({ id: userId, username: b.username.toLowerCase() }, 201);
+    return c.json(
+      {
+        id: userId,
+        username: b.username.toLowerCase(),
+        admin: 0,
+      },
+      201,
+    );
   });
 
   // ---- passkey sign-in ----

@@ -41,7 +41,7 @@ A push follows **Git client → main Worker authorization → repository DO coor
 
 1. In `wrangler.jsonc`, set `APP_ORIGIN` (your canonical origin) and `APPS_ORIGIN` (the app gateway origin), and fill in your own D1 `database_id`.
 2. Configure the `BOOTSTRAP_SECRET` and `CREDENTIAL_ENCRYPTION_KEY` Worker secrets.
-3. Run `npm run deploy` to deploy the compiler, gateway, and main Worker in order; open the main Worker URL and create your administrator with the bootstrap secret.
+3. Run `npm run deploy` to deploy the compiler, gateway, and main Worker in order; open the main Worker URL and create your administrator with the bootstrap secret. Regular users register with a passkey.
 
 See the [deployment guide](docs/en/DEPLOYMENT.md) for database migrations, resource bindings, and service wiring. When upgrading an existing instance, preserve its resources and encryption keys.
 

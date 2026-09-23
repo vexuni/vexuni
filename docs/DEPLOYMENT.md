@@ -8,7 +8,7 @@
 
 规范地址由 `APP_ORIGIN` 指定，浏览器登录和 LFS 都应使用该地址。迁移旧域名时可设置可选变量 `LEGACY_APP_ORIGIN`：仅旧域名的网页 GET/HEAD 请求重定向到规范地址，原生 Git 和 API 请求不重定向。OIDC/OAuth 回调应指向 `<APP_ORIGIN>/api/auth/oidc/callback`。
 
-首次初始化通过网页完成，用户名和密码由操作者选择。初始化 secret 存放在本机被 Git 忽略的 `.data/production-bootstrap-secret.txt`（权限 0600），同时保存在 Worker secret 中。不要将它加入源码或公开发送。成功创建管理员后，D1 会锁定初始化，可删除云端 BOOTSTRAP_SECRET。
+首次初始化通过网页完成，用户名和密码由操作者选择，并需提供部署时的初始化密钥。初始化 secret 存放在本机被 Git 忽略的 `.data/production-bootstrap-secret.txt`（权限 0600），同时保存在 Worker secret 中。不要将它加入源码或公开发送。成功创建管理员后，D1 会锁定初始化，可删除云端 BOOTSTRAP_SECRET。普通用户使用通行密钥注册，只能成为普通用户。
 
 ## 主域名与语言
 
@@ -53,7 +53,7 @@ npx wrangler secret put CREDENTIAL_ENCRYPTION_KEY
 
 `deploy` 与打包命令会先从明确的源码目录生成 `public/source.tar.gz`，通过页面提供 AGPL 源码下载。不要将私有文件放入这些源码目录；`.data`、`.wrangler` 和环境密钥文件不在打包白名单。
 
-为 BOOTSTRAP_SECRET 使用至少 32 字节的随机值，在 Wrangler 提示中输入。未配置密钥时初始化接口拒绝创建账号，不会开放无密钥注册。生产不能使用 `wrangler.local.jsonc`；它含公开的本地测试密钥。不要导入本地 `.wrangler` 数据。
+为 BOOTSTRAP_SECRET 使用至少 32 字节的随机值，在 Wrangler 提示中输入。未配置密钥时初始化接口拒绝创建管理员；通行密钥注册保持开放，且始终只创建普通用户。生产不能使用 `wrangler.local.jsonc`；它含公开的本地测试密钥。不要导入本地 `.wrangler` 数据。
 
 访问 `/api/health`，确认 HTTPS 与静态页面可用，然后初始化管理员、创建私有验收项目和临时 PAT，执行真实 push、clone、fetch、merge 与 LFS。验证后撤销验收凭证。公开 DNS 和本地负缓存传播可能有时间差；不要为排查 DNS 而关闭 TLS 校验。
 

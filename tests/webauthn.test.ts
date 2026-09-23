@@ -226,13 +226,25 @@ async function fixture() {
   return { db, env, req };
 }
 
-async function register(req: any, auth: Authenticator, username: string) {
-  const options = (await req("/webauthn/register/options", "POST", {})).data;
+async function register(
+  req: any,
+  auth: Authenticator,
+  username: string,
+  cookie = "",
+) {
+  const options = (
+    await req("/webauthn/register/options", "POST", {}, cookie)
+  ).data;
   const attestation = await auth.attestation(options.challenge);
-  return req("/webauthn/register/verify", "POST", {
-    username,
-    response: attestation,
-  });
+  return req(
+    "/webauthn/register/verify",
+    "POST",
+    {
+      username,
+      response: attestation,
+    },
+    cookie,
+  );
 }
 
 test("passkey-first registration creates the account and signs in", async () => {
@@ -388,6 +400,43 @@ test("manage endpoints add, list, rename and guard the last passkey", async () =
     cookie,
   );
   assert.equal(guarded.status, 409);
+});
+
+test("passkey registration always creates regular users and never initializes the instance", async () => {
+  const { db, req } = await fixture();
+  db.prepare("DELETE FROM credentials").run();
+  db.prepare("DELETE FROM users").run();
+  db.prepare("DELETE FROM settings WHERE key='initialized'").run();
+  const auth = await new Authenticator().init();
+  const r = await register(req, auth, "first");
+  assert.equal(r.status, 201, JSON.stringify(r.data));
+  assert.equal(r.data.admin, 0);
+  assert.equal(
+    (
+      db
+        .prepare("SELECT admin FROM users WHERE username='first'")
+        .get() as any
+    )?.admin,
+    0,
+  );
+  // Public registration must not mark setup complete — the operator still
+  // creates the administrator through POST /api/setup + BOOTSTRAP_SECRET.
+  assert.equal(
+    db.prepare("SELECT 1 FROM settings WHERE key='initialized'").get(),
+    undefined,
+  );
+  const boot = await req("/bootstrap");
+  assert.equal(boot.data.required, true);
+});
+
+test("a signed-in user cannot register another public account", async () => {
+  const { req } = await fixture();
+  const auth = await new Authenticator().init();
+  const r = await register(req, auth, "solo");
+  assert.equal(r.status, 201);
+  const again = await new Authenticator().init();
+  const r2 = await register(req, again, "second", r.cookie);
+  assert.equal(r2.status, 409);
 });
 
 test("a fresh passkey session can set a password", async () => {

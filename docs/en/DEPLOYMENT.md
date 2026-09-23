@@ -8,7 +8,7 @@ Each vexuni instance has three Workers plus a set of storage resources: the main
 
 The canonical origin is set by `APP_ORIGIN`; browser sign-in and LFS should use it. When migrating a previous domain, the optional `LEGACY_APP_ORIGIN` variable redirects only that domain's browser GET/HEAD pages to the canonical origin — native Git and API requests are never redirected. OIDC/OAuth callbacks should point at `<APP_ORIGIN>/api/auth/oidc/callback`.
 
-The operator chooses the initial administrator username and password in the website. The bootstrap secret is held in the Worker secrets and in an ignored local `.data/production-bootstrap-secret.txt` file with mode 0600. Never add it to source or publish it. Successful setup locks initialization in D1; BOOTSTRAP_SECRET can then be removed from the Worker.
+The operator chooses the initial administrator username and password on the setup page and proves the deployment bootstrap secret. The secret is held in the Worker secrets and in an ignored local `.data/production-bootstrap-secret.txt` file with mode 0600. Never add it to source or publish it. Successful setup locks initialization in D1; BOOTSTRAP_SECRET can then be removed from the Worker. Regular users register with a passkey and can only become regular users.
 
 ## Primary domain and languages
 
@@ -53,7 +53,7 @@ Keep LOADER in the gateway configuration. Set APPS_ORIGIN to its independent URL
 
 Deployment and build commands generate `public/source.tar.gz` from an explicit source allowlist for AGPL source downloads. Keep private files outside these directories. `.data`, `.wrangler`, and environment-secret files are excluded.
 
-Use at least 32 random bytes for BOOTSTRAP_SECRET and enter it at the Wrangler prompt. Without this secret, setup refuses account creation; there is no unprotected registration. Never deploy `wrangler.local.jsonc`, which contains public test secrets, or import local `.wrangler` data.
+Use at least 32 random bytes for BOOTSTRAP_SECRET and enter it at the Wrangler prompt. Without this secret, setup refuses administrator creation; passkey registration stays open and always creates regular users. Never deploy `wrangler.local.jsonc`, which contains public test secrets, or import local `.wrangler` data.
 
 Check `/api/health`, HTTPS, and static pages. Initialize the administrator, create a private acceptance project and temporary PAT, and exercise real push, clone, fetch, merge, and LFS operations. Revoke test credentials afterward. DNS propagation and local negative caching can differ; do not disable TLS verification to diagnose DNS.
 
