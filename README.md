@@ -41,7 +41,7 @@
 
 1. 在 `wrangler.jsonc` 中设置 `APP_ORIGIN`（规范地址）与 `APPS_ORIGIN`（应用网关地址），并填入你自己的 D1 `database_id`。
 2. 配置 `BOOTSTRAP_SECRET` 与 `CREDENTIAL_ENCRYPTION_KEY` 两个 Worker secret。
-3. 执行 `npm run deploy`，依次部署编译服务、应用网关与主服务；打开主 Worker 地址，用初始化密钥创建管理员。普通用户使用通行密钥注册。
+3. 执行 `npm run deploy`，依次部署编译服务、应用网关与主服务；使用初始化密钥调用 `POST /api/setup` 创建管理员。普通用户使用通行密钥注册。
 
 数据库迁移、资源绑定与服务地址的连接方式详见 [部署说明](docs/DEPLOYMENT.md)。已有实例升级请保留原有资源和加密密钥。
 
@@ -56,7 +56,7 @@ npm ci
 npm run dev
 ```
 
-打开 [localhost:8787](http://localhost:8787)，使用初始化密钥 `local-development-only-change-me` 创建管理员，密码至少 12 个字符。此密钥仅供本地开发；Git HTTPS 认证使用个人访问令牌（PAT）作为密码。
+打开 [localhost:8787](http://localhost:8787)，使用初始化密钥 `local-development-only-change-me` 调用 `POST /api/setup` 创建管理员，密码至少 12 个字符。此密钥仅供本地开发；Git HTTPS 认证使用个人访问令牌（PAT）作为密码。
 
 ## 使用范围
 

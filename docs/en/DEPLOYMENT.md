@@ -8,7 +8,7 @@ Each vexuni instance has three Workers plus a set of storage resources: the main
 
 The canonical origin is set by `APP_ORIGIN`; browser sign-in and LFS should use it. When migrating a previous domain, the optional `LEGACY_APP_ORIGIN` variable redirects only that domain's browser GET/HEAD pages to the canonical origin — native Git and API requests are never redirected. OIDC/OAuth callbacks should point at `<APP_ORIGIN>/api/auth/oidc/callback`.
 
-The operator chooses the initial administrator username and password on the setup page and proves the deployment bootstrap secret. The secret is held in the Worker secrets and in an ignored local `.data/production-bootstrap-secret.txt` file with mode 0600. Never add it to source or publish it. Successful setup locks initialization in D1; BOOTSTRAP_SECRET can then be removed from the Worker. Regular users register with a passkey and can only become regular users.
+The operator provisions the initial administrator by calling `POST /api/setup` with the deployment bootstrap secret (not exposed in the web UI). The secret is held in the Worker secrets and in an ignored local `.data/production-bootstrap-secret.txt` file with mode 0600. Never add it to source or publish it. Successful setup locks initialization in D1; BOOTSTRAP_SECRET can then be removed from the Worker. Regular users register with a passkey and can only become regular users.
 
 ## Primary domain and languages
 

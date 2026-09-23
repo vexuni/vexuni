@@ -66,7 +66,7 @@ function AuthFrame({ children }: { children: React.ReactNode }) {
 
 export function LoginPage() {
   const { t } = useT();
-  const { refresh, setupRequired } = useAuth();
+  const { refresh } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -80,23 +80,11 @@ export function LoginPage() {
     setBusy(true);
     setError("");
     try {
-      if (setupRequired) {
-        await api.post("/setup", {
-          secret: data.secret,
-          username: data.username,
-          password: data.password,
-        });
-        await api.post("/login", {
-          username: data.username,
-          password: data.password,
-        });
-      } else {
-        await api.post("/login", {
-          username: data.username,
-          password: data.password,
-          otp: data.otp || undefined,
-        });
-      }
+      await api.post("/login", {
+        username: data.username,
+        password: data.password,
+        otp: data.otp || undefined,
+      });
       await refresh();
       navigate("/");
     } catch (err) {
@@ -104,48 +92,6 @@ export function LoginPage() {
       setBusy(false);
     }
   }
-
-  if (setupRequired)
-    return (
-      <AuthFrame>
-        <form onSubmit={submit}>
-          <h2>{t("auth.setup")}</h2>
-          <p className="muted">{t("auth.setupHint")}</p>
-          {error && <div className="errbox">{error}</div>}
-          <Field label={t("auth.secret")}>
-            <input
-              name="secret"
-              required
-              autoFocus
-              autoComplete="off"
-            />
-          </Field>
-          <Field label={t("auth.username")}>
-            <input
-              name="username"
-              required
-              autoComplete="username"
-              pattern="[a-z0-9][a-z0-9_\-]{0,47}"
-            />
-          </Field>
-          <Field label={t("auth.password")} hint={t("auth.passwordHint")}>
-            <input
-              name="password"
-              type="password"
-              required
-              minLength={12}
-              autoComplete="new-password"
-            />
-          </Field>
-          <button className="btn primary" type="submit" disabled={busy}>
-            {t("auth.submitSetup")} →
-          </button>
-          <div className="alt">
-            <Link to="/register">{t("auth.registerLink")}</Link>
-          </div>
-        </form>
-      </AuthFrame>
-    );
 
   return (
     <AuthFrame>

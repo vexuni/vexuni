@@ -8,7 +8,7 @@
 
 规范地址由 `APP_ORIGIN` 指定，浏览器登录和 LFS 都应使用该地址。迁移旧域名时可设置可选变量 `LEGACY_APP_ORIGIN`：仅旧域名的网页 GET/HEAD 请求重定向到规范地址，原生 Git 和 API 请求不重定向。OIDC/OAuth 回调应指向 `<APP_ORIGIN>/api/auth/oidc/callback`。
 
-首次初始化通过网页完成，用户名和密码由操作者选择，并需提供部署时的初始化密钥。初始化 secret 存放在本机被 Git 忽略的 `.data/production-bootstrap-secret.txt`（权限 0600），同时保存在 Worker secret 中。不要将它加入源码或公开发送。成功创建管理员后，D1 会锁定初始化，可删除云端 BOOTSTRAP_SECRET。普通用户使用通行密钥注册，只能成为普通用户。
+首次初始化由操作者调用 `POST /api/setup` 完成，用户名和密码由操作者选择，并需提供部署时的初始化密钥（该接口不在网页界面中展示）。初始化 secret 存放在本机被 Git 忽略的 `.data/production-bootstrap-secret.txt`（权限 0600），同时保存在 Worker secret 中。不要将它加入源码或公开发送。成功创建管理员后，D1 会锁定初始化，可删除云端 BOOTSTRAP_SECRET。普通用户使用通行密钥注册，只能成为普通用户。
 
 ## 主域名与语言
 
