@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { useT, type Locale } from "../lib/i18n";
 import { useTheme, type Theme } from "../lib/theme";
-import { Avatar, Modal, Pill } from "./ui";
+import { Avatar, ErrorBoundary, Modal, Pill } from "./ui";
 import { CommandPalette } from "./palette";
 import { Icon } from "./icons";
 
@@ -367,6 +367,7 @@ export function Shell({
 }) {
   const { t } = useT();
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const [navOpen, setNavOpen] = useState(false);
   const [palOpen, setPalOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -440,7 +441,11 @@ export function Shell({
             )}
           </div>
         </header>
-        <div className={`content${wide ? " wide" : ""}`}>{children}</div>
+        <div className={`content${wide ? " wide" : ""}`}>
+          {/* Keyed by route so a crashed page recovers on navigation instead
+              of pinning the boundary fallback across the app. */}
+          <ErrorBoundary key={pathname}>{children}</ErrorBoundary>
+        </div>
       </div>
       <CommandPalette open={palOpen} onClose={() => setPalOpen(false)} />
       {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}

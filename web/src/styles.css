@@ -871,12 +871,7 @@ textarea {
   font-size: 13px;
   flex-wrap: wrap;
 }
-.filebar select {
-  width: auto;
-  padding: 4px 8px;
-  font-size: 12.5px;
-  font-family: var(--mono);
-}
+
 .crumbs {
   display: flex;
   align-items: center;
@@ -1465,6 +1460,82 @@ textarea {
   background: var(--surface-2);
   color: var(--ink);
   text-decoration: none;
+}
+
+.clone-menu {
+  min-width: 340px;
+}
+.clone-menu .clone-box {
+  margin: 4px 6px 8px;
+}
+
+/* ref picker */
+.ref-btn {
+  gap: 6px;
+  font-size: 12.5px;
+  padding: 5px 10px;
+}
+.ref-name {
+  font-family: var(--mono);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ref-menu {
+  left: 0;
+  right: auto;
+  min-width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.menu-label {
+  padding: 7px 10px 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.ref-menu button[aria-checked="true"] {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.seg-sm button {
+  padding: 4px 9px;
+  font-size: 11.5px;
+}
+
+/* commit diff */
+.diff-filehead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 12.5px;
+}
+.chip-link {
+  text-decoration: none;
+  align-self: center;
+}
+.chip-link:hover .chip {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* code line anchors */
+a.ln {
+  text-decoration: none;
+  cursor: pointer;
+}
+a.ln:hover {
+  color: var(--accent-ink);
+}
+.cline:target,
+.cline.hl {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 .modal-veil {
   position: fixed;

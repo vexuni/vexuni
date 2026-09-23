@@ -21,6 +21,7 @@ import { useRepo } from "./layout";
 export function MergesPage() {
   const { t } = useT();
   const { ns, name, base } = useRepo();
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const state = params.get("state") || "open";
   const { data, error, loading, reload } = useApi<{ merges: MergeRequest[] }>(
@@ -50,8 +51,8 @@ export function MergesPage() {
           ))}
         </div>
         <span className="mark-read" />
-        <Link className="btn primary" to={`${base}/merges/new`}>
-          <Icon name="plus" /> {t("merges.new")}
+        <Link className="btn primary" to={user ? `${base}/merges/new` : "/login"}>
+          <Icon name="plus" /> {user ? t("merges.new") : t("repos.loginToCreate")}
         </Link>
       </div>
       {error && <ErrorBox error={error} onRetry={reload} />}
@@ -64,8 +65,8 @@ export function MergesPage() {
               title={t("merges.empty")}
               body={t("merges.emptyBody")}
               action={
-                <Link className="btn primary" to={`${base}/merges/new`}>
-                  {t("merges.first")}
+                <Link className="btn primary" to={user ? `${base}/merges/new` : "/login"}>
+                  {user ? t("merges.first") : t("repos.loginToCreate")}
                 </Link>
               }
             />
@@ -171,6 +172,7 @@ export function MergeDetailPage() {
 export function NewMergePage() {
   const { t } = useT();
   const { repo, ns, name, base } = useRepo();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { data: branches } = useApi<{ branches: Branch[] }>(
     repoPath(ns, name) + "/branches",
@@ -200,6 +202,22 @@ export function NewMergePage() {
       setBusy(false);
     }
   }
+
+  if (!user)
+    return (
+      <div className="panel">
+        <Empty
+          icon="lock"
+          title={t("auth.required")}
+          body={t("auth.requiredBody")}
+          action={
+            <Link className="btn primary" to="/login">
+              {t("top.login")}
+            </Link>
+          }
+        />
+      </div>
+    );
 
   return (
     <div className="panel panelpad narrow">

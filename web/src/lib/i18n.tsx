@@ -97,6 +97,8 @@ const en: Record<string, string> = {
   "auth.storyTitle": "Your code,\non your terms.",
   "auth.storyBody": "From the first commit to the next merge. Keep repositories, discussion and collaboration in a space of your own.",
   "auth.footer": "OPEN SOURCE · AGPL-3.0",
+  "auth.required": "Sign in required",
+  "auth.requiredBody": "You need an account to do that.",
   "auth.register": "Create your account",
   "auth.registerHint":
     "Your passkey comes first — your device's screen lock becomes your sign-in. Then choose a username for your regular account.",
@@ -155,12 +157,16 @@ const en: Record<string, string> = {
   "repo.emptyHint": "Push an existing repository or create your first commit:",
   "repo.archived": "Archived",
   "repo.noReadme": "No README yet.",
+  "repo.cloneUrl": "Clone URL",
+  "repo.cloneCmd": "Command",
   "code.file": "file",
   "code.binary": "Binary file — preview unavailable.",
   "code.lines": "lines",
   "code.raw": "Raw",
   "code.blame": "Blame",
   "code.history": "History",
+  "code.preview": "Preview",
+  "code.download": "Download",
   "commits.empty": "No commits yet",
   "commits.forPath": "History for this path",
   "commit.changes": "Changes",
@@ -297,6 +303,8 @@ const en: Record<string, string> = {
   "err.backHome": "Back to projects",
   "err.load": "Failed to load data",
   "err.retry": "Retry",
+  "err.boundary": "This page ran into a problem",
+  "err.boundaryBody": "The view crashed while rendering. Retry or navigate elsewhere — the rest of the app is unaffected.",
 };
 
 const zh: Record<string, string> = {
@@ -385,6 +393,8 @@ const zh: Record<string, string> = {
   "auth.storyTitle": "代码的归属，\n由你定义。",
   "auth.storyBody": "从第一个 commit 到下一次合并。把仓库、讨论与协作，留在自己的空间。",
   "auth.footer": "开源 · AGPL-3.0",
+  "auth.required": "需要登录",
+  "auth.requiredBody": "此操作需要一个账户。",
   "auth.register": "创建你的账户",
   "auth.registerHint":
     "先创建通行密钥——用设备的屏幕锁登录,然后为普通账户选择一个用户名。",
@@ -443,12 +453,16 @@ const zh: Record<string, string> = {
   "repo.emptyHint": "推送一个已有仓库，或创建第一个提交：",
   "repo.archived": "已归档",
   "repo.noReadme": "还没有 README。",
+  "repo.cloneUrl": "克隆地址",
+  "repo.cloneCmd": "命令",
   "code.file": "文件",
   "code.binary": "二进制文件，无法预览。",
   "code.lines": "行",
   "code.raw": "原始",
   "code.blame": "溯源",
   "code.history": "历史",
+  "code.preview": "预览",
+  "code.download": "下载",
   "commits.empty": "还没有提交",
   "commits.forPath": "此路径的历史",
   "commit.changes": "变更",
@@ -584,6 +598,8 @@ const zh: Record<string, string> = {
   "err.backHome": "回到项目",
   "err.load": "加载数据失败",
   "err.retry": "重试",
+  "err.boundary": "页面出现问题",
+  "err.boundaryBody": "视图渲染时出错。可以重试或前往其他页面——应用其余部分不受影响。",
 };
 
 const dicts: Record<Locale, Record<string, string>> = { "zh-CN": zh, en };

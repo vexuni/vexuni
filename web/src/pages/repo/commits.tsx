@@ -3,7 +3,7 @@ import { qs, repoPath, revisionMissing } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
 import { fullDate, shortSha } from "../../lib/format";
-import type { CommitItem } from "../../lib/types";
+import type { Branch, CommitItem } from "../../lib/types";
 import { DiffView } from "../../components/code";
 import { Empty, ErrorBox, Chip, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
@@ -11,15 +11,32 @@ import { useRepo } from "./layout";
 
 interface CommitDetail {
   sha?: string;
-  commit?: { sha?: string; message?: string; author?: string; date?: string; parents?: string[] };
+  commit?: {
+    sha?: string;
+    message?: string;
+    author?: string;
+    date?: string;
+    parents?: string[];
+    parent_shas?: string[];
+  };
   message?: string;
   author?: string;
   date?: string;
   parents?: string[];
-  files?: { path: string; status?: string }[];
-  changes?: { path: string; status?: string }[];
+  parent_shas?: string[];
+}
+
+interface DiffResult {
+  source_sha?: string;
+  target_sha?: string;
   diff?: string;
   patch?: string;
+  files?: {
+    path: string;
+    status?: string;
+    binary?: boolean;
+    patch?: string;
+  }[];
 }
 
 export function CommitsPage() {
@@ -32,7 +49,14 @@ export function CommitsPage() {
     repoPath(ns, name) + `/commits${qs({ ref, path })}`,
     [ns, name, ref, path],
   );
+  const { data: branches } = useApi<{ branches: Branch[] }>(
+    repoPath(ns, name) + "/branches",
+    [ns, name],
+  );
   const commits = data?.commits;
+  // A populated repo with a bogus ref also yields "revision missing" — the
+  // branch list decides whether "no commits" is true or the error is real.
+  const emptyRepo = branches?.branches.length === 0;
   return (
     <>
       {path && (
@@ -41,7 +65,7 @@ export function CommitsPage() {
         </div>
       )}
       {error &&
-        (revisionMissing(error) ? (
+        (revisionMissing(error) && (!branches || emptyRepo) ? (
           <Empty icon="commit" title={t("commits.empty")} />
         ) : (
           <ErrorBox error={error} />
@@ -70,7 +94,9 @@ export function CommitsPage() {
                   <span>{fullDate(c.date)}</span>
                 </div>
               </div>
-              <Chip>{shortSha(c.sha)}</Chip>
+              <Link to={`${base}/commit/${c.sha}`} className="chip-link" title={c.sha}>
+                <Chip>{shortSha(c.sha)}</Chip>
+              </Link>
             </div>
           ))}
         </div>
@@ -87,10 +113,16 @@ export function CommitDetailPage() {
     repoPath(ns, name) + `/commit${qs({ ref: sha })}`,
     [ns, name, sha],
   );
+  // The commit endpoint returns metadata only; the diff endpoint produces the
+  // change set against the first parent, which is what this page exists for.
+  const { data: diff } = useApi<DiffResult>(
+    sha ? repoPath(ns, name) + `/diff${qs({ sha })}` : null,
+    [ns, name, sha],
+  );
 
   const commit = data?.commit?.sha ? data.commit : data;
-  const files = data?.files || data?.changes || [];
-  const patch = data?.diff || data?.patch;
+  const parents = commit?.parent_shas || commit?.parents || [];
+  const files = diff?.files || [];
 
   return (
     <>
@@ -114,11 +146,11 @@ export function CommitDetailPage() {
               {commit.date && <span>{fullDate(commit.date)}</span>}
               <Chip>{sha.slice(0, 10)}</Chip>
             </div>
-            {commit.parents && commit.parents.length > 0 && (
+            {parents.length > 0 && (
               <div className="rowmeta mt-sm">
                 <span className="faint small">
                   {t("commit.parents")}:{" "}
-                  {commit.parents.map((p) => (
+                  {parents.map((p) => (
                     <Link key={p} to={`${base}/commit/${p}`} className="mono">
                       {shortSha(p)}{" "}
                     </Link>
@@ -136,17 +168,40 @@ export function CommitDetailPage() {
               {files.map((f) => (
                 <div className="row" key={f.path}>
                   <Icon name="diff" size={14} />
-                  <span className="mono small">{f.path}</span>
+                  <Link
+                    className="rowlink mono small grow"
+                    to={`${base}/blob/${f.path}?ref=${encodeURIComponent(sha)}`}
+                  >
+                    {f.path}
+                  </Link>
                   {f.status && <span className="faint small">{f.status}</span>}
                 </div>
               ))}
             </div>
           )}
-          {patch && (
+          {files.length > 0 ? (
+            files
+              .filter((f) => f.patch && !f.binary)
+              .map((f) => (
+                <div className="diff-panel" key={f.path}>
+                  <div className="diff-filehead">
+                    <Icon name="file" size={13} />
+                    <span className="mono small">{f.path}</span>
+                    {f.status && <span className="faint small">{f.status}</span>}
+                  </div>
+                  {/* The file head already shows path/status, so the patch's
+                      own diff --git/index/---/+++ header is noise — keep the hunks. */}
+                  <DiffView text={f.patch!.slice(Math.max(0, f.patch!.indexOf("@@")))} />
+                </div>
+              ))
+          ) : diff?.diff || diff?.patch ? (
             <div className="diff-panel">
-              <DiffView text={patch} />
+              <DiffView text={diff.diff || diff.patch || ""} />
             </div>
-          )}
+          ) : null}
+          <p className="faint small">
+            <Link to={`${base}/commits?ref=${encodeURIComponent(sha)}`}>← {t("repo.commits")}</Link>
+          </p>
         </div>
       )}
     </>

@@ -127,15 +127,16 @@ export function RepoLayout() {
               <Icon name="chevD" size={12} />
             </button>
             {cloneOpen && (
-              <div className="menu" role="menu">
+              <div className="menu clone-menu" role="menu">
+                <div className="menu-label">{t("repo.cloneUrl")}</div>
                 <div className="clone-box">
                   <code>{cloneURL}</code>
                   <CopyButton text={cloneURL} />
                 </div>
-                <div className="notebox">
-                  <code>
-                    git clone {cloneURL}
-                  </code>
+                <div className="menu-label">{t("repo.cloneCmd")}</div>
+                <div className="clone-box">
+                  <code>git clone {cloneURL}</code>
+                  <CopyButton text={`git clone ${cloneURL}`} />
                 </div>
               </div>
             )}

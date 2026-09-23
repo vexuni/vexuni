@@ -1,11 +1,12 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { qs, repoPath, revisionMissing } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
-import { bytes } from "../../lib/format";
-import type { Blob, Branch, Tree } from "../../lib/types";
+import { bytes, extOf } from "../../lib/format";
+import type { Blob, Branch, Tag, Tree } from "../../lib/types";
 import { CodeView } from "../../components/code";
-import { Readme } from "../../components/markdown";
+import { Markdown, Readme } from "../../components/markdown";
 import { CopyButton, Empty, ErrorBox, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
@@ -66,26 +67,78 @@ function Crumbs({
   );
 }
 
-function BranchPicker({ branches, refName }: { branches: Branch[]; refName: string }) {
+/** Ref picker matching the app menu style; a native <select> looked
+ *  unfinished next to the styled dropdowns and hid tags entirely. */
+function BranchPicker({ ns, name, branches, refName }: { ns: string; name: string; branches: Branch[]; refName: string }) {
+  const { t } = useT();
   const [params, setParams] = useSearchParams();
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const { data: tags } = useApi<{ tags: Tag[] }>(
+    open ? repoPath(ns, name) + "/tags" : null,
+    [ns, name, open],
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const pick = (r: string) => {
+    params.set("ref", r);
+    setParams(params);
+    setOpen(false);
+  };
+  const isBranch = branches.some((b) => b.name === refName);
+
   return (
-    <select
-      aria-label="branch"
-      value={refName}
-      onChange={(e) => {
-        params.set("ref", e.target.value);
-        setParams(params);
-      }}
-    >
-      {branches.map((b) => (
-        <option key={b.name} value={b.name}>
-          {b.name}
-        </option>
-      ))}
-      {!branches.some((b) => b.name === refName) && (
-        <option value={refName}>{refName.slice(0, 10)}</option>
+    <div className="menu-wrap" ref={wrapRef}>
+      <button
+        className="btn ref-btn"
+        onClick={() => setOpen(!open)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <Icon name={isBranch ? "branch" : "tag"} size={13} />
+        <span className="ref-name">{isBranch ? refName : refName.slice(0, 10)}</span>
+        <Icon name="chevD" size={12} />
+      </button>
+      {open && (
+        <div className="menu ref-menu" role="menu">
+          <div className="menu-label">{t("repo.branches")}</div>
+          {branches.map((b) => (
+            <button key={b.name} role="menuitemradio" aria-checked={b.name === refName} onClick={() => pick(b.name)}>
+              <Icon name="branch" size={13} />
+              <span className="grow">{b.name}</span>
+              {b.name === refName && <Icon name="check" size={13} />}
+            </button>
+          ))}
+          {(tags?.tags.length ?? 0) > 0 && (
+            <>
+              <div className="menu-label">{t("tags.title")}</div>
+              {tags!.tags.map((tag) => (
+                <button key={tag.name} role="menuitemradio" aria-checked={tag.name === refName} onClick={() => pick(tag.name)}>
+                  <Icon name="tag" size={13} />
+                  <span className="grow">{tag.name}</span>
+                  {tag.name === refName && <Icon name="check" size={13} />}
+                </button>
+              ))}
+            </>
+          )}
+        </div>
       )}
-    </select>
+    </div>
   );
 }
 
@@ -111,9 +164,17 @@ export function RepoCodePage() {
   const emptyRepo =
     branches?.branches.length === 0 ||
     (revisionMissing(error) && !branches?.branches.length);
-  const readmeEntry = tree?.entries.find(
-    (e) => e.type === "blob" && /^readme(\.(md|txt|org))?$/i.test(e.name),
-  );
+  // Locale-suffixed readmes (README.en.md, README.zh-CN.md) are common, so
+  // match readme.* rather than only bare README.md; prefer markdown variants.
+  const readmeEntry = tree?.entries
+    .filter(
+      (e) =>
+        e.type === "blob" &&
+        /^readme(?:[._-][\w-]+)*(?:\.(?:md|markdown|mdown|txt|org))?$/i.test(
+          e.name,
+        ),
+    )
+    .sort((a, b) => Number(/\.(md|markdown|mdown)$/i.test(b.name)) - Number(/\.(md|markdown|mdown)$/i.test(a.name)))[0];
   const { data: readme } = useApi<Blob>(
     readmeEntry
       ? repoPath(ns, name) + `/blob${qs({ ref, path: subpath ? subpath + "/" + readmeEntry.name : readmeEntry.name })}`
@@ -131,7 +192,7 @@ export function RepoCodePage() {
     <>
       <div className="filebar">
         {branches && branches.branches.length > 0 && (
-          <BranchPicker branches={branches.branches} refName={ref} />
+          <BranchPicker ns={ns} name={name} branches={branches.branches} refName={ref} />
         )}
         <Crumbs root={base} base={`${base}/tree`} path={subpath} refName={ref} />
         <span className="mark-read" />
@@ -174,8 +235,8 @@ export function RepoCodePage() {
           );
         })}
       </div>
-      {readme?.content ? (
-        <Readme name={readmeEntry!.name} text={readme.content} />
+      {readme?.content && readmeEntry ? (
+        <Readme name={readmeEntry.name} text={readme.content} />
       ) : (
         tree &&
         sorted.length > 0 &&
@@ -196,24 +257,60 @@ export function RepoFilePage() {
   const filePath = params["*"] || "";
   const ref = search.get("ref") || repo.default_branch || "HEAD";
   const dir = filePath.split("/").slice(0, -1).join("/");
+  const fileName = filePath.split("/").pop() || "file";
+  const isMd = /^(md|markdown|mdown)$/i.test(extOf(filePath));
+  const [mdMode, setMdMode] = useState<"preview" | "raw">("preview");
 
   const { data: blob, error, loading } = useApi<Blob>(
     repoPath(ns, name) + `/blob${qs({ ref, path: filePath })}`,
     [ns, name, ref, filePath],
   );
+  const { data: branches } = useApi<{ branches: Branch[] }>(
+    repoPath(ns, name) + "/branches",
+    [ns, name],
+  );
+
+  // Served entirely client-side: the content is already in hand, so a
+  // download needs no extra request.
+  const download = () => {
+    const url = URL.createObjectURL(
+      new window.Blob([blob?.content || ""], { type: "text/plain" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <>
       <div className="filebar">
         <Crumbs root={base} base={`${base}/tree`} path={dir} refName={ref} />
         <span className="sep">/</span>
-        <span className="mono small">{filePath.split("/").pop()}</span>
+        <span className="mono small">{fileName}</span>
         <span className="mark-read" />
-        {blob && (
+        {blob && !blob.binary && (
           <span className="faint small">
             {bytes(blob.size)}
             {blob.content ? ` · ${blob.content.split("\n").length} ${t("code.lines")}` : ""}
           </span>
+        )}
+        {isMd && blob?.content && (
+          <div className="seg seg-sm">
+            <button type="button" className={mdMode === "preview" ? "on" : ""} onClick={() => setMdMode("preview")}>
+              {t("code.preview")}
+            </button>
+            <button type="button" className={mdMode === "raw" ? "on" : ""} onClick={() => setMdMode("raw")}>
+              {t("code.raw")}
+            </button>
+          </div>
+        )}
+        {blob?.content && <CopyButton text={blob.content} />}
+        {blob?.content && (
+          <button className="copy-btn" title={t("code.download")} aria-label={t("code.download")} onClick={download}>
+            <Icon name="download" size={14} />
+          </button>
         )}
         <Link
           className="faint small"
@@ -224,7 +321,7 @@ export function RepoFilePage() {
       </div>
       <div className="codewrap">
         {error &&
-          (revisionMissing(error) ? (
+          (revisionMissing(error) && branches?.branches.length === 0 ? (
             <EmptyRepo ns={ns} name={name} />
           ) : (
             <ErrorBox error={error} />
@@ -232,7 +329,11 @@ export function RepoFilePage() {
         {loading && <SkeletonRows />}
         {blob &&
           (blob.binary ? (
-            <Empty icon="file" title={filePath.split("/").pop() || ""} body={t("code.binary")} />
+            <Empty icon="file" title={fileName} body={t("code.binary")} />
+          ) : isMd && mdMode === "preview" ? (
+            <div className="panel panelpad">
+              <Markdown text={blob.content || ""} />
+            </div>
           ) : (
             <CodeView path={filePath} text={blob.content || ""} />
           ))}

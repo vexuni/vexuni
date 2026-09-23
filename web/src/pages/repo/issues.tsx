@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api, qs, repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
@@ -23,6 +23,7 @@ import { useRepo } from "./layout";
 export function IssuesPage() {
   const { t } = useT();
   const { ns, name, base } = useRepo();
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const state = params.get("state") || "open";
   const { data, error, loading, reload } = useApi<{ issues: Issue[] }>(
@@ -48,8 +49,10 @@ export function IssuesPage() {
           ))}
         </div>
         <span className="mark-read" />
-        <Link className="btn primary" to={`${base}/issues/new`}>
-          <Icon name="plus" /> {t("issues.new")}
+        {/* Creation endpoints require auth — send anonymous users to sign in
+            rather than to a form that can only fail. */}
+        <Link className="btn primary" to={user ? `${base}/issues/new` : "/login"}>
+          <Icon name="plus" /> {user ? t("issues.new") : t("repos.loginToCreate")}
         </Link>
       </div>
       {error && <ErrorBox error={error} onRetry={reload} />}
@@ -62,8 +65,8 @@ export function IssuesPage() {
               title={t("issues.empty")}
               body={t("issues.emptyBody")}
               action={
-                <Link className="btn primary" to={`${base}/issues/new`}>
-                  {t("issues.first")}
+                <Link className="btn primary" to={user ? `${base}/issues/new` : "/login"}>
+                  {user ? t("issues.first") : t("repos.loginToCreate")}
                 </Link>
               }
             />
@@ -204,6 +207,8 @@ export function IssueDetailPage() {
 export function NewIssuePage() {
   const { t } = useT();
   const { ns, name, base } = useRepo();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -220,12 +225,29 @@ export function NewIssuePage() {
         title: d.title,
         body: d.body || "",
       });
-      location.href = `${base}/issues/${r.id}`;
+      // SPA nav — a full reload would drop scroll position and session fetches.
+      navigate(`${base}/issues/${r.id}`);
     } catch (err) {
       setError((err as Error).message);
       setBusy(false);
     }
   }
+
+  if (!user)
+    return (
+      <div className="panel">
+        <Empty
+          icon="lock"
+          title={t("auth.required")}
+          body={t("auth.requiredBody")}
+          action={
+            <Link className="btn primary" to="/login">
+              {t("top.login")}
+            </Link>
+          }
+        />
+      </div>
+    );
 
   return (
     <div className="panel panelpad narrow">

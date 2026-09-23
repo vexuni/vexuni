@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import hljs from "highlight.js/lib/common";
 import { extOf } from "../lib/format";
 
@@ -33,8 +33,16 @@ const ALIAS: Record<string, string> = {
   ipynb: "json",
 };
 
-/** Syntax-highlighted, line-numbered source view. */
+/** Syntax-highlighted, line-numbered source view.
+ *  Lines carry #L<n> anchors so a position in a file is linkable — a core
+ *  interaction for a code host (sharing a line reference in discussion).
+ *  The highlight is state-driven, not :target: the browser resolves the
+ *  fragment once at parse time, before React mounts, so a :target rule
+ *  would never match client-rendered lines. */
 export function CodeView({ path, text }: { path: string; text: string }) {
+  const [target, setTarget] = useState(
+    () => /^#L(\d+)$/.exec(location.hash)?.[1],
+  );
   const lines = useMemo(() => {
     const lang = ALIAS[extOf(path)] || extOf(path);
     let html: string;
@@ -47,11 +55,37 @@ export function CodeView({ path, text }: { path: string; text: string }) {
     }
     return html.split("\n");
   }, [path, text]);
+
+  useEffect(() => {
+    setTarget(/^#L(\d+)$/.exec(location.hash)?.[1]);
+  }, [path]);
+  useEffect(() => {
+    if (target)
+      document
+        .getElementById(`L${target}`)
+        ?.scrollIntoView({ block: "center" });
+  }, [target, path]);
+
   return (
     <pre className="codeview hljs" aria-label={path}>
       {lines.map((line, i) => (
-        <div className="cline" key={i}>
-          <span className="ln">{i + 1}</span>
+        <div
+          className={`cline${target === String(i + 1) ? " hl" : ""}`}
+          id={`L${i + 1}`}
+          key={i}
+        >
+          <a
+            className="ln"
+            href={`#L${i + 1}`}
+            onClick={(e) => {
+              e.preventDefault();
+              history.replaceState(null, "", `#L${i + 1}`);
+              setTarget(String(i + 1));
+            }}
+            aria-label={`Line ${i + 1}`}
+          >
+            {i + 1}
+          </a>
           <span dangerouslySetInnerHTML={{ __html: line || " " }} />
         </div>
       ))}

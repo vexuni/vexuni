@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useT } from "../lib/i18n";
 import { Icon } from "./icons";
@@ -233,6 +233,48 @@ export function Modal({
       </div>
     </div>
   );
+}
+
+function BoundaryFallback({ error, onReset }: { error: Error; onReset: () => void }) {
+  const { t } = useT();
+  return (
+    <div className="panel">
+      <Empty
+        icon="alert"
+        title={t("err.boundary")}
+        body={error.message || t("err.boundaryBody")}
+        action={
+          <button className="btn" onClick={onReset}>
+            {t("err.retry")}
+          </button>
+        }
+      />
+    </div>
+  );
+}
+
+/** Render crash barrier: without it a single bad page unmounts the whole
+ *  SPA and strands the user on a blank screen. The boundary keeps the shell
+ *  alive and offers a retry; keying it by route lets navigation recover. */
+export class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  render() {
+    const { error } = this.state;
+    if (error)
+      return (
+        <BoundaryFallback
+          error={error}
+          onReset={() => this.setState({ error: null })}
+        />
+      );
+    return this.props.children;
+  }
 }
 
 /** Status pill with semantic tone for issues / merges / CI runs. */
