@@ -131,6 +131,7 @@ function SecurityPage() {
       await api.post("/password", {
         current_password: d.current,
         new_password: d.password,
+        otp: d.otp || "",
       });
       form.reset();
       setMsg("");
@@ -152,6 +153,13 @@ function SecurityPage() {
           </Field>
           <Field label={t("account.new")} hint={t("auth.passwordHint")}>
             <input name="password" type="password" required minLength={12} autoComplete="new-password" />
+          </Field>
+          <Field label={t("auth.otp")} optional>
+            <input
+              name="otp"
+              autoComplete="one-time-code"
+              placeholder={t("auth.otpHint")}
+            />
           </Field>
           <button className="btn primary">{t("common.save")}</button>
         </form>
@@ -313,7 +321,12 @@ function TokensPage() {
     try {
       const r = await api.post<{ id: string; token: string }>("/tokens", {
         name: d.name || "token",
-        scopes: d.scopes === "write" ? ["read", "write"] : ["read"],
+        // The API takes a singular scope enum; unknown keys are dropped, so a
+        // misspelled field would silently mint a write token either way.
+        scope: d.scope === "write" ? "write" : "read",
+        // Minting is step-up protected — without an OTP field, MFA accounts
+        // can never satisfy the fresh-factor check.
+        otp: d.otp || "",
       });
       setFresh(r.token);
       setCreating(false);
@@ -337,7 +350,13 @@ function TokensPage() {
       <div className="panel">
         <div className="panelhead">
           <strong>{t("tokens.title")}</strong>
-          <button className="btn small" onClick={() => setCreating(true)}>
+          <button
+            className="btn small"
+            onClick={() => {
+              setErr2("");
+              setCreating(true);
+            }}
+          >
             <Icon name="plus" /> {t("tokens.new")}
           </button>
         </div>
@@ -394,10 +413,17 @@ function TokensPage() {
               <input name="name" required autoFocus placeholder="ci-deploy" />
             </Field>
             <Field label={t("tokens.scope")}>
-              <select name="scopes" defaultValue="read">
+              <select name="scope" defaultValue="read">
                 <option value="read">{t("tokens.scope.read")}</option>
                 <option value="write">{t("tokens.scope.write")}</option>
               </select>
+            </Field>
+            <Field label={t("auth.otp")} optional>
+              <input
+                name="otp"
+                autoComplete="one-time-code"
+                placeholder={t("auth.otpHint")}
+              />
             </Field>
           </form>
         </Modal>
