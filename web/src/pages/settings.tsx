@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { NavLink, Navigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { api } from "../lib/api";
 import { useApi } from "../lib/hooks";
 import { useAuth } from "../lib/auth";
@@ -23,7 +23,6 @@ import {
   passkeySupported,
   type CreationOptions,
 } from "../lib/webauthn";
-import { Routes, Route } from "react-router-dom";
 
 interface Passkey {
   id: string;
@@ -67,7 +66,7 @@ function SettingsShell({
   );
 }
 
-function ProfilePage() {
+export function ProfilePage() {
   const { t } = useT();
   const { user, refresh } = useAuth();
   const { data: profile } = useApi<{ user?: { display_name?: string; bio?: string } }>(
@@ -115,7 +114,7 @@ function ProfilePage() {
   );
 }
 
-function SecurityPage() {
+export function SecurityPage() {
   const { t } = useT();
   const [msg, setMsg] = useState("");
   const toast = useToast();
@@ -305,7 +304,7 @@ function PasskeyPanel() {
   );
 }
 
-function TokensPage() {
+export function TokensPage() {
   const { t } = useT();
   const { data, error, loading, reload } = useApi<{ tokens: Token[] }>("/tokens");
   const [creating, setCreating] = useState(false);
@@ -429,16 +428,5 @@ function TokensPage() {
         </Modal>
       )}
     </SettingsShell>
-  );
-}
-
-export function SettingsRoutes() {
-  return (
-    <Routes>
-      <Route index element={<Navigate to="/settings/profile" replace />} />
-      <Route path="profile" element={<ProfilePage />} />
-      <Route path="security" element={<SecurityPage />} />
-      <Route path="tokens" element={<TokensPage />} />
-    </Routes>
   );
 }
