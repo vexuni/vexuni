@@ -51,6 +51,24 @@ test("password hashes are salted and verified; equality includes length", async 
   assert.equal(equal("abc", "abc\0"), false);
   assert.equal(equal("abc", "abd"), false);
 });
+test("verification honors the stored KDF parameters and rejects malformed rows", async () => {
+  const salt = "a".repeat(32),
+    rotated = await passwordHash("a-long-test-password", salt, 1000);
+  assert.match(rotated, /^pbkdf2:1000:/);
+  assert.equal(await verifyPassword("a-long-test-password", rotated), true);
+  assert.equal(await verifyPassword("wrong-password", rotated), false);
+  for (const stored of [
+    "",
+    "pbkdf2",
+    "pbkdf2:100000:" + salt,
+    "pbkdf2:0:" + salt + ":" + "b".repeat(64),
+    "pbkdf2:2000000:" + salt + ":" + "b".repeat(64),
+    "pbkdf2:100000:not-hex-salt:" + "b".repeat(64),
+    "scrypt:100000:" + salt + ":" + "b".repeat(64),
+    rotated.slice(0, -1) + "0",
+  ])
+    assert.equal(await verifyPassword("a-long-test-password", stored), false);
+});
 test("streaming request limit cannot be bypassed by omitted content-length", async () => {
   const chunks = [new Uint8Array(3), new Uint8Array(4)];
   const stream = new ReadableStream({

@@ -25,6 +25,7 @@ import {
   consumeFactor,
   stepUp,
   passwordProof,
+  securityLimit,
 } from "./account";
 import { registerCollaboration } from "./collaboration";
 import { registerCIRoutes } from "./ci";
@@ -598,6 +599,12 @@ app.post("/api/setup", async (c) => {
     c,
     userInput.extend({ secret: z.string().min(1).max(256) }),
   );
+  // Before initialization this is the only unauthenticated secret check on the
+  // surface, so it carries the same attempt cap as the other recovery paths.
+  await securityLimit(
+    c.env,
+    "setup:" + (await digest(c.req.header("cf-connecting-ip") || "local")),
+  );
   if (
     !c.env.BOOTSTRAP_SECRET ||
     !equal(await digest(b.secret), await digest(c.env.BOOTSTRAP_SECRET))
@@ -646,6 +653,15 @@ app.post("/api/login", async (c) => {
     .first<{ attempts: number }>();
   if ((limit?.attempts || 0) > 20)
     fail(429, "Too many sign-in attempts; retry in ten minutes");
+  // The per-IP bucket slows password spraying; a second bucket keyed on the
+  // account covers credential stuffing spread across many addresses. It can
+  // briefly throttle one victim's password login — recovery, WebAuthn and SSO
+  // paths stay open — which is the accepted price of closing the stuffing gap.
+  // The key uses the lookup-normalized name or case variants would slip it.
+  await securityLimit(
+    c.env,
+    "login:user:" + (await digest(b.username.toLowerCase())),
+  );
   const user = await c.env.DB.prepare("SELECT * FROM users WHERE username=?")
     .bind(b.username.toLowerCase())
     .first<

@@ -75,9 +75,13 @@ export async function digest(value: string | Uint8Array) {
 export function randomToken() {
   return "vx_" + hex(crypto.getRandomValues(new Uint8Array(32)).buffer);
 }
+const HASH_ITERATIONS = 100000;
+// The stored string is self-describing (scheme:iterations:salt:hash) so a cost
+// rotation never strands accounts the way a parameter pinned in code would.
 export async function passwordHash(
   password: string,
   salt = hex(crypto.getRandomValues(new Uint8Array(16)).buffer),
+  iterations = HASH_ITERATIONS,
 ) {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -90,27 +94,45 @@ export async function passwordHash(
     {
       name: "PBKDF2",
       salt: new TextEncoder().encode(salt),
-      iterations: 100000,
+      iterations,
       hash: "SHA-256",
     },
     key,
     256,
   );
-  return `pbkdf2:100000:${salt}:${hex(hash)}`;
+  return `pbkdf2:${iterations}:${salt}:${hex(hash)}`;
 }
 export function equal(a: string, b: string) {
+  // WebCrypto offers no constant-time compare. One accumulator folds length and
+  // content differences into a single result; callers compare fixed-length
+  // digests, so worst-case cost stays uniform either way.
   let mismatch = a.length ^ b.length;
   for (let i = 0; i < Math.max(a.length, b.length); i++)
     mismatch |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   return mismatch === 0;
 }
 export async function verifyPassword(password: string, stored: string) {
-  return equal(await passwordHash(password, stored.split(":")[2]), stored);
+  const [scheme, iter, salt, hash] = stored.split(":");
+  const iterations = Number(iter);
+  // Derive with the row's declared parameters — but only inside sane bounds, so
+  // a corrupted row cannot turn the login path into a CPU exhaustion oracle.
+  if (
+    scheme !== "pbkdf2" ||
+    !Number.isSafeInteger(iterations) ||
+    iterations < 1000 ||
+    iterations > 1000000 ||
+    !/^[0-9a-f]{32}$/.test(salt || "") ||
+    !/^[0-9a-f]{64}$/.test(hash || "")
+  )
+    return false;
+  return equal(await passwordHash(password, salt, iterations), stored);
 }
 export async function boundedBody(
   request: Pick<Request, "headers" | "body">,
   max: number,
 ): Promise<Uint8Array> {
+  // Content-Length is only a fast reject — it may be absent or understate the
+  // real stream. The running total below is the actual bound.
   if (Number(request.headers.get("content-length") || 0) > max)
     fail(413, "Request too large");
   if (!request.body) return new Uint8Array();
