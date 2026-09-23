@@ -55,7 +55,7 @@ export function RepoLayout() {
 
   if (loading) {
     return (
-      <Shell crumbs={crumbs}>
+      <Shell crumbs={crumbs} wide>
         <div className="titlebar">
           <Skeleton className="sk-w-40" />
         </div>
@@ -65,7 +65,7 @@ export function RepoLayout() {
   }
   if (error || !repo) {
     return (
-      <Shell crumbs={crumbs}>
+      <Shell crumbs={crumbs} wide>
         <ErrorBox error={error || new Error("404")} onRetry={reload} />
       </Shell>
     );
@@ -75,7 +75,7 @@ export function RepoLayout() {
     urls?.url || `${location.origin}/${ns}/${name}.git`;
 
   return (
-    <Shell crumbs={crumbs}>
+    <Shell crumbs={crumbs} wide>
       <div className="repo-head">
         <div className="titlebar">
           <div>

@@ -34,16 +34,16 @@ export function AdminPage() {
 
   const o = overview.data;
   return (
-    <Shell crumbs={[{ label: t("admin.title") }]}>
+    <Shell crumbs={[{ label: t("admin.title") }]} wide>
       <PageTitle title={t("admin.title")} />
       {o && (
-        <div className="stats">
+        <div className="metrics">
           {(["users", "repositories", "workspaces", "issues"] as const).map(
             (k) =>
               o[k] !== undefined && (
-                <div className="stat" key={k}>
-                  <div className="lbl">{t(`admin.${k}`)}</div>
-                  <div className="num">{o[k]}</div>
+                <div className="metric" key={k}>
+                  <span className="lbl">{t(`admin.${k}`)}</span>
+                  <span className="num">{o[k]}</span>
                 </div>
               ),
           )}

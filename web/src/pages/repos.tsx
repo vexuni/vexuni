@@ -39,113 +39,125 @@ export function ReposPage() {
           )
         }
       />
-      {repos && (
-        <div className="stats">
-          <div className="stat">
-            <div className="lbl">{t("repos.statList")}</div>
-            <div className="num">
-              {repos.length}
-              <small>{t("repos.statUnit")}</small>
+      <div className="home-layout">
+        <div className="home-main">
+          <form className="toolbar" action="/" method="get">
+            <div className="search">
+              <Icon name="search" />
+              <input
+                name="q"
+                type="search"
+                defaultValue={q}
+                placeholder={t("repos.searchPh")}
+                aria-label={t("common.search")}
+              />
             </div>
-          </div>
-          <div className="stat">
-            <div className="lbl">{t("repos.statPublic")}</div>
-            <div className="num">
-              {repos.filter((r) => r.visibility === "public").length}
-              <small>{t("repos.statUnit")}</small>
+            <button className="btn" type="submit">
+              {t("common.search")}
+            </button>
+            <span className="faint small">↓ {t("repos.recent")}</span>
+          </form>
+          {error && <ErrorBox error={error} onRetry={reload} />}
+          {loading && <SkeletonRows />}
+          {repos && (
+            <div className="panel">
+              <div className="panelhead">
+                <strong>{q ? t("repos.results") : t("repos.all")}</strong>
+                <span className="muted small">
+                  {repos.length} {t("repos.statUnit")}
+                </span>
+              </div>
+              {repos.length === 0 ? (
+                <Empty
+                  title={q ? t("repos.emptySearch") : t("repos.emptyTitle")}
+                  body={q ? t("repos.emptySearchBody") : t("repos.emptyBody")}
+                  action={
+                    user && !q ? (
+                      <Link className="btn primary" to="/new">
+                        {t("repos.first")}
+                      </Link>
+                    ) : undefined
+                  }
+                />
+              ) : (
+                repos.map((r) => (
+                  <article className="repo-row" key={r.id}>
+                    <div className="repo-icon">
+                      <Icon name="repo" size={17} />
+                    </div>
+                    <div className="grow">
+                      <Link
+                        className="repo-name"
+                        to={`/${r.namespace}/${encodeURIComponent(r.name)}`}
+                      >
+                        <span className="ns">{r.namespace} / </span>
+                        {r.name}
+                      </Link>
+                      <p className="repo-desc">
+                        {r.description || t("repos.none")}
+                      </p>
+                      <div className="rowmeta">
+                        <span>
+                          <Icon name="branch" size={12} /> {r.default_branch}
+                        </span>
+                        {r.created_at && (
+                          <span>
+                            {t("common.created")} {fullDate(r.created_at)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Pill tone={r.visibility === "private" ? "yellow" : ""}>
+                      {r.visibility === "private"
+                        ? t("common.private")
+                        : t("common.public")}
+                    </Pill>
+                  </article>
+                ))
+              )}
             </div>
-          </div>
-          <div className="stat">
-            <div className="lbl">{t("repos.statPrivate")}</div>
-            <div className="num">
-              {repos.filter((r) => r.visibility === "private").length}
-              <small>{t("repos.statUnit")}</small>
-            </div>
-          </div>
-        </div>
-      )}
-      <form className="toolbar" action="/" method="get">
-        <div className="search">
-          <Icon name="search" />
-          <input
-            name="q"
-            type="search"
-            defaultValue={q}
-            placeholder={t("repos.searchPh")}
-            aria-label={t("common.search")}
-          />
-        </div>
-        <button className="btn" type="submit">
-          {t("common.search")}
-        </button>
-        <span className="faint small">↓ {t("repos.recent")}</span>
-      </form>
-      {error && <ErrorBox error={error} onRetry={reload} />}
-      {loading && <SkeletonRows />}
-      {repos && (
-        <div className="panel">
-          <div className="panelhead">
-            <strong>{q ? t("repos.results") : t("repos.all")}</strong>
-            <span className="muted small">
-              {repos.length} {t("repos.statUnit")}
-            </span>
-          </div>
-          {repos.length === 0 ? (
-            <Empty
-              title={q ? t("repos.emptySearch") : t("repos.emptyTitle")}
-              body={q ? t("repos.emptySearchBody") : t("repos.emptyBody")}
-              action={
-                user && !q ? (
-                  <Link className="btn primary" to="/new">
-                    {t("repos.first")}
-                  </Link>
-                ) : undefined
-              }
+          )}
+          {repos && repos.length > 0 && (
+            <Pager
+              page={page}
+              hasNext={repos.length === 50 || !!data?.next_cursor}
+              make={(p) => `/?page=${p}&q=${encodeURIComponent(q)}`}
             />
-          ) : (
-            repos.map((r) => (
-              <article className="repo-row" key={r.id}>
-                <div className="repo-icon">
-                  <Icon name="repo" size={17} />
-                </div>
-                <div className="grow">
-                  <Link
-                    className="repo-name"
-                    to={`/${r.namespace}/${encodeURIComponent(r.name)}`}
-                  >
-                    <span className="ns">{r.namespace} / </span>
-                    {r.name}
-                  </Link>
-                  <p className="repo-desc">{r.description || t("repos.none")}</p>
-                  <div className="rowmeta">
-                    <span>
-                      <Icon name="branch" size={12} /> {r.default_branch}
-                    </span>
-                    {r.created_at && (
-                      <span>
-                        {t("common.created")} {fullDate(r.created_at)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <Pill tone={r.visibility === "private" ? "yellow" : ""}>
-                  {r.visibility === "private"
-                    ? t("common.private")
-                    : t("common.public")}
-                </Pill>
-              </article>
-            ))
           )}
         </div>
-      )}
-      {repos && repos.length > 0 && (
-        <Pager
-          page={page}
-          hasNext={repos.length === 50 || !!data?.next_cursor}
-          make={(p) => `/?page=${p}&q=${encodeURIComponent(q)}`}
-        />
-      )}
-      <p className="footer-note">{t("repos.footnote")}</p>
+        <aside className="home-side">
+          {repos && (
+            <div className="metrics v">
+              <div className="metric">
+                <span className="lbl">{t("repos.statList")}</span>
+                <span className="num">
+                  {repos.length}
+                  <small>{t("repos.statUnit")}</small>
+                </span>
+              </div>
+              <div className="metric">
+                <span className="lbl">{t("repos.statPublic")}</span>
+                <span className="num">
+                  {repos.filter((r) => r.visibility === "public").length}
+                  <small>{t("repos.statUnit")}</small>
+                </span>
+              </div>
+              <div className="metric">
+                <span className="lbl">{t("repos.statPrivate")}</span>
+                <span className="num">
+                  {repos.filter((r) => r.visibility === "private").length}
+                  <small>{t("repos.statUnit")}</small>
+                </span>
+              </div>
+            </div>
+          )}
+          <div className="side-hint">
+            <kbd>⌘K</kbd>
+            <span>{t("help.palette")}</span>
+          </div>
+          <p className="side-note">{t("repos.footnote")}</p>
+        </aside>
+      </div>
     </Shell>
   );
 }

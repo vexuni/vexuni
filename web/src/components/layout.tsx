@@ -30,6 +30,166 @@ function NavItem({ to, icon, label, end }: { to: string; icon: string; label: st
   );
 }
 
+/** Routes that live at the top level rather than inside /ns/repo. */
+const TOP_LEVEL = new Set([
+  "login",
+  "recover",
+  "new",
+  "search",
+  "notifications",
+  "spaces",
+  "settings",
+  "admin",
+]);
+
+function RailLink({
+  to,
+  icon,
+  label,
+  end,
+  forceActive,
+}: {
+  to: string;
+  icon: string;
+  label: string;
+  end?: boolean;
+  forceActive?: boolean;
+}) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      data-tip={label}
+      aria-label={label}
+      className={({ isActive }) =>
+        `rail-item${isActive || forceActive ? " active" : ""}`
+      }
+    >
+      <Icon name={icon} size={17} />
+    </NavLink>
+  );
+}
+
+/** Slim desktop rail: anchors only — the command palette carries real navigation. */
+function Rail() {
+  const { t, locale, setLocale } = useT();
+  const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+  const { pathname } = useLocation();
+  const [prefsOpen, setPrefsOpen] = useState(false);
+  const prefsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!prefsOpen) return;
+    const close = (e: MouseEvent) => {
+      if (!prefsRef.current?.contains(e.target as Node)) setPrefsOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPrefsOpen(false);
+    };
+    document.addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", close);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [prefsOpen]);
+
+  const segs = pathname.split("/").filter(Boolean);
+  const inRepo = segs.length >= 2 && !TOP_LEVEL.has(segs[0]);
+  const prefsTip = `${t("common.language")} / ${t("common.theme")}`;
+
+  return (
+    <nav className="rail" aria-label={t("nav.section.workspace")}>
+      <Link to="/" className="rail-logo" data-tip="vexuni" aria-label="vexuni">
+        <span className="prompt">$</span>
+        <span className="cursor" aria-hidden="true" />
+      </Link>
+      <div className="rail-sep" />
+      <RailLink
+        to="/"
+        icon="repo"
+        label={t("nav.projects")}
+        end
+        forceActive={inRepo}
+      />
+      <RailLink to="/search" icon="search" label={t("nav.search")} />
+      {user && (
+        <>
+          <RailLink to="/notifications" icon="bell" label={t("nav.notifications")} />
+          <RailLink to="/spaces" icon="users" label={t("nav.spaces")} />
+        </>
+      )}
+      <div className="rail-flex" />
+      {user && (
+        <RailLink to="/settings" icon="gear" label={t("nav.section.settings")} />
+      )}
+      {user?.admin && (
+        <RailLink to="/admin" icon="lock" label={t("nav.admin")} />
+      )}
+      <a
+        className="rail-item"
+        href="/docs"
+        target="_blank"
+        rel="noreferrer"
+        data-tip={t("nav.docs")}
+        aria-label={t("nav.docs")}
+      >
+        <Icon name="book" size={17} />
+      </a>
+      <a
+        className="rail-item"
+        href="/source.tar.gz"
+        download
+        data-tip={t("nav.source")}
+        aria-label={t("nav.source")}
+      >
+        <Icon name="download" size={17} />
+      </a>
+      <div className="rail-sep" />
+      <div className="rail-menu-wrap" ref={prefsRef}>
+        <button
+          className="rail-item"
+          data-tip={prefsTip}
+          aria-label={prefsTip}
+          aria-haspopup="menu"
+          aria-expanded={prefsOpen}
+          onClick={() => setPrefsOpen(!prefsOpen)}
+        >
+          <Icon name="globe" size={17} />
+        </button>
+        {prefsOpen && (
+          <div className="menu rail-menu" role="menu">
+            <div className="rail-field">
+              <label htmlFor="rail-lang">{t("common.language")}</label>
+              <select
+                id="rail-lang"
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as Locale)}
+              >
+                <option value="zh-CN">简体中文</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div className="rail-field">
+              <label htmlFor="rail-theme">{t("common.theme")}</label>
+              <select
+                id="rail-theme"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as Theme)}
+              >
+                <option value="auto">{t("theme.auto")}</option>
+                <option value="light">{t("theme.light")}</option>
+                <option value="dark">{t("theme.dark")}</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
+    </nav>
+  );
+}
+
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t, locale, setLocale } = useT();
   const { theme, setTheme } = useTheme();
@@ -195,13 +355,15 @@ function ShortcutsHelp({ onClose }: { onClose: () => void }) {
   );
 }
 
-/** App frame: sidebar + sticky topbar + content column. */
+/** App frame: icon rail + drawer (mobile) + sticky topbar + content column. */
 export function Shell({
   crumbs,
   children,
+  wide,
 }: {
   crumbs: { label: string; to?: string }[];
   children: ReactNode;
+  wide?: boolean;
 }) {
   const { t } = useT();
   const { user } = useAuth();
@@ -232,7 +394,11 @@ export function Shell({
 
   return (
     <div className="shell">
+      <Rail />
       <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
+      {navOpen && (
+        <div className="drawer-veil" onClick={() => setNavOpen(false)} />
+      )}
       <div className="main">
         <header className="topbar">
           <div className="breadcrumb">
@@ -254,16 +420,16 @@ export function Shell({
               </span>
             ))}
           </div>
+          <button
+            className="search-trigger"
+            onClick={() => setPalOpen(true)}
+            aria-label={t("top.search")}
+          >
+            <Icon name="search" size={14} />
+            <span className="st-label">{t("top.search")}</span>
+            <kbd>⌘K</kbd>
+          </button>
           <div className="right">
-            <button
-              className="search-trigger"
-              onClick={() => setPalOpen(true)}
-              aria-label={t("top.search")}
-            >
-              <Icon name="search" size={14} />
-              <span className="st-label">{t("top.search")}</span>
-              <kbd>⌘K</kbd>
-            </button>
             <Pill>{t("top.selfhosted")}</Pill>
             {user ? (
               <UserMenu />
@@ -274,7 +440,7 @@ export function Shell({
             )}
           </div>
         </header>
-        <div className="content">{children}</div>
+        <div className={`content${wide ? " wide" : ""}`}>{children}</div>
       </div>
       <CommandPalette open={palOpen} onClose={() => setPalOpen(false)} />
       {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
