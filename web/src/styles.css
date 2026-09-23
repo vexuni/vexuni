@@ -453,6 +453,9 @@ svg.icon {
   gap: 16px;
   margin-bottom: 20px;
 }
+.titlebar > div:first-child {
+  min-width: 0;
+}
 .titlebar h1 {
   font-size: 26px;
   letter-spacing: -0.02em;
@@ -696,6 +699,10 @@ textarea {
   gap: 13px;
   padding: 15px 16px;
   border-bottom: 1px solid var(--line);
+  transition: background 0.15s ease;
+}
+.repo-row:hover {
+  background: var(--surface-2);
 }
 .repo-row:last-child {
   border-bottom: 0;
@@ -844,6 +851,10 @@ textarea {
 }
 .repo-head .repo-name {
   font-size: 22px;
+  overflow-wrap: anywhere;
+}
+.repo-meta {
+  margin-top: 8px;
 }
 .filebar {
   position: sticky;
@@ -889,6 +900,10 @@ textarea {
 .filetree .row {
   padding: 8px 14px;
   font-size: 13.5px;
+  transition: background 0.12s ease;
+}
+.filetree .row:hover {
+  background: var(--surface-2);
 }
 .filetree .row a {
   color: var(--ink);
@@ -1131,11 +1146,20 @@ textarea {
   padding: 56px 24px;
   color: var(--ink-2);
 }
+.empty > div:first-child {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  margin-bottom: 12px;
+}
 .empty .icon {
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   color: var(--ink-3);
-  margin-bottom: 10px;
 }
 .empty h2 {
   font-family: var(--serif);
@@ -1166,13 +1190,28 @@ textarea {
   to { transform: rotate(360deg); }
 }
 .errbox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
   border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line));
+  border-left-width: 3px;
   background: var(--danger-soft);
   color: var(--danger);
   border-radius: var(--r-sm);
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 14px;
+}
+.errbox .icon {
+  flex: none;
+}
+.errbox span {
+  flex: 1;
+  min-width: 0;
+}
+.errbox .btn {
+  margin-left: auto;
+  flex: none;
 }
 .notebox {
   border: 1px solid var(--line);
@@ -1365,6 +1404,16 @@ textarea {
   padding: 7px 10px;
   overflow: hidden;
 }
+.setup-cmds {
+  display: grid;
+  gap: 8px;
+  width: min(520px, 100%);
+  margin: 0 auto;
+  text-align: left;
+}
+.setup-cmds .clone-box {
+  background: var(--surface);
+}
 .clone-box code {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1516,6 +1565,9 @@ textarea {
   .tabs {
     margin: 0 -16px 18px;
     padding: 0 16px;
+    /* Faded right edge hints that the strip scrolls on narrow screens. */
+    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+    mask-image: linear-gradient(to right, #000 88%, transparent);
   }
   .topbar {
     padding: 0 14px;

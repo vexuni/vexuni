@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Outlet, useOutletContext, useParams } from "react-router-dom";
+import { Link, Outlet, useOutletContext, useParams } from "react-router-dom";
 import { repoPath } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
+import { fullDate } from "../../lib/format";
 import type { Repository, RepoURL } from "../../lib/types";
 import { Shell, Tabs } from "../../components/layout";
-import { CopyButton, ErrorBox, Pill, Skeleton, SkeletonRows } from "../../components/ui";
+import { CopyButton, Empty, ErrorBox, Pill, Skeleton, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 
 export interface RepoCtx {
@@ -64,9 +65,28 @@ export function RepoLayout() {
     );
   }
   if (error || !repo) {
+    // A missing or private repo is an expected state, not an exception — give
+    // it the same designed treatment as the other empty states. Other failures
+    // keep the retry affordance.
+    const missing = error ? /not found/i.test(error.message) : true;
     return (
       <Shell crumbs={crumbs} wide>
-        <ErrorBox error={error || new Error("404")} onRetry={reload} />
+        {missing ? (
+          <div className="panel">
+            <Empty
+              icon="repo"
+              title={t("err.notFound")}
+              body={t("err.notFoundBody")}
+              action={
+                <Link className="btn" to="/">
+                  {t("err.backHome")}
+                </Link>
+              }
+            />
+          </div>
+        ) : (
+          <ErrorBox error={error || new Error("404")} onRetry={reload} />
+        )}
       </Shell>
     );
   }
@@ -90,6 +110,16 @@ export function RepoLayout() {
               {repo.archived_at && <Pill tone="red">{t("repo.archived")}</Pill>}
             </h1>
             {repo.description && <p className="sub">{repo.description}</p>}
+            <div className="rowmeta repo-meta">
+              <span>
+                <Icon name="branch" size={12} /> {repo.default_branch}
+              </span>
+              {repo.created_at && (
+                <span>
+                  {t("common.created")} {fullDate(repo.created_at)}
+                </span>
+              )}
+            </div>
           </div>
           <div className="btn-group menu-wrap">
             <button className="btn" onClick={() => setCloneOpen(!cloneOpen)}>

@@ -63,3 +63,8 @@ export const api = {
 /** Repository-scoped endpoint prefix. */
 export const repoPath = (namespace: string, name: string) =>
   `/repos/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`;
+
+/** The API reports a missing ref as an error, but on a repository with no
+ * commits that is a normal state — callers render empty states, not failures. */
+export const revisionMissing = (error?: Error) =>
+  !!error && /revision not found/i.test(error.message);

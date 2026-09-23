@@ -1,14 +1,37 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { qs, repoPath } from "../../lib/api";
+import { qs, repoPath, revisionMissing } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
 import { bytes } from "../../lib/format";
 import type { Blob, Branch, Tree } from "../../lib/types";
 import { CodeView } from "../../components/code";
 import { Readme } from "../../components/markdown";
-import { Empty, ErrorBox, SkeletonRows } from "../../components/ui";
+import { CopyButton, Empty, ErrorBox, SkeletonRows } from "../../components/ui";
 import { Icon } from "../../components/icons";
 import { useRepo } from "./layout";
+
+function EmptyRepo({ ns, name }: { ns: string; name: string }) {
+  const { t } = useT();
+  const cloneURL = `${location.origin}/${ns}/${name}.git`;
+  const cmds = [`git clone ${cloneURL}`, `git push ${cloneURL} HEAD:main`];
+  return (
+    <Empty
+      icon="repo"
+      title={t("repo.emptyRepo")}
+      body={t("repo.emptyHint")}
+      action={
+        <div className="setup-cmds">
+          {cmds.map((c) => (
+            <div className="clone-box" key={c}>
+              <code>{c}</code>
+              <CopyButton text={c} />
+            </div>
+          ))}
+        </div>
+      }
+    />
+  );
+}
 
 function Crumbs({
   root,
@@ -83,6 +106,11 @@ export function RepoCodePage() {
     repoPath(ns, name) + `/tree${qs({ ref, path: subpath })}`,
     [ns, name, ref, subpath],
   );
+  // The branch list is the ground truth for "no commits yet"; the tree error
+  // is a fallback while it is still loading.
+  const emptyRepo =
+    branches?.branches.length === 0 ||
+    (revisionMissing(error) && !branches?.branches.length);
   const readmeEntry = tree?.entries.find(
     (e) => e.type === "blob" && /^readme(\.(md|txt|org))?$/i.test(e.name),
   );
@@ -102,7 +130,9 @@ export function RepoCodePage() {
   return (
     <>
       <div className="filebar">
-        {branches && <BranchPicker branches={branches.branches} refName={ref} />}
+        {branches && branches.branches.length > 0 && (
+          <BranchPicker branches={branches.branches} refName={ref} />
+        )}
         <Crumbs root={base} base={`${base}/tree`} path={subpath} refName={ref} />
         <span className="mark-read" />
         <Link className="faint small" to={`${base}/branches`}>
@@ -116,19 +146,15 @@ export function RepoCodePage() {
         </Link>
       </div>
       <div className="filetree">
-        {error && <ErrorBox error={error} />}
-        {loading && <SkeletonRows />}
-        {tree && sorted.length === 0 && (
-          <Empty
-            icon="repo"
-            title={t("repo.emptyRepo")}
-            body={t("repo.emptyHint")}
-            action={
-              <div className="clone-box">
-                <code>git push {location.origin}/{ns}/{name}.git HEAD:main</code>
-              </div>
-            }
-          />
+        {emptyRepo && <EmptyRepo ns={ns} name={name} />}
+        {!emptyRepo && (
+          <>
+            {error && <ErrorBox error={error} />}
+            {loading && <SkeletonRows />}
+            {tree && sorted.length === 0 && (
+              <Empty icon="repo" title={t("repo.emptyRepo")} body={t("repo.emptyHint")} />
+            )}
+          </>
         )}
         {sorted.map((e) => {
           const next = subpath ? `${subpath}/${e.name}` : e.name;
@@ -197,7 +223,12 @@ export function RepoFilePage() {
         </Link>
       </div>
       <div className="codewrap">
-        {error && <ErrorBox error={error} />}
+        {error &&
+          (revisionMissing(error) ? (
+            <EmptyRepo ns={ns} name={name} />
+          ) : (
+            <ErrorBox error={error} />
+          ))}
         {loading && <SkeletonRows />}
         {blob &&
           (blob.binary ? (

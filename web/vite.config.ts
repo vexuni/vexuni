@@ -21,9 +21,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // API_PROXY lets a dev frontend run against a staging/live API when no
+    // local worker is running; default stays the local wrangler port.
     proxy: {
-      "/api": "http://localhost:8787",
-      "/docs": "http://localhost:8787",
+      "/api": process.env.API_PROXY || "http://localhost:8787",
+      "/docs": process.env.API_PROXY || "http://localhost:8787",
     },
   },
 });

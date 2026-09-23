@@ -40,14 +40,14 @@ export function ErrorBox({ error, onRetry }: { error: Error; onRetry?: () => voi
   const { t } = useT();
   return (
     <div className="errbox" role="alert">
-      <strong>{t("err.load")}:</strong> {error.message}
+      <Icon name="alert" size={15} />
+      <span>
+        <strong>{t("err.load")}:</strong> {error.message}
+      </span>
       {onRetry && (
-        <>
-          {" "}
-          <button className="btn small" onClick={onRetry}>
-            {t("err.retry")}
-          </button>
-        </>
+        <button className="btn small" onClick={onRetry}>
+          {t("err.retry")}
+        </button>
       )}
     </div>
   );

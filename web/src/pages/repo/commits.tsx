@@ -1,5 +1,5 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { qs, repoPath } from "../../lib/api";
+import { qs, repoPath, revisionMissing } from "../../lib/api";
 import { useApi } from "../../lib/hooks";
 import { useT } from "../../lib/i18n";
 import { fullDate, shortSha } from "../../lib/format";
@@ -40,7 +40,12 @@ export function CommitsPage() {
           {t("commits.forPath")}: <code>{path}</code>
         </div>
       )}
-      {error && <ErrorBox error={error} />}
+      {error &&
+        (revisionMissing(error) ? (
+          <Empty icon="commit" title={t("commits.empty")} />
+        ) : (
+          <ErrorBox error={error} />
+        ))}
       {loading && <SkeletonRows />}
       {commits && commits.length === 0 && (
         <Empty icon="commit" title={t("commits.empty")} />
